@@ -62,21 +62,17 @@ const statusObj: StatusObj = {
 }
 
 const TableStickyHeader = ({
-  reloadPageValue,
   rawStocksData,
-  handleStockCheck
+  handleStockCheck,
+  isPriceLoading
 }: {
-  reloadPageValue: boolean
   rawStocksData: Data[]
   handleStockCheck: (_id: string, token: string, name: string, exch_seg: string) => void
+  isPriceLoading: boolean
 }) => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const [formattedRows, setFormattedRows] = useState<RawFormat[]>([])
-
-  useEffect(() => {
-    setPage(0)
-  }, [reloadPageValue])
 
   useEffect(() => {
     // if (rawStocksData.length > 0) {
@@ -101,8 +97,13 @@ const TableStickyHeader = ({
           />
         ),
         _id: (
-          <Button variant='contained' color='primary' onClick={() => handleStockCheck(_id, token, name, exch_seg)}>
-            Check
+          <Button
+            variant='contained'
+            color='primary'
+            onClick={() => handleStockCheck(_id, token, name, exch_seg)}
+            disabled={status === 'approved' || status === 'rejected'}
+          >
+            {isPriceLoading ? 'Loading...' : 'Check'}
           </Button>
         )
       })

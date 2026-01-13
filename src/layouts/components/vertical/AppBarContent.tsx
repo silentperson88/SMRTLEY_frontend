@@ -19,9 +19,12 @@ import ModeToggler from 'src/@core/layouts/components/shared-components/ModeTogg
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
 import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import { Button } from '@mui/material'
-import useSWR, { mutate } from 'swr'
-import { axiosService, getService } from 'src/@core/utils/api-service'
-import { useEffect, useState } from 'react'
+import { mutate } from 'swr'
+import { useState } from 'react'
+import { ENDURL } from 'src/utils/constants/endurl.utils'
+import { useMutationSWR, useSimpleSWR } from 'src/hooks/swr/swrhooks'
+import { getErrorMessage } from 'src/api/axios/errorhandler'
+import { useSnackbar } from '../SnackbarContext'
 
 interface Props {
   hidden: boolean
@@ -34,9 +37,13 @@ interface serverStatus {
   isOnline: boolean
 }
 
+interface LoginResponse {
+  status: number
+}
+
 const AppBarContent = (props: Props) => {
-  const [totp, setTotp] = useState<string>("")
-  const [refresh, setRefresh] = useState<boolean>(false)
+  const [totp, setTotp] = useState<string>('')
+  const { showSnackbar } = useSnackbar()
 
   // ** Props
   const { hidden, settings, saveSettings, toggleNavVisibility } = props
@@ -44,30 +51,21 @@ const AppBarContent = (props: Props) => {
   // ** Hook
   const hiddenSm = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
 
-  const { data, error, isLoading } = useSWR<serverStatus>(
-    '/tokens/on', // Always fetch on first render
-    getService,
-    {
-      refreshInterval: 600000, // Refresh every 10 minutes
-      revalidateOnFocus: false // Optional: Prevent revalidation on window focus
-    }
-  )
+  const { data } = useSimpleSWR<serverStatus>(ENDURL.GET_SERVER_STATUS)
 
-  useEffect(() => {
-    console.log(data, error, isLoading)
-  }, [data, error, isLoading])
-
-  useEffect(() => {
-    if (refresh) {
-      mutate('/tokens/on')
-    }
-  }, [refresh])
+  const { trigger, isMutating } = useMutationSWR<LoginResponse, { totp: string }>(ENDURL.POST_SMART_LOGIN)
 
   const handleAngelLogin = async () => {
-    console.log('here')
-    const res: any = await axiosService.post('/tokens', { totp }).catch(err => err.response)
-    if (res.status === 200) setRefresh(true)
-    else console.log(res)
+    try {
+      await trigger({ totp })
+
+      showSnackbar('Login successful', 'success')
+
+      // Manually revalidate GET only on success
+      mutate(ENDURL.GET_SERVER_STATUS)
+    } catch (err) {
+      showSnackbar(getErrorMessage(err), 'error')
+    }
   }
 
   return (
@@ -120,7 +118,7 @@ const AppBarContent = (props: Props) => {
               value={totp}
               onChange={e => setTotp(e.target.value)}
             />
-            <Button variant='contained' sx={{ marginRight: 3.5 }} onClick={handleAngelLogin}>
+            <Button variant='contained' sx={{ marginRight: 3.5 }} onClick={handleAngelLogin} disabled={isMutating}>
               Start
             </Button>
           </>

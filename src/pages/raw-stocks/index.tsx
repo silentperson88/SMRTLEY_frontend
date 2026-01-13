@@ -4,15 +4,19 @@ import Link from '@mui/material/Link'
 import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
-import { Alert, AlertColor } from '@mui/material'
+import { LinearProgress } from '@mui/material'
 
 // ** Demo Components Imports
 import RawStocksHeader from 'src/views/tables/RawStocks'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import { InputAdornment, Snackbar, TextField } from '@mui/material'
+import { useState } from 'react'
+import { InputAdornment, TextField } from '@mui/material'
 import { Magnify } from 'mdi-material-ui'
-import DraggableDialog from 'src/views/modal/showStockOHCL'
+import ReviewRawStock from 'src/views/modal/ReviewRawStock'
+import { useMutationSWR, usePaginatedSWR, usePatchSWR } from 'src/hooks/swr/swrhooks'
+import { ENDURL } from 'src/utils/constants/endurl.utils'
+import { mutate } from 'swr'
+import { useSnackbar } from 'src/layouts/components/SnackbarContext'
+import { getErrorMessage } from 'src/api/axios/errorhandler'
 
 interface StockData {
   symbol: string
@@ -23,7 +27,7 @@ interface StockData {
   name: string
 }
 
-interface checkRawStock {
+interface rawStockPrice {
   exchange: string
   tradingSymbol: string
   symbolToken: string
@@ -34,125 +38,102 @@ interface checkRawStock {
   close: number
 }
 
-function createData(
-  name: string,
-  symbol: string,
-  token: string,
-  exch_seg: string,
-  _id: string,
-  status: string
-): StockData {
-  return { name, symbol, token, exch_seg, _id, status }
+interface stockPriceResponse {
+  data: {
+    fetched: rawStockPrice[]
+    unfetched: [{ message: string }]
+  }
+}
+
+export interface reviewModal {
+  open: boolean
+  name: string
+  data: rawStockPrice[]
+  error: string
 }
 
 const intialliveStockData = {
   open: false,
   name: '',
-  data: []
+  data: [],
+  error: ''
 }
 
-// Define the type for the snackbar data
-interface SnackbarData {
-  open: boolean
-  type: AlertColor // Restrict to 'error' | 'warning' | 'info' | 'success'
-  message: string
+interface updateStatusBody {
+  rawStockId: string
+  status: string
 }
-
-const intialSnackbarData: SnackbarData = {
-  open: false,
-  type: 'success',
-  message: ''
-}
-
-const baseUrl = 'http://localhost:8000/api/v1/admin'
 
 const MUITable = () => {
-  const [liveStock, setLiveStock] =
-    useState<{ open: boolean; name: string; data: Array<checkRawStock> }>(intialliveStockData)
-  const [searchValue, setSearchValue] = useState<string>('')
-  const [reloadPageValue, setReloadPageValue] = useState<boolean>(false)
-  const [rawStocksData, setRawStocksData] = useState<StockData[]>([])
-  const [checkRawStockData, setCheckRawStockData] = useState<checkRawStock[]>([])
+  const page = 1
+  const limit = 50
+  const [openReviewModal, setOpenReviewModal] = useState<reviewModal>(intialliveStockData)
   const [stockId, setStockId] = useState<string>('')
-  const [openSnacker, setOpenSnacker] = useState<SnackbarData>(intialSnackbarData)
+  const [searchValue, setSearchValue] = useState<string>('')
+  const { showSnackbar } = useSnackbar()
 
-  useEffect(() => {
-    console.log('rawStocksData', rawStocksData)
-  }, [rawStocksData])
+  const { data, isLoading } = usePaginatedSWR<StockData[]>(ENDURL.GET_RAW_STOCKS, {
+    page,
+    limit,
+    search: searchValue.length > 1 ? searchValue : ''
+  })
 
-  const handleClose = () => {
-    setLiveStock(intialliveStockData)
-  }
+  const { trigger: checkPrice, isMutating: isLoadingPrice } = useMutationSWR<
+    stockPriceResponse,
+    { mode: string; tokenIds: [string] }
+  >(ENDURL.POST_RAW_STOCK_PRICE)
 
-  const handleFilter = async () => {
-    const res = await axios.get(`${baseUrl}/raw-stocks${searchValue ? `?search=${searchValue}` : ''}`)
+  const { trigger: patch, isMutating } = usePatchSWR<{ message: string }, updateStatusBody>(
+    ENDURL.POST_RAW_STOCK_STATUS
+  )
 
-    if (res.status === 200) {
-      setRawStocksData(res.data.data)
-      setReloadPageValue(v => !v)
-    }
-  }
+  const handleClose = () => setOpenReviewModal(intialliveStockData)
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
     setSearchValue(value)
   }
 
-  useEffect(() => {
-    handleFilter()
-  }, [])
-
   const handleStockCheck = async (_id: string, token: string, name: string) => {
     setStockId(_id)
 
     try {
-      const body = {
+      const body: { mode: string; tokenIds: [string] } = {
         mode: 'OHLC',
         tokenIds: [token]
       }
-      const res = await axios.post(`${baseUrl}/raw-stock-price`, body)
+
+      const res = await checkPrice(body)
       console.log(res)
-      setCheckRawStockData([res.data.data])
-      setLiveStock({ open: true, name, data: res.data.data.data.fetched })
+
+      setOpenReviewModal({
+        open: true,
+        name,
+        data: res.data.fetched.length > 0 ? res.data.fetched : [],
+        error: res.data.unfetched[0]?.message
+      })
     } catch (error) {
       console.error(error)
     }
   }
 
-  const handleAddLiveStock = async () => {
-    const res = await axios
-      .post(`${baseUrl}/stocks`, {
-        rawStockId: stockId
-      })
-      .catch(err => err.response)
-
-    if (res.status === 201) {
-      setOpenSnacker({ open: true, type: 'success', message: 'Stock Added' })
-      handleFilter()
-    } else if (res.status === 409) {
-      setOpenSnacker({ open: true, type: 'error', message: 'Stock already exists' })
-    }
-  }
-
   const handleUpdateStatus = async (status: string) => {
-    const body = {
-      rawStockId: stockId,
-      status
-    }
-    const res = await axios.patch(`${baseUrl}/raw-stock/status`, body)
+    try {
+      const body: updateStatusBody = {
+        rawStockId: stockId,
+        status
+      }
+      await patch(body)
 
-    if (res.status === 201) {
-      setOpenSnacker({
-        open: true,
-        type: status === 'approved' ? 'success' : 'error',
-        message: status === 'approved' ? 'Stock Added' : 'Stock Rejected'
-      })
-      handleFilter()
-    } else if (res.status === 409) {
-      setOpenSnacker({ open: true, type: 'error', message: 'Stock already exists' })
-    }
+      setOpenReviewModal(intialliveStockData)
 
-    setLiveStock(intialliveStockData)
+      showSnackbar('Status updated', 'success')
+
+      // Manually revalidate GET only on success
+      mutate([ENDURL.GET_RAW_STOCKS, { page, limit, search: searchValue }])
+    } catch (err) {
+      showSnackbar(getErrorMessage(err), 'error')
+    }
   }
 
   return (
@@ -176,37 +157,31 @@ const MUITable = () => {
               </InputAdornment>
             )
           }}
-          onKeyPress={e => {
-            if (e.key === 'Enter') {
-              handleFilter()
-            }
-          }}
         />
       </Grid>
 
       <Grid item xs={12}>
         <Card>
           <CardHeader title='Raw Stocks' titleTypographyProps={{ variant: 'h6' }} />
-          <RawStocksHeader
-            reloadPageValue={reloadPageValue}
-            rawStocksData={rawStocksData}
-            handleStockCheck={handleStockCheck}
-          />
+          {isLoading ? (
+            <LinearProgress color='primary' />
+          ) : (
+            <RawStocksHeader
+              rawStocksData={data ?? []}
+              handleStockCheck={handleStockCheck}
+              isPriceLoading={isLoadingPrice}
+            />
+          )}
         </Card>
       </Grid>
-      {liveStock.open && (
-        <DraggableDialog handleClose={handleClose} handleUpdateStatus={handleUpdateStatus} liveStock={liveStock} />
+      {openReviewModal.open && (
+        <ReviewRawStock
+          handleClose={handleClose}
+          handleUpdateStatus={handleUpdateStatus}
+          liveStock={openReviewModal}
+          isLoading={isMutating}
+        />
       )}
-      <Snackbar
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        open={openSnacker.open}
-        autoHideDuration={1200}
-        onClose={() => setOpenSnacker(intialSnackbarData)}
-      >
-        <Alert severity={openSnacker.type} variant='filled' sx={{ width: '100%' }}>
-          {openSnacker.message}
-        </Alert>
-      </Snackbar>
     </Grid>
   )
 }

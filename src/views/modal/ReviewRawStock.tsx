@@ -7,6 +7,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Paper, { PaperProps } from '@mui/material/Paper'
 import Draggable from 'react-draggable'
+import { reviewModal } from 'src/pages/raw-stocks'
 
 function PaperComponent(props: PaperProps) {
   return (
@@ -16,30 +17,14 @@ function PaperComponent(props: PaperProps) {
   )
 }
 
-interface stock {
-  exchange: string
-  tradingSymbol: string
-  symbolToken: string
-  ltp: number
-  open: number
-  high: number
-  low: number
-  close: number
-}
-
-interface liveStock {
-  open: boolean
-  name: string
-  data: Array<stock>
-}
-
 interface modalProps {
   handleClose: () => void
   handleUpdateStatus: (status: string) => void
-  liveStock: liveStock
+  liveStock: reviewModal
+  isLoading: boolean
 }
 
-export default function ShowStockOHCL({ handleClose, handleUpdateStatus, liveStock }: modalProps) {
+export default function ReviewRawStock({ handleClose, handleUpdateStatus, liveStock, isLoading }: modalProps) {
   return (
     <React.Fragment>
       <Dialog
@@ -54,7 +39,7 @@ export default function ShowStockOHCL({ handleClose, handleUpdateStatus, liveSto
               {liveStock.name}
             </DialogTitle>
             <DialogContent>
-              <DialogContentText>No Data Found </DialogContentText>
+              <DialogContentText>{liveStock.error}</DialogContentText>
             </DialogContent>
           </div>
         ) : (
@@ -78,11 +63,11 @@ export default function ShowStockOHCL({ handleClose, handleUpdateStatus, liveSto
           </Button>
           {liveStock.data.length === 0 ? (
             <Button color='error' onClick={() => handleUpdateStatus('rejected')}>
-              Reject
+              {isLoading ? 'Rejecting...' : 'Reject'}
             </Button>
           ) : (
             <Button color='success' onClick={() => handleUpdateStatus('approved')}>
-              Add
+              {isLoading ? 'Adding...' : 'Add'}
             </Button>
           )}
         </DialogActions>
