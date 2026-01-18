@@ -53,11 +53,11 @@ const AppBarContent = (props: Props) => {
 
   const { data } = useSimpleSWR<serverStatus>(ENDURL.GET_SERVER_STATUS)
 
-  const { trigger, isMutating } = useMutationSWR<LoginResponse, { totp: string }>(ENDURL.POST_SMART_LOGIN)
+  const { trigger, isMutating } = useMutationSWR<LoginResponse, { data: string }>(ENDURL.POST_SMART_LOGIN)
 
   const handleAngelLogin = async () => {
     try {
-      await trigger({ totp })
+      await trigger({ data: totp })
 
       showSnackbar('Login successful', 'success')
 
@@ -113,7 +113,7 @@ const AppBarContent = (props: Props) => {
             <TextField
               fullWidth
               label='TOTP'
-              placeholder=''
+              placeholder='TOTP-9:15-15:30'
               size='small'
               value={totp}
               onChange={e => setTotp(e.target.value)}
