@@ -9,7 +9,7 @@ export const ENDURL = {
   GET_RAW_STOCKS: 'admin/raw-stocks',
   GET_RAW_STOCK_BY_ID: 'admin/raw-stock/:id',
   POST_RAW_STOCK: 'admin/raw-stock',
-  POST_RAW_STOCK_STATUS: 'admin/raw-stock/status',
+  POST_RAW_STOCK_STATUS: 'master/create',
   POST_RAW_STOCK_PRICE: 'admin/raw-stock-price',
 
   // Stock Endpoints
