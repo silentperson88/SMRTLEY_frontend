@@ -15,5 +15,8 @@ export const ENDURL = {
   // Stock Endpoints
   GET_ALL_ACTIVE_STOCKS: '/activestock',
   GET_STOCK_BY_SYMBOL: '/stocks/symbol/:symbol',
-  GET_STOCK_BY_ID: '/stocks/:id'
+  GET_STOCK_BY_ID: '/stocks/:id',
+
+  // Stock Fundamental
+  Fetch_STOCK_FUNDAMENTAL: 'fundamentals/fetch'
 }

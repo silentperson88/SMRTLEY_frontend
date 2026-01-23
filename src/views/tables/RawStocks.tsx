@@ -13,7 +13,7 @@ import Chip from '@mui/material/Chip'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 interface Column {
-  id: 'srNo' | 'name' | 'token' | 'ltp' | 'highLow' | 'openClose' | '_id' | 'status'
+  id: 'srNo' | 'name' | 'symbol' | 'token' | 'exch_seg' | '_id' | 'status'
   label: string
   minWidth?: number
   align?: 'right' | 'center'
@@ -23,10 +23,9 @@ interface Column {
 const columns: readonly Column[] = [
   { id: 'srNo', label: 'Sr. No.' },
   { id: 'name', label: 'Name' },
+  { id: 'symbol', label: 'Symbol' },
   { id: 'token', label: 'Token', align: 'center' },
-  { id: 'ltp', label: 'LTP', align: 'center' },
-  { id: 'highLow', label: 'High/Low', align: 'center' },
-  { id: 'openClose', label: 'Open/Close', align: 'center' },
+  { id: 'exch_seg', label: 'Exchange', align: 'right' },
   { id: 'status', label: 'Status', minWidth: 170, align: 'center' },
   { id: '_id', label: 'Action', minWidth: 170, align: 'center' }
 ]
@@ -38,21 +37,14 @@ interface Data {
   exch_seg: string
   _id: string
   status: string
-  ltp?: number
-  open?: number
-  high?: number
-  low?: number
-  close?: number
-  fetched?: boolean
 }
 
 interface RawFormat {
   srNo: JSX.Element
   name: JSX.Element
+  symbol: JSX.Element
   token: JSX.Element
-  ltp: JSX.Element
-  highLow: JSX.Element
-  openClose: JSX.Element
+  exch_seg: JSX.Element
   _id: JSX.Element
   status: JSX.Element
 }
@@ -71,58 +63,24 @@ const statusObj: StatusObj = {
 
 const TableStickyHeader = ({
   rawStocksData,
-  handleStockCheck,
-  isPriceLoading
+  handleStockCheck
 }: {
   rawStocksData: Data[]
-  handleStockCheck: (
-    _id: string,
-    token: string,
-    name: string,
-    exch_seg: string,
-    fetched: boolean,
-    ltp?: number,
-    open?: number,
-    high?: number,
-    low?: number,
-    close?: number
-  ) => void
-  isPriceLoading: boolean
+  handleStockCheck: (_id: string, token: string, name: string, exch_seg: string) => void
 }) => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const [formattedRows, setFormattedRows] = useState<RawFormat[]>([])
 
   useEffect(() => {
+    // if (rawStocksData.length > 0) {
     const temp: RawFormat[] = rawStocksData.map(
-      (
-        { name, symbol, token, exch_seg, _id, close, high, low, ltp, open, status, fetched = false }: Data,
-        index: number
-      ) => ({
+      ({ name, symbol, token, exch_seg, _id, status }: Data, index: number) => ({
         srNo: <Typography>{index + 1}</Typography>,
-        name: (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}>
-            <Typography>{name}</Typography>
-            <Typography variant='caption'>{symbol}</Typography>
-          </div>
-        ),
-        token: (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}>
-            <Typography>{token}</Typography>
-            <Typography variant='caption'>{exch_seg}</Typography>
-          </div>
-        ),
-        ltp: <Typography>{ltp ?? 0}</Typography>,
-        highLow: (
-          <Typography>
-            {high ?? 0}/{low ?? 0}
-          </Typography>
-        ),
-        openClose: (
-          <Typography>
-            {open ?? 0}/{close ?? 0}
-          </Typography>
-        ),
+        name: <Typography>{name}</Typography>,
+        symbol: <Typography>{symbol}</Typography>,
+        token: <Typography>{token}</Typography>,
+        exch_seg: <Typography>{exch_seg}</Typography>,
 
         status: (
           <Chip
@@ -140,10 +98,10 @@ const TableStickyHeader = ({
           <Button
             variant='contained'
             color='primary'
-            onClick={() => handleStockCheck(_id, token, name, exch_seg, fetched, close, high, low, ltp, open)}
+            onClick={() => handleStockCheck(_id, token, name, exch_seg)}
             disabled={status === 'approved' || status === 'rejected'}
           >
-            {fetched ? 'Update' : isPriceLoading ? 'Loading...' : 'Check'}
+            Check
           </Button>
         )
       })

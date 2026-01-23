@@ -33,6 +33,7 @@ const columns: readonly Column[] = [
 ]
 
 interface Data {
+  master_id?: string
   _id: string
   name: string
   symbol: string
@@ -62,10 +63,10 @@ interface RawFormat {
 
 const TableStickyHeader = ({
   rawStocksData,
-  handleOpen
+  handleFetchfundamental
 }: {
   rawStocksData: Data[]
-  handleOpen: (_id: any) => void
+  handleFetchfundamental: (_id: any) => void
 }) => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
@@ -74,7 +75,10 @@ const TableStickyHeader = ({
   useEffect(() => {
     if (rawStocksData.length > 0) {
       const temp: RawFormat[] = rawStocksData.map(
-        ({ _id, name, symbol, token, exchange, ltp, open, high, low, close, percentChange }: Data, index: number) => ({
+        (
+          { name, symbol, token, exchange, ltp, open, high, low, close, percentChange, master_id }: Data,
+          index: number
+        ) => ({
           srNo: <Typography>{index + 1}</Typography>,
           name: (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}>
@@ -95,8 +99,13 @@ const TableStickyHeader = ({
           close: <Typography>{close}</Typography>,
           status: percentChange > 0 ? <Profit color='success' /> : <Loss color='error' />,
           action: (
-            <Button variant='contained' color='primary' onClick={() => handleOpen(_id)}>
-              Add
+            <Button
+              variant='contained'
+              color='primary'
+              style={{ color: '#ffffff' }}
+              onClick={() => handleFetchfundamental(master_id)}
+            >
+              FF
             </Button>
           )
         })
