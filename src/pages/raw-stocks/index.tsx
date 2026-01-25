@@ -62,6 +62,7 @@ const intialliveStockData = {
 interface updateStatusBody {
   rawStockId: string
   status: string
+  screenerUrl?: string
 }
 
 const MUITable = () => {
@@ -78,10 +79,9 @@ const MUITable = () => {
     search: searchValue.length > 1 ? searchValue : ''
   })
 
-  const { trigger: checkPrice, isMutating: isLoadingPrice } = useMutationSWR<
-    stockPriceResponse,
-    { mode: string; tokenIds: [string] }
-  >(ENDURL.POST_RAW_STOCK_PRICE)
+  const { trigger: checkPrice } = useMutationSWR<stockPriceResponse, { mode: string; tokenIds: [string] }>(
+    ENDURL.POST_RAW_STOCK_PRICE
+  )
 
   const { trigger: patch, isMutating } = usePatchSWR<{ message: string }, updateStatusBody>(
     ENDURL.POST_RAW_STOCK_STATUS
@@ -94,13 +94,14 @@ const MUITable = () => {
     setSearchValue(value)
   }
 
-  const handleStockCheck = async (_id: string, token: string, name: string) => {
+  const handleStockCheck = async (_id: string, token: string, name: string, exch_seg: string) => {
     setStockId(_id)
 
     try {
-      const body: { mode: string; tokenIds: [string] } = {
+      const body: { mode: string; tokenIds: [string]; exchange: string } = {
         mode: 'OHLC',
-        tokenIds: [token]
+        tokenIds: [token],
+        exchange: exch_seg
       }
 
       const res = await checkPrice(body)
@@ -117,11 +118,12 @@ const MUITable = () => {
     }
   }
 
-  const handleUpdateStatus = async (status: string) => {
+  const handleUpdateStatus = async (status: string, screenerUrl?: string) => {
     try {
       const body: updateStatusBody = {
         rawStockId: stockId,
-        status
+        status,
+        screenerUrl
       }
       await patch(body)
 
@@ -166,11 +168,7 @@ const MUITable = () => {
           {isLoading ? (
             <LinearProgress color='primary' />
           ) : (
-            <RawStocksHeader
-              rawStocksData={data ?? []}
-              handleStockCheck={handleStockCheck}
-              isPriceLoading={isLoadingPrice}
-            />
+            <RawStocksHeader rawStocksData={data ?? []} handleStockCheck={handleStockCheck} />
           )}
         </Card>
       </Grid>

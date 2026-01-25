@@ -8,6 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Paper, { PaperProps } from '@mui/material/Paper'
 import Draggable from 'react-draggable'
 import { reviewModal } from 'src/pages/raw-stocks'
+import { TextField } from '@mui/material'
 
 function PaperComponent(props: PaperProps) {
   return (
@@ -19,12 +20,18 @@ function PaperComponent(props: PaperProps) {
 
 interface modalProps {
   handleClose: () => void
-  handleUpdateStatus: (status: string) => void
+  handleUpdateStatus: (status: string, screenerUrl?: string) => void
   liveStock: reviewModal
   isLoading: boolean
 }
 
 export default function ReviewRawStock({ handleClose, handleUpdateStatus, liveStock, isLoading }: modalProps) {
+  const [screenerUrl, setScreenerUrl] = React.useState<string>('')
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setScreenerUrl(event.target.value)
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -57,6 +64,23 @@ export default function ReviewRawStock({ handleClose, handleUpdateStatus, liveSt
           </div>
         )}
 
+        {/* Input Field for adding screener url */}
+        {liveStock.data.length !== 0 && (
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin='dense'
+              id='name'
+              label='Screener URL'
+              type='text'
+              fullWidth
+              variant='standard'
+              value={screenerUrl}
+              onChange={handleChange}
+            />
+          </DialogContent>
+        )}
+
         <DialogActions>
           <Button autoFocus onClick={handleClose}>
             Cancel
@@ -66,9 +90,14 @@ export default function ReviewRawStock({ handleClose, handleUpdateStatus, liveSt
               {isLoading ? 'Rejecting...' : 'Reject'}
             </Button>
           ) : (
-            <Button color='success' onClick={() => handleUpdateStatus('approved')}>
-              {isLoading ? 'Adding...' : 'Add'}
-            </Button>
+            <>
+              <Button color='error' onClick={() => handleUpdateStatus('rejected')}>
+                {isLoading ? 'Rejecting...' : 'Reject'}
+              </Button>
+              <Button color='success' onClick={() => handleUpdateStatus('approved', screenerUrl)}>
+                {isLoading ? 'Adding...' : 'Add'}
+              </Button>
+            </>
           )}
         </DialogActions>
       </Dialog>

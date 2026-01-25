@@ -63,12 +63,10 @@ const statusObj: StatusObj = {
 
 const TableStickyHeader = ({
   rawStocksData,
-  handleStockCheck,
-  isPriceLoading
+  handleStockCheck
 }: {
   rawStocksData: Data[]
   handleStockCheck: (_id: string, token: string, name: string, exch_seg: string) => void
-  isPriceLoading: boolean
 }) => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
@@ -103,7 +101,7 @@ const TableStickyHeader = ({
             onClick={() => handleStockCheck(_id, token, name, exch_seg)}
             disabled={status === 'approved' || status === 'rejected'}
           >
-            {isPriceLoading ? 'Loading...' : 'Check'}
+            Check
           </Button>
         )
       })

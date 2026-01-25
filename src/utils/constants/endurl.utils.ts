@@ -9,11 +9,14 @@ export const ENDURL = {
   GET_RAW_STOCKS: 'admin/raw-stocks',
   GET_RAW_STOCK_BY_ID: 'admin/raw-stock/:id',
   POST_RAW_STOCK: 'admin/raw-stock',
-  POST_RAW_STOCK_STATUS: 'admin/raw-stock/status',
+  POST_RAW_STOCK_STATUS: 'master/create',
   POST_RAW_STOCK_PRICE: 'admin/raw-stock-price',
 
   // Stock Endpoints
   GET_ALL_ACTIVE_STOCKS: '/activestock',
   GET_STOCK_BY_SYMBOL: '/stocks/symbol/:symbol',
-  GET_STOCK_BY_ID: '/stocks/:id'
+  GET_STOCK_BY_ID: '/stocks/:id',
+
+  // Stock Fundamental
+  Fetch_STOCK_FUNDAMENTAL: 'fundamentals/fetch'
 }
