@@ -18,5 +18,6 @@ export const ENDURL = {
   GET_STOCK_BY_ID: '/stocks/:id',
 
   // Stock Fundamental
-  Fetch_STOCK_FUNDAMENTAL: 'fundamentals/fetch'
+  Fetch_STOCK_FUNDAMENTAL: 'fundamentals/fetch',
+  GET_STOCK_FUNDAMENTAL_DETAILS: 'fundamentals'
 }

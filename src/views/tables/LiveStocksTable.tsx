@@ -10,6 +10,8 @@ import TablePagination from '@mui/material/TablePagination'
 import { Button, Typography } from '@mui/material'
 import Profit from '@mui/icons-material/TrendingUp'
 import Loss from '@mui/icons-material/TrendingDown'
+import NextLink from 'next/link'
+import Link from '@mui/material/Link'
 
 interface Column {
   id: 'srNo' | 'name' | 'token' | 'ltp' | 'open' | 'high' | 'low' | 'close' | 'status' | 'action'
@@ -81,10 +83,25 @@ const TableStickyHeader = ({
         ) => ({
           srNo: <Typography>{index + 1}</Typography>,
           name: (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}>
-              <Typography>{name}</Typography>
-              <Typography variant='caption'>{symbol}</Typography>
-            </div>
+            <NextLink
+              href={{
+                pathname: `/stock-fundamental/${name}`
+              }}
+              passHref
+
+              // target='_blank'
+            >
+              <Link
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'start'
+                }}
+              >
+                <Typography>{name}</Typography>
+                <Typography variant='caption'>{symbol}</Typography>
+              </Link>
+            </NextLink>
           ),
           token: (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}>
@@ -122,11 +139,6 @@ const TableStickyHeader = ({
     setRowsPerPage(+event.target.value)
     setPage(0)
   }
-
-  // const handleButtonClick = (id: string) => {
-  //   // Add your button click logic here
-  //   console.log(`Button clicked for row with id: ${id}`)
-  // }
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
