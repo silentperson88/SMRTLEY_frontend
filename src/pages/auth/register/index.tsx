@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, ChangeEvent, MouseEvent, ReactNode, FormEvent } from 'react'
+import { useState, ChangeEvent, MouseEvent, ReactNode, FormEvent, useEffect } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
@@ -35,16 +35,25 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Demo Imports
 import FooterIllustrationsV1 from 'src/views/pages/auth/FooterIllustration'
-import ApiServiceUtils from 'src/utils/ApiService.utils'
 import { FormHelperText } from '@mui/material'
 import { useRouter } from 'next/router'
+import { useMutationSWR } from 'src/hooks/swr/swrhooks'
+import { ENDURL } from 'src/utils/constants/endurl.utils'
 
 interface State {
+  name: string
   username: string
   email: string
   password: string
   confirmPassword: string
   showPassword: boolean
+}
+
+interface FormBody {
+  name: string
+  username: string
+  email: string
+  password: string
 }
 
 // ** Styled Components
@@ -61,6 +70,7 @@ const LinkStyled = styled('a')(({ theme }) => ({
 const RegisterPage = () => {
   // ** States
   const [values, setValues] = useState<State>({
+    name: '',
     username: '',
     email: '',
     password: '',
@@ -68,18 +78,26 @@ const RegisterPage = () => {
     showPassword: false
   })
   const [errors, setErrors] = useState<State>({
+    name: '',
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
     showPassword: false
   })
-
+  const [generalError, setGeneralError] = useState<string>('')
   const router = useRouter()
 
   // ** Hook
   const theme = useTheme()
 
+  const { trigger: register, error } = useMutationSWR<{ message: string }, FormBody>(ENDURL.REGISTER)
+
+  useEffect(() => {
+    if (error) {
+      setGeneralError(error?.response?.data?.message)
+    }
+  }, [error])
   const handleChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value })
   }
@@ -91,13 +109,59 @@ const RegisterPage = () => {
   }
 
   const validation = () => {
-    const { username, email, password, confirmPassword } = values
-    const error = { username: '', email: '', password: '', confirmPassword: '' }
-    if (username === '' || username.length < 3) error.username = 'Username must be at least 3 characters'
-    if (email === '' || !email.includes('@') || !email.includes('.')) error.email = 'Invalid email address'
-    if (password === '') error.password = 'Password is required'
-    if (confirmPassword === '') error.confirmPassword = 'Confirm Password is required'
-    if (password !== confirmPassword) error.confirmPassword = 'Passwords do not match'
+    const { name, username, email, password, confirmPassword } = values
+
+    const error = {
+      name: '',
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    }
+
+    // Name
+    if (!name.trim()) {
+      error.name = 'Name is required'
+    }
+
+    // Username
+    if (!username.trim()) {
+      error.username = 'Username is required'
+    } else if (username.includes(' ')) {
+      error.username = 'Username should not contain spaces'
+    } else if (username.length < 3 || username.length > 20) {
+      error.username = 'Username must be 3–20 characters'
+    } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      error.username = 'Only letters, numbers, and underscore allowed'
+    }
+
+    // Email
+    if (!email.trim()) {
+      error.email = 'Email is required'
+    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+      error.email = 'Invalid email address'
+    }
+
+    // Password
+    if (!password) {
+      error.password = 'Password is required'
+    } else if (password.length < 8) {
+      error.password = 'Password must be at least 8 characters'
+    } else if (!/[A-Z]/.test(password)) {
+      error.password = 'Password must contain at least one uppercase letter'
+    } else if (!/[a-z]/.test(password)) {
+      error.password = 'Password must contain at least one lowercase letter'
+    } else if (!/[0-9]/.test(password)) {
+      error.password = 'Password must contain at least one number'
+    }
+
+    // Confirm Password
+    if (!confirmPassword) {
+      error.confirmPassword = 'Confirm Password is required'
+    } else if (password !== confirmPassword) {
+      error.confirmPassword = 'Passwords do not match'
+    }
+
     setErrors({ ...error, showPassword: false })
 
     return Object.values(error).every(x => x === '')
@@ -105,27 +169,31 @@ const RegisterPage = () => {
 
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log(values)
     const isValid = validation()
     if (!isValid) return
-    const { username, email, password } = values
-    const body = {
+    const { name, username, email, password } = values
+    const body: FormBody = {
+      name,
       username,
       email,
       password
     }
 
-    const res = await ApiServiceUtils.post('/auth/register', body)
-      .then(res => res)
-      .catch(err => err.response)
+    const res = await register(body)
 
-    console.log(res)
-    if (res.status === 200) {
-      setValues({ ...values, username: '', email: '', password: '', confirmPassword: '' })
-      setErrors({ ...errors, username: '', email: '', password: '', confirmPassword: '' })
+    if (res) {
+      setValues({ ...values, name: '', username: '', email: '', password: '', confirmPassword: '' })
+      setErrors({ ...errors, name: '', username: '', email: '', password: '', confirmPassword: '' })
       router.push({ pathname: '/pages/login' })
-    } else if (res.status === 400) {
-      setErrors({ username: '', email: '', password: '', confirmPassword: '', showPassword: true, ...res.data.data })
+    } else {
+      setErrors({
+        name: '',
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        showPassword: true
+      })
     }
   }
 
@@ -206,13 +274,29 @@ const RegisterPage = () => {
               {themeConfig.templateName}
             </Typography>
           </Box>
-          <Box sx={{ mb: 6 }}>
+          <Box sx={{ mb: 6, textAlign: 'center' }}>
             <Typography variant='h5' sx={{ fontWeight: 600, marginBottom: 1.5 }}>
               Adventure starts here 🚀
             </Typography>
             <Typography variant='body2'>Make your app management easy and fun!</Typography>
+            {generalError && (
+              <Typography variant='h5' color='error' sx={{ textAlign: 'center', mt: 4 }}>
+                {generalError}
+              </Typography>
+            )}
           </Box>
           <form noValidate autoComplete='off' onSubmit={e => handleRegister(e)}>
+            <TextField
+              autoFocus
+              fullWidth
+              id='name'
+              label='Name'
+              sx={{ marginBottom: 4 }}
+              value={values.name}
+              onChange={handleChange('name')}
+              error={Boolean(errors.name)}
+              helperText={errors.name}
+            />
             <TextField
               autoFocus
               fullWidth
