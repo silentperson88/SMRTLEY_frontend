@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, FormEvent, MouseEvent, ReactNode, useState } from 'react'
+import { ChangeEvent, FormEvent, MouseEvent, ReactNode, useEffect, useState } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
@@ -38,14 +38,21 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Demo Imports
 import FooterIllustrationsV1 from 'src/views/pages/auth/FooterIllustration'
-import ApiServiceUtils from 'src/utils/ApiService.utils'
 import { FormHelperText } from '@mui/material'
+import { useMutationSWR } from 'src/hooks/swr/swrhooks'
+import { ENDURL } from 'src/utils/constants/endurl.utils'
+import { redirectIfAuthenticated } from 'src/utils/authGuard'
 
 interface State {
   email: string
   password: string
   showPassword: boolean
   error: { email: string; password: string }
+}
+
+type FormBody = {
+  email: string
+  password: string
 }
 
 // ** Styled Components
@@ -74,10 +81,17 @@ const LoginPage = () => {
     showPassword: false,
     error: { email: '', password: '' }
   })
+  const [generalError, setGeneralError] = useState<string>('')
 
   // ** Hook
   const theme = useTheme()
   const router = useRouter()
+
+  useEffect(() => {
+    redirectIfAuthenticated(router)
+  }, [])
+
+  const { trigger: login } = useMutationSWR<{ message: string }, FormBody>(ENDURL.LOGIN)
 
   const handleChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value })
@@ -97,31 +111,26 @@ const LoginPage = () => {
     if (email === '' || !email.includes('@') || !email.includes('.')) error.email = 'Email is required'
     if (password === '') error.password = 'Password is required'
     setValues({ ...values, error })
-    console.log(error)
 
     return Object.values(error).every(x => x === '')
   }
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log(values)
     const isValid = validation()
-    console.log(isValid)
     if (!isValid) return
     const { email, password } = values
     const body = {
       email,
       password
     }
-    const res = await ApiServiceUtils.post('/auth/login', body)
-      .then(res => res)
-      .catch(err => err.response)
-    if (res.status === 200) {
-      localStorage.setItem('token', res.data.data.token)
-      router.push({ pathname: '/dashboard/analytics' })
-    } else if (res.status === 400) {
+    const res = await login(body).catch(err => err.response)
+    if (res) {
+      localStorage.setItem('token', res.token)
+      router.push({ pathname: '/' })
+    } else if (res) {
       setValues({ ...values, email: '', password: '' })
-      router.push('/')
+      setGeneralError(res.data.message)
     }
   }
 
@@ -202,11 +211,16 @@ const LoginPage = () => {
               {themeConfig.templateName}
             </Typography>
           </Box>
-          <Box sx={{ mb: 6 }}>
+          <Box sx={{ mb: 6, textAlign: 'center' }}>
             <Typography variant='h5' sx={{ fontWeight: 600, marginBottom: 1.5 }}>
               Welcome to {themeConfig.templateName}! 👋🏻
             </Typography>
             <Typography variant='body2'>Please sign-in to your account and start the adventure</Typography>
+            {generalError && (
+              <Typography variant='h5' color='error' sx={{ mt: 4 }}>
+                {generalError}
+              </Typography>
+            )}
           </Box>
           <form noValidate autoComplete='off' onSubmit={e => handleLogin(e)}>
             <TextField
