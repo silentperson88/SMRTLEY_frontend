@@ -1,169 +1,227 @@
+import { useEffect, useState } from 'react'
+
 // ** MUI Imports
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardActions from '@mui/material/CardActions'
 import Typography from '@mui/material/Typography'
-import CardHeader from '@mui/material/CardHeader'
+import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
+import Box from '@mui/material/Box'
+import CreatePortfolioDialog from 'src/views/portfolio/CreatePortfolioDialog'
+import { useSimpleSWR } from 'src/hooks/swr/swrhooks'
+import { ENDURL } from 'src/utils/constants/endurl.utils'
 
-// ** Demo Components Imports
-import PorfolioStocksTable from 'src/views/tables/PorfolioStocksTable'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import { Alert, InputAdornment, Snackbar, TextField } from '@mui/material'
-import { Magnify } from 'mdi-material-ui'
+// ------------------------------------------------------
 
-interface StockData {
-  symbol: string
-  token: string
-  exchange: string
-  ltp: number
-  open: number
-  high: number
-  low: number
-  close: number
-  percentChange: number
+export interface PortfolioType {
   _id: string
-  status: string
-  name: string
-  atPrice: number
-  purchasedDate: string | null
-  quantity: number
-  type: string
+  code: string
+  display_name: string
+  description: string
+  risk_level: 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH'
+  important_notes: string[]
+  fund: number
 }
 
-function createData(
-  name: string,
-  symbol: string,
-  token: string,
-  exchange: string,
-  ltp: number,
-  open: number,
-  high: number,
-  low: number,
-  close: number,
-  percentChange: number,
-  _id: string,
-  status: string,
-  atPrice: number,
-  purchasedDate: string | null,
-  quantity: number,
-  type: string
-): StockData {
-  return {
-    name,
-    symbol,
-    token,
-    exchange,
-    ltp,
-    open,
-    high,
-    low,
-    close,
-    percentChange,
-    _id,
-    status,
-    atPrice,
-    purchasedDate,
-    quantity,
-    type
+export interface MyPortfolio {
+  _id: string
+  name: string
+  portfolio_type: {
+    display_name: string
+    risk_level: 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH'
+  }
+  fund: number
+  invested: number
+  pnl: number
+  created_at: string
+}
+
+const DUMMY_MY_PORTFOLIOS: MyPortfolio[] = [
+  {
+    _id: 'p1',
+    name: 'IPO Practice Jan',
+    portfolio_type: {
+      display_name: 'IPO Simulation',
+      risk_level: 'MEDIUM'
+    },
+    fund: 100000,
+    invested: 60000,
+    pnl: 4200,
+    created_at: '2026-01-10'
+  },
+  {
+    _id: 'p2',
+    name: 'Retirement Wealth',
+    portfolio_type: {
+      display_name: 'Retirement Plan',
+      risk_level: 'LOW'
+    },
+    fund: 500000,
+    invested: 480000,
+    pnl: -3200,
+    created_at: '2025-12-01'
+  }
+]
+
+export const getRiskColor = (risk: string) => {
+  switch (risk) {
+    case 'LOW':
+      return 'success'
+    case 'MEDIUM':
+      return 'warning'
+    case 'HIGH':
+      return 'error'
+    default:
+      return 'default'
   }
 }
 
-const initialSnackbarData = {
-  open: false,
-  message: ''
-}
+// ------------------------------------------------------
 
-const baseUrl = 'http://localhost:8000/api'
+const PortfolioList = () => {
+  const [openCreate, setOpenCreate] = useState(false)
+  const [portfolioTypes, setPortfolioTypes] = useState<PortfolioType[]>([])
+  const [selected, setSelected] = useState<string | null>(null)
+  const [myPortfolios, setMyPortfolios] = useState<MyPortfolio[]>([])
 
-const LiveStocks = () => {
-  const [searchValue, setSearchValue] = useState<string>('')
-  const [rawStocksData, setRawStocksData] = useState<StockData[]>([])
-  const [openSnacker, setOpenSnacker] = useState<{ open: boolean; message: string }>(initialSnackbarData)
+  const { data } = useSimpleSWR<PortfolioType[]>(ENDURL.GET_PORTFOLIO_TYPES)
+  const { data: myPortfolioData } = useSimpleSWR<MyPortfolio[]>(ENDURL.GET_MY_PORTFOLIOS)
 
-  const handleFilter = async () => {
+  useEffect(() => {
+    if (myPortfolioData?.length) {
+      setMyPortfolios(myPortfolioData)
+    } else {
+      setMyPortfolios(DUMMY_MY_PORTFOLIOS)
+    }
+  }, [myPortfolioData])
+
+  const fetchPortfolioTypes = async (data: PortfolioType[]) => {
     try {
-      const res = await axios.get(`${baseUrl}/ps${searchValue ? `?search=${searchValue}` : ''}`)
-      if (res.status === 200) {
-        const rawData: StockData[] = res.data.data.flatMap((item: any) =>
-          item.liveStock.map((stock: any) =>
-            createData(
-              stock.name,
-              stock.symbol,
-              stock.token,
-              stock.exchange,
-              stock.ltp,
-              stock.open,
-              stock.high,
-              stock.low,
-              stock.close,
-              stock.percentChange,
-              stock._id,
-              item.type, // Assuming `type` comes from the parent object
-              item.atPrice, // New field
-              item.purchasedDate, // New field
-              item.quantity, // New field
-              item.type // New field (buy/sell type)
-            )
-          )
-        )
-        setRawStocksData(rawData)
+      console.log('fetchPortfolioTypes', data)
+      if (data.length) {
+        setPortfolioTypes(data.map(item => item))
       }
     } catch (error) {
-      console.error('Error fetching data:', error)
+      console.warn('Using dummy portfolio types')
     }
   }
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    setSearchValue(value)
+  useEffect(() => {
+    if (!data) return
+    fetchPortfolioTypes(data)
+  }, [data])
+
+  const handleSelect = (id: string) => {
+    setSelected(id)
+    setOpenCreate(true)
   }
 
-  useEffect(() => {
-    handleFilter()
-  }, [])
-
   return (
-    <Grid container spacing={6}>
-      <Grid item xs={12}>
-        <Typography variant='body2'>Search by name, symbol, token</Typography>
-        <TextField
-          size='small'
-          sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4 } }}
-          value={searchValue}
-          onChange={handleSearch}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position='start'>
-                <Magnify fontSize='small' />
-              </InputAdornment>
-            )
-          }}
-          onKeyPress={e => {
-            if (e.key === 'Enter') {
-              handleFilter()
-            }
-          }}
-        />
-      </Grid>
+    <>
+      <Grid container spacing={6}>
+        {/* Header */}
+        <Grid item xs={12}>
+          <Box display='flex' justifyContent='space-between' alignItems='center'>
+            <Typography variant='h5'>My Portfolios</Typography>
+            <Button variant='contained' onClick={() => setOpenCreate(true)}>
+              + Create New Portfolio
+            </Button>
+          </Box>
+        </Grid>
 
-      <Grid item xs={12}>
-        <Card>
-          <CardHeader title='Live Stocks' titleTypographyProps={{ variant: 'h6' }} />
-          <PorfolioStocksTable rawStocksData={rawStocksData} />
-        </Card>
+        {/* My Portfolios Section */}
+        {myPortfolios.map(portfolio => (
+          <Grid item xs={12} sm={6} md={4} key={portfolio._id}>
+            <Card sx={{ height: '100%' }}>
+              <CardContent>
+                <Box display='flex' justifyContent='space-between' alignItems='center' mb={1}>
+                  <Typography variant='h6'>{portfolio.name}</Typography>
+                  <Chip
+                    label={portfolio.portfolio_type.risk_level}
+                    size='small'
+                    color={getRiskColor(portfolio.portfolio_type.risk_level)}
+                  />
+                </Box>
+
+                <Typography variant='body2' color='text.secondary'>
+                  {portfolio.portfolio_type.display_name}
+                </Typography>
+
+                <Box mt={2}>
+                  <Typography variant='body2'>
+                    💰 Fund: <strong>₹{portfolio.fund.toLocaleString()}</strong>
+                  </Typography>
+                  <Typography variant='body2'>📊 Invested: ₹{portfolio.invested.toLocaleString()}</Typography>
+                  <Typography variant='body2' color={portfolio.pnl >= 0 ? 'success.main' : 'error.main'}>
+                    📈 P&L: {portfolio.pnl >= 0 ? '+' : ''}₹{portfolio.pnl.toLocaleString()}
+                  </Typography>
+                </Box>
+
+                <Typography variant='caption' color='text.secondary' display='block' mt={1}>
+                  Created on {new Date(portfolio.created_at).toLocaleDateString()}
+                </Typography>
+              </CardContent>
+
+              <CardActions>
+                <Button size='small' variant='outlined'>
+                  View
+                </Button>
+                <Button size='small' variant='contained'>
+                  Trade
+                </Button>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+
+        {/* PortfolioType Label */}
+        <Grid item xs={12}>
+          <Box my={2}>
+            <Typography variant='h6' color='text.secondary'>
+              Available Portfolio Types
+            </Typography>
+          </Box>
+        </Grid>
+        {/* Portfolio Cards */}
+        {portfolioTypes.map(portfolio => (
+          <Grid item xs={12} sm={6} md={4} key={portfolio._id}>
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <CardContent>
+                <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
+                  <Typography variant='h6'>{portfolio.display_name}</Typography>
+                  <Chip label={portfolio.risk_level} size='small' color={getRiskColor(portfolio.risk_level)} />
+                </Box>
+
+                <Typography variant='body2' color='text.secondary' mb={2}>
+                  {portfolio.description}
+                </Typography>
+
+                {portfolio.important_notes?.slice(0, 2).map((note, index) => (
+                  <Typography key={index} variant='caption' display='block' color='text.secondary'>
+                    • {note}
+                  </Typography>
+                ))}
+              </CardContent>
+
+              <CardActions sx={{ mt: 'auto', px: 4, pb: 4 }}>
+                <Button size='small' variant='contained' onClick={() => handleSelect(portfolio._id)}>
+                  Create
+                </Button>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
-      <Snackbar
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        open={openSnacker.open}
-        autoHideDuration={1200}
-        onClose={() => setOpenSnacker(initialSnackbarData)}
-      >
-        <Alert severity='success' variant='filled' sx={{ width: '100%' }}>
-          {openSnacker.message}
-        </Alert>
-      </Snackbar>
-    </Grid>
+      <CreatePortfolioDialog
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+        portfolioTypes={portfolioTypes}
+        selectedId={selected}
+      />
+    </>
   )
 }
 
-export default LiveStocks
+export default PortfolioList

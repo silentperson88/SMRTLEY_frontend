@@ -21,7 +21,19 @@ export const ENDURL = {
   Fetch_STOCK_FUNDAMENTAL: 'ticker/fundamentals/fetch',
   GET_STOCK_FUNDAMENTAL_DETAILS: 'ticker/fundamentals',
 
+  // Master Stock
+  GET_MASTER_STOCKS: 'ticker/master',
+
   // authentication
   REGISTER: 'user/auth/register',
-  LOGIN: 'user/auth/login'
+  LOGIN: 'user/auth/login',
+
+  // Portfolio
+  GET_PORTFOLIO_TYPES: 'user/portfolio-types',
+  GET_MY_PORTFOLIOS: 'user/portfolios',
+
+  // GET_PORTFOLIOS: 'ticker/portfolios',
+  // POST_PORTFOLIO: 'ticker/portfolios',
+  // GET_PORTFOLIO_BY_ID: 'ticker/portfolios/:id',
+  // DELETE_PORTFOLIO_BY_ID: 'ticker/portfolios/:id'
 }

@@ -1,5 +1,5 @@
 // ** React Imports
-import { ReactElement, useEffect, useMemo, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -7,14 +7,12 @@ import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import Avatar from '@mui/material/Avatar'
 import CardHeader from '@mui/material/CardHeader'
-import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 
 // ** Icons Imports
 import TrendingUp from 'mdi-material-ui/TrendingUp'
 import CurrencyUsd from 'mdi-material-ui/CurrencyUsd'
-import DotsVertical from 'mdi-material-ui/DotsVertical'
 import ChartPie from 'mdi-material-ui/ChartPie'
 import ScaleBalance from 'mdi-material-ui/ScaleBalance'
 import BookOpenPageVariant from 'mdi-material-ui/BookOpenPageVariant'
@@ -29,7 +27,9 @@ import CertificateOutline from 'mdi-material-ui/CertificateOutline'
 
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
-import { Fundamental } from 'src/pages/stock-fundamental/[symbol]'
+import { Fundamental, TodaysMarket } from 'src/pages/stock-fundamental/[symbol]'
+import { Button } from '@mui/material'
+import StockGraph from './stockGraph'
 
 export interface DataType {
   stats: string | number
@@ -64,9 +64,10 @@ const renderStats = (stats: DataType[]) => {
   ))
 }
 
-const CompanyStatisticsCard = (props: { fundamentals: Fundamental }) => {
+const CompanyStatisticsCard = (props: { fundamentals: Fundamental; todaysMarket?: TodaysMarket }) => {
   const [stats, setStats] = useState<DataType[]>([])
   const { companyName, marketSnapshot } = props?.fundamentals
+  const { todaysMarket } = props
 
   useEffect(() => {
     console.log(marketSnapshot)
@@ -166,26 +167,50 @@ const CompanyStatisticsCard = (props: { fundamentals: Fundamental }) => {
     }
   }, [marketSnapshot])
 
-  const growth = useMemo(() => {
-    return (((marketSnapshot?.open - marketSnapshot?.close) / marketSnapshot?.close) * 100).toFixed(2)
-  }, [stats])
-
   return (
     <Card>
       <CardHeader
         title={companyName}
         action={
-          <IconButton size='small' aria-label='settings' className='card-more-options' sx={{ color: 'text.secondary' }}>
-            <DotsVertical />
-          </IconButton>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant='contained'
+              color='success'
+
+              // onClick={() => handleStockCheck(_id, token, name, exch_seg)}
+              // disabled={status === 'approved' || status === 'rejected'}
+            >
+              Buy
+            </Button>
+            <Button
+              variant='contained'
+              color='error'
+
+              // onClick={() => handleStockCheck(_id, token, name, exch_seg)}
+              // disabled={status === 'approved' || status === 'rejected'}
+            >
+              Sell
+            </Button>
+          </Box>
         }
         subheader={
-          <Typography variant='body2'>
-            <Box component='span' sx={{ fontWeight: 600, color: 'text.primary' }}>
-              Total {growth}% growth on {new Date(marketSnapshot?.date).toDateString()}
-            </Box>{' '}
-            😎 
-          </Typography>
+          todaysMarket && (
+            <>
+              <Typography variant='h5' color={todaysMarket.percentChange > 0 ? 'green' : 'error'}>
+                <Box component='span' sx={{ fontWeight: 600 }}>
+                  {todaysMarket?.ltp}
+                </Box>{' '}
+              </Typography>
+              <Typography variant='body2' color={todaysMarket.percentChange > 0 ? 'green' : 'error'}>
+                <Box component='span' sx={{ fontWeight: 600 }}>
+                  {(todaysMarket.ltp - todaysMarket.open).toFixed(2)}{' '}
+                  {/* Total {growth}% growth on {new Date(marketSnapshot?.date).toDateString()} */}(
+                  {todaysMarket.percentChange.toFixed(2)} %)
+                </Box>{' '}
+                {todaysMarket.percentChange > 0 ? '😎' : ''}
+              </Typography>
+            </>
+          )
         }
         titleTypographyProps={{
           sx: {
@@ -195,6 +220,9 @@ const CompanyStatisticsCard = (props: { fundamentals: Fundamental }) => {
           }
         }}
       />
+
+      {todaysMarket?.dayCandles && <StockGraph candles={todaysMarket?.dayCandles} />}
+
       <CardContent sx={{ pt: theme => `${theme.spacing(3)} !important` }}>
         <Grid container spacing={[5, 0]}>
           {renderStats(stats)}
