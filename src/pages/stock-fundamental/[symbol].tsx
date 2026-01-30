@@ -26,6 +26,8 @@ import CompanyStatisticsCard from 'src/views/stock-fundamentals/companyStatics'
 import ProsCons from 'src/views/stock-fundamentals/prosCons'
 import FundamentalTable, { TableData } from 'src/views/stock-fundamentals/FundamentalTable'
 import { Card, CardHeader, LinearProgress } from '@mui/material'
+import { useLivePrices } from 'src/hooks/socket/useLivePrice'
+import { Candles } from 'src/types/ws'
 
 interface MarketSnapshot {
   marketCap: number
@@ -215,6 +217,16 @@ const ratiosType: RatiosEntryMap[] = [
   { name: 'ROE', key: 'roe' }
 ]
 
+export interface TodaysMarket {
+  ltp: number
+  open: number
+  high: number
+  low: number
+  close: number
+  percentChange: number
+  dayCandles?: Candles[]
+}
+
 const Dashboard = () => {
   // get symbol from url
   const [fundamentals, setFundamentals] = useState<Fundamental | null>()
@@ -222,12 +234,78 @@ const Dashboard = () => {
   const [quarterlyResult, setQuarterlyResult] = useState<TableData | null>()
   const [balanceSheet, setBalanceSheet] = useState<TableData | null>()
   const [cashFlows, setCashFlows] = useState<TableData | null>()
+  const [todaysMarket, setTodaysMarket] = useState<TodaysMarket | null>()
   const [ratios, setRatios] = useState<TableData | null>()
   const router = useRouter()
   const { symbol } = router.query
   const { data } = useSimpleSWR<any>(`${ENDURL.GET_STOCK_FUNDAMENTAL_DETAILS}/${symbol}`)
 
+  const liveStocksData = useLivePrices([data?.master_id?.symbol as string])
+
   useEffect(() => {
+    console.log('liveStocksData', liveStocksData, data)
+    const symbol = (data?.master_id?.symbol as string) || ''
+    if (!symbol) return
+
+    const live = liveStocksData?.[symbol]
+
+    // ---------- helper to build daily candle ----------
+    const buildDailyCandle = (candles: Candles, high: number, low: number, close: number) => {
+      if (!candles)
+        return {
+          o: 0,
+          h: 0,
+          l: 0,
+          c: 0,
+          t: '0'
+        }
+
+      return {
+        o: candles.o,
+        h: high,
+        l: low,
+        c: close,
+        t: candles.t
+      }
+    }
+
+    // ---------- LIVE DATA ----------
+    if (live && Object.keys(live).length > 0) {
+      // const high = Math.max(...live.dayCandles.map((item: Candles) => item.h))
+      // const low = Math.min(...live.dayCandles.map((item: Candles) => item.l))
+      // const close = live.dayCandles[live.dayCandles.length - 1].c
+      // const dailyCandle = live.dayCandles.map((item: Candles) => buildDailyCandle(item, high, low, close))
+
+      setTodaysMarket({
+        ltp: live?.ltp || 0,
+        open: live?.open || 0,
+        high: live?.high || 0,
+        low: live?.low || 0,
+        close: live?.close || 0,
+        percentChange: ((live?.ltp - live.open) / live.open) * 100,
+        dayCandles: live?.dayCandles || [] // ✅ FIX
+      })
+
+      return
+    }
+
+    // ---------- FALLBACK (DB DATA) ----------
+    if (data?.active_stock_id) {
+      const s = data.active_stock_id
+
+      setTodaysMarket({
+        ltp: s.ltp || 0,
+        open: s.open || 0,
+        high: s.high || 0,
+        low: s.low || 0,
+        close: s.close || 0,
+        percentChange: s.open ? ((s.ltp - s.open) / s.open) * 100 : 0
+      })
+    }
+  }, [data, liveStocksData])
+
+  useEffect(() => {
+    console.log('data', data)
     if (data) {
       const marketSnapshot: MarketSnapshot = {
         marketCap: data?.summary?.market_snapshot?.market_cap,
@@ -434,7 +512,7 @@ const Dashboard = () => {
       ) : (
         <Grid container spacing={6}>
           <Grid item xs={12} md={12}>
-            <CompanyStatisticsCard fundamentals={fundamentals} />
+            <CompanyStatisticsCard fundamentals={fundamentals} todaysMarket={todaysMarket as TodaysMarket} />
           </Grid>
 
           <Grid item xs={12} md={12} lg={12}>

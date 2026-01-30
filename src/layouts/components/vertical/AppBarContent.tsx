@@ -18,13 +18,14 @@ import { Settings } from 'src/@core/context/settingsContext'
 import ModeToggler from 'src/@core/layouts/components/shared-components/ModeToggler'
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
 import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
-import { Button } from '@mui/material'
+import { Button, ClickAwayListener, List, ListItemButton, ListItemText, Paper, Popper } from '@mui/material'
 import { mutate } from 'swr'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
-import { useMutationSWR, useSimpleSWR } from 'src/hooks/swr/swrhooks'
+import { useMutationSWR, usePaginatedSWR, useSimpleSWR } from 'src/hooks/swr/swrhooks'
 import { getErrorMessage } from 'src/api/axios/errorhandler'
 import { useSnackbar } from '../SnackbarContext'
+import { useRouter } from 'next/router'
 
 interface Props {
   hidden: boolean
@@ -41,9 +42,19 @@ interface LoginResponse {
   status: number
 }
 
+interface SearchList {
+  name: string
+  symbol: string
+}
+
 const AppBarContent = (props: Props) => {
   const [totp, setTotp] = useState<string>('')
   const { showSnackbar } = useSnackbar()
+  const inputWrapperRef = useRef<HTMLInputElement | null>(null)
+  const router = useRouter()
+
+  const [searchValue, setSearchValue] = useState<string>('')
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   // ** Props
   const { hidden, settings, saveSettings, toggleNavVisibility } = props
@@ -52,6 +63,23 @@ const AppBarContent = (props: Props) => {
   const hiddenSm = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
 
   const { data } = useSimpleSWR<serverStatus>(ENDURL.GET_SERVER_STATUS)
+
+  const { data: searchList, isLoading } = usePaginatedSWR<SearchList[]>(ENDURL.GET_MASTER_STOCKS, {
+    page: 0,
+    limit: 5,
+    search: searchValue.length > 1 ? searchValue : ''
+  })
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setSearchValue(value)
+
+    if (value.length > 1) {
+      setAnchorEl(event.currentTarget)
+    } else {
+      setAnchorEl(null)
+    }
+  }
 
   const { trigger, isMutating } = useMutationSWR<LoginResponse, { data: string }>(ENDURL.POST_SMART_LOGIN)
 
@@ -80,17 +108,70 @@ const AppBarContent = (props: Props) => {
             <Menu />
           </IconButton>
         ) : null}
-        <TextField
-          size='small'
-          sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4 } }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position='start'>
-                <Magnify fontSize='small' />
-              </InputAdornment>
-            )
-          }}
-        />
+        <Box ref={inputWrapperRef} sx={{ display: 'inline-block', position: 'relative' }}>
+          <TextField
+            size='small'
+            value={searchValue}
+            onChange={handleSearch}
+            autoComplete='off'
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <Magnify fontSize='small' />
+                </InputAdornment>
+              )
+            }}
+          />
+        </Box>
+
+        <Popper
+          open={Boolean(anchorEl && searchValue.length >= 2)}
+          anchorEl={inputWrapperRef.current}
+          placement='bottom-start'
+          style={{ zIndex: 1300 }}
+          modifiers={[
+            {
+              name: 'width',
+              enabled: true,
+              phase: 'beforeWrite',
+              requires: ['computeStyles'],
+              fn: ({ state }) => {
+                state.styles.popper.width = `${state.rects.reference.width}px`
+              }
+            }
+          ]}
+        >
+          <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
+            <Paper sx={{ maxHeight: 300, overflowY: 'auto' }}>
+              <List dense>
+                {isLoading && (
+                  <ListItemButton disabled>
+                    <ListItemText primary='Searching…' />
+                  </ListItemButton>
+                )}
+
+                {!isLoading && searchList?.length === 0 && (
+                  <ListItemButton disabled>
+                    <ListItemText primary='No results' />
+                  </ListItemButton>
+                )}
+
+                {searchList?.map((item: any) => (
+                  <ListItemButton
+                    key={item._id}
+                    onClick={() => {
+                      setSearchValue(item.company)
+                      setAnchorEl(null)
+                      router.push(`/stock-fundamental/${item.name}`)
+                    }}
+                  >
+                    <ListItemText primary={item.company} secondary={item.name} />
+                  </ListItemButton>
+                ))}
+              </List>
+            </Paper>
+          </ClickAwayListener>
+        </Popper>
       </Box>
       <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
         {/* {hiddenSm ? null : (
