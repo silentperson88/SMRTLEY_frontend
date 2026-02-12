@@ -15,7 +15,11 @@ import {
 } from '@mui/material'
 import Chip from '@mui/material/Chip'
 import { useEffect, useState } from 'react'
+import { getErrorMessage } from 'src/api/axios/errorhandler'
+import { useMutationSWR } from 'src/hooks/swr/swrhooks'
+import { useSnackbar } from 'src/layouts/components/SnackbarContext'
 import { getRiskColor, PortfolioType } from 'src/pages/portfolio-stocks'
+import { ENDURL } from 'src/utils/constants/endurl.utils'
 
 interface Props {
   open: boolean
@@ -24,25 +28,53 @@ interface Props {
   selectedId: string | null
 }
 
+interface portfolioPayload {
+  name: string
+  portfolio_type_id: string
+  initial_fund: number
+}
+
 const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Props) => {
   const [portfolioName, setPortfolioName] = useState('')
   const [selectedType, setSelectedType] = useState<PortfolioType | null>(null)
   const [initialFund, setInitialFund] = useState<number | ''>('')
   const [accepted, setAccepted] = useState(false)
+  const { showSnackbar } = useSnackbar()
 
-  const handleCreate = () => {
+  const { trigger } = useMutationSWR<{ message: string }, portfolioPayload>(ENDURL.GET_MY_PORTFOLIOS)
+  const [fundError, setFundError] = useState<string>('')
+
+  const handleCreate = async () => {
     if (!portfolioName || !selectedType || !accepted) return
+    setFundError('')
 
-    const payload = {
-      name: portfolioName,
-      portfolio_type_id: selectedType._id,
-      initial_fund: initialFund || 0
+    try {
+      const payload: portfolioPayload = {
+        name: portfolioName,
+        portfolio_type_id: selectedType._id,
+        initial_fund: initialFund || 0
+      }
+
+      console.log('CREATE PORTFOLIO PAYLOAD', payload)
+      const res = await trigger(payload)
+
+      showSnackbar('Portfolio created', 'success')
+
+      console.log('CREATE PORTFOLIO RESPONSE', res)
+      if (!res) return
+
+      // TODO: replace with API call
+      onClose()
+    } catch (error: unknown) {
+      const backendMessage = getErrorMessage(error)
+      const isInsufficientFunds = /insufficient|not\s+enough\s+fund/i.test(backendMessage)
+      const message = isInsufficientFunds
+        ? 'You do not have enough funds to create a new portfolio. First, add funds to your account.'
+        : backendMessage || 'Unable to create portfolio'
+
+      setFundError(message)
+      showSnackbar(message, 'error')
     }
-
-    console.log('CREATE PORTFOLIO PAYLOAD', payload)
-
-    // TODO: replace with API call
-    onClose()
   }
 
   const handleSelectType = (id: string) => {
@@ -50,7 +82,7 @@ const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Pr
     if (!type) return
 
     setSelectedType(type)
-    setInitialFund(type.fund || 0)
+    setInitialFund(type.initial_fund || 0)
   }
 
   useEffect(() => {
@@ -58,7 +90,7 @@ const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Pr
       const type = portfolioTypes.find(type => type._id === selectedId)
       if (!type) return
       setSelectedType(type)
-      setInitialFund(type.fund || 0)
+      setInitialFund(type.initial_fund || 0)
     }
   }, [selectedId, portfolioTypes])
 
@@ -112,6 +144,11 @@ const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Pr
           value={initialFund}
           onChange={e => setInitialFund(Number(e.target.value))}
         />
+        {fundError && (
+          <Alert severity='error' sx={{ mt: 2 }}>
+            {fundError || "You don't have enough funds to add in this portfolio."}
+          </Alert>
+        )}
 
         {/* Important Notes */}
         {selectedType?.important_notes?.length ? (
@@ -157,3 +194,5 @@ const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Pr
 }
 
 export default CreatePortfolioDialog
+
+

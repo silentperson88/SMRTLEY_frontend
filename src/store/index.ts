@@ -1,10 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 import adminReducer from './slices/admin.slice'
+import SubbscribeMArketSlice from './slices/subscribeMarket.slice'
+import portfolioReducer from './slices/portfolio.slice'
 
 export const store = configureStore({
   reducer: {
-    admin: adminReducer
+    admin: adminReducer,
+    market: SubbscribeMArketSlice,
+    portfolio: portfolioReducer
   }
 
   //   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(stockApi.middleware)

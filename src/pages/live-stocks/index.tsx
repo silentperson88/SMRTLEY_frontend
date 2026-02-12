@@ -11,9 +11,10 @@ import { InputAdornment, LinearProgress, TextField } from '@mui/material'
 import { Magnify } from 'mdi-material-ui'
 import { useMutationSWR, usePaginatedSWR } from 'src/hooks/swr/swrhooks'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
-import { useLivePrices } from 'src/hooks/socket/useLivePrice'
 import { useSnackbar } from 'src/layouts/components/SnackbarContext'
 import { mutate } from 'swr'
+import { useDispatch, useSelector } from 'react-redux'
+import { requestSubscribe } from 'src/store/slices/subscribeMarket.slice'
 
 interface StockData {
   master_id?: string
@@ -40,6 +41,7 @@ const LiveStocks = () => {
   const pageSize = 50
   const [searchValue, setSearchValue] = useState<string>('')
   const { showSnackbar } = useSnackbar()
+  const dispatch = useDispatch()
 
   const { data: apiData, isLoading } = usePaginatedSWR<StockData[]>(ENDURL.GET_ALL_ACTIVE_STOCKS, {
     page,
@@ -47,14 +49,20 @@ const LiveStocks = () => {
     searchValue
   })
 
+  useEffect(() => {
+    if (!apiData?.length) return
+
+    dispatch(requestSubscribe(apiData.map(stock => stock.symbol)))
+  }, [apiData])
+
   const { trigger } = useMutationSWR<FetchFundaMentalResponse, { master_id: string }>(ENDURL.Fetch_STOCK_FUNDAMENTAL)
 
   // Get live prices and merged data from websocket hook
-  const liveStocksData = useLivePrices(apiData?.flatMap(item => item.symbol) ?? [])
+  const livePrices = useSelector((state: any) => state.market.prices)
 
   useEffect(() => {
-    console.log('Live Stocks Data Updated:', liveStocksData, apiData)
-  }, [liveStocksData, apiData])
+    console.log('Live Stocks Data Updated:', livePrices, apiData)
+  }, [livePrices, apiData])
 
   // const [portfolioStock, setPortfolioStock] = useState<{ open: boolean; data: any; error: any }>(initialPortFolio)
 
@@ -75,7 +83,7 @@ const LiveStocks = () => {
 
   const mergedStocksData =
     apiData?.map(stock => {
-      const live = liveStocksData[stock.symbol]
+      const live = livePrices[stock.symbol]
 
       if (!live) return stock
 

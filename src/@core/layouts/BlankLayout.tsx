@@ -8,6 +8,7 @@ import { BlankLayoutProps } from './types'
 // Styled component for Blank Layout component
 const BlankLayoutWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   height: '100vh',
+  backgroundColor: theme.palette.background.default,
 
   // For V1 Blank layout pages
   '& .content-center': {
@@ -30,7 +31,10 @@ const BlankLayoutWrapper = styled(Box)<BoxProps>(({ theme }) => ({
 const BlankLayout = ({ children }: BlankLayoutProps) => {
   return (
     <BlankLayoutWrapper className='layout-wrapper'>
-      <Box className='app-content' sx={{ minHeight: '100vh', overflowX: 'hidden', position: 'relative' }}>
+      <Box
+        className='app-content'
+        sx={{ minHeight: '100vh', overflowX: 'hidden', position: 'relative', backgroundColor: 'background.default' }}
+      >
         {children}
       </Box>
     </BlankLayoutWrapper>

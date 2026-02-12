@@ -8,8 +8,6 @@ import { useRouter } from 'next/router'
 // ** MUI Components
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
-import Checkbox from '@mui/material/Checkbox'
 import TextField from '@mui/material/TextField'
 import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
@@ -20,13 +18,8 @@ import OutlinedInput from '@mui/material/OutlinedInput'
 import { styled, useTheme } from '@mui/material/styles'
 import MuiCard, { CardProps } from '@mui/material/Card'
 import InputAdornment from '@mui/material/InputAdornment'
-import MuiFormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel'
 
 // ** Icons Imports
-import Google from 'mdi-material-ui/Google'
-import Github from 'mdi-material-ui/Github'
-import Twitter from 'mdi-material-ui/Twitter'
-import Facebook from 'mdi-material-ui/Facebook'
 import EyeOutline from 'mdi-material-ui/EyeOutline'
 import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
 
@@ -42,6 +35,7 @@ import { FormHelperText } from '@mui/material'
 import { useMutationSWR } from 'src/hooks/swr/swrhooks'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
 import { redirectIfAuthenticated } from 'src/utils/authGuard'
+import { getErrorMessage } from 'src/api/axios/errorhandler'
 
 interface State {
   email: string
@@ -55,6 +49,19 @@ type FormBody = {
   password: string
 }
 
+type LoginUser = {
+  id: string
+  email: string
+  role: string
+  name?: string
+  full_name?: string
+}
+
+type LoginResponse = {
+  token: string
+  user: LoginUser
+}
+
 // ** Styled Components
 const Card = styled(MuiCard)<CardProps>(({ theme }) => ({
   [theme.breakpoints.up('sm')]: { width: '28rem' }
@@ -64,13 +71,6 @@ const LinkStyled = styled('a')(({ theme }) => ({
   fontSize: '0.875rem',
   textDecoration: 'none',
   color: theme.palette.primary.main
-}))
-
-const FormControlLabel = styled(MuiFormControlLabel)<FormControlLabelProps>(({ theme }) => ({
-  '& .MuiFormControlLabel-label': {
-    fontSize: '0.875rem',
-    color: theme.palette.text.secondary
-  }
 }))
 
 const LoginPage = () => {
@@ -91,7 +91,7 @@ const LoginPage = () => {
     redirectIfAuthenticated(router)
   }, [])
 
-  const { trigger: login } = useMutationSWR<{ message: string }, FormBody>(ENDURL.LOGIN)
+  const { trigger: login, isMutating } = useMutationSWR<LoginResponse, FormBody>(ENDURL.LOGIN)
 
   const handleChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value })
@@ -124,13 +124,14 @@ const LoginPage = () => {
       email,
       password
     }
-    const res = await login(body).catch(err => err.response)
-    if (res) {
+    try {
+      const res = await login(body)
       localStorage.setItem('token', res.token)
+      localStorage.setItem('user', JSON.stringify(res.user))
       router.push({ pathname: '/' })
-    } else if (res) {
+    } catch (error: unknown) {
       setValues({ ...values, email: '', password: '' })
-      setGeneralError(res.data.message)
+      setGeneralError(getErrorMessage(error))
     }
   }
 
@@ -261,9 +262,8 @@ const LoginPage = () => {
             <Box
               sx={{ mb: 4, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}
             >
-              <FormControlLabel control={<Checkbox />} label='Remember Me' />
-              <Link passHref href='/'>
-                <LinkStyled onClick={e => e.preventDefault()}>Forgot Password?</LinkStyled>
+              <Link passHref href='/auth/forgot-password'>
+                <LinkStyled>Forgot Password?</LinkStyled>
               </Link>
             </Box>
             <Button
@@ -272,20 +272,21 @@ const LoginPage = () => {
               variant='contained'
               type='submit'
               sx={{ marginBottom: 7 }}
-              disabled={values.email === '' || values.password === ''}
+              disabled={isMutating || values.email === '' || values.password === ''}
             >
-              Login
+              {isMutating ? 'Signing in...' : 'Login'}
             </Button>
             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
               <Typography variant='body2' sx={{ marginRight: 2 }}>
                 New on our platform?
               </Typography>
               <Typography variant='body2'>
-                <Link passHref href='/pages/register'>
+                <Link passHref href='/auth/register'>
                   <LinkStyled>Create an account</LinkStyled>
                 </Link>
               </Typography>
             </Box>
+            {/*
             <Divider sx={{ my: 5 }}>or</Divider>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Link href='/' passHref>
@@ -311,6 +312,7 @@ const LoginPage = () => {
                 </IconButton>
               </Link>
             </Box>
+            */}
           </form>
         </CardContent>
       </Card>

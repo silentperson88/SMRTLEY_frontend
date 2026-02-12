@@ -30,6 +30,7 @@ import { ThemeColor } from 'src/@core/layouts/types'
 import { Fundamental, TodaysMarket } from 'src/pages/stock-fundamental/[symbol]'
 import { Button } from '@mui/material'
 import StockGraph from './stockGraph'
+import { TC } from 'src/utils/constants/text.constants'
 
 export interface DataType {
   stats: string | number
@@ -64,10 +65,18 @@ const renderStats = (stats: DataType[]) => {
   ))
 }
 
-const CompanyStatisticsCard = (props: { fundamentals: Fundamental; todaysMarket?: TodaysMarket }) => {
+const CompanyStatisticsCard = (props: {
+  fundamentals: Fundamental
+  todaysMarket?: TodaysMarket
+  onBuy?: () => void
+  onSell?: () => void
+  totalHoldingQty?: number
+  totalHoldingValue?: number
+}) => {
   const [stats, setStats] = useState<DataType[]>([])
+
   const { companyName, marketSnapshot } = props?.fundamentals
-  const { todaysMarket } = props
+  const { todaysMarket, onBuy, onSell, totalHoldingQty = 0, totalHoldingValue = 0 } = props
 
   useEffect(() => {
     console.log(marketSnapshot)
@@ -167,28 +176,24 @@ const CompanyStatisticsCard = (props: { fundamentals: Fundamental; todaysMarket?
     }
   }, [marketSnapshot])
 
+  const currentValue = todaysMarket ? todaysMarket.ltp * totalHoldingQty : totalHoldingValue
+
+  const pnl = currentValue - totalHoldingValue
+  const pnlPercent = totalHoldingValue > 0 ? (pnl / totalHoldingValue) * 100 : 0
+
+  const isProfit = pnl > 0
+  const isLoss = pnl < 0
+
   return (
     <Card>
       <CardHeader
         title={companyName}
         action={
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button
-              variant='contained'
-              color='success'
-
-              // onClick={() => handleStockCheck(_id, token, name, exch_seg)}
-              // disabled={status === 'approved' || status === 'rejected'}
-            >
+            <Button variant='contained' color='success' onClick={onBuy} disabled={!onBuy}>
               Buy
             </Button>
-            <Button
-              variant='contained'
-              color='error'
-
-              // onClick={() => handleStockCheck(_id, token, name, exch_seg)}
-              // disabled={status === 'approved' || status === 'rejected'}
-            >
+            <Button variant='contained' color='error' onClick={onSell} disabled={!onSell}>
               Sell
             </Button>
           </Box>
@@ -221,7 +226,57 @@ const CompanyStatisticsCard = (props: { fundamentals: Fundamental; todaysMarket?
         }}
       />
 
-      {todaysMarket?.dayCandles && <StockGraph candles={todaysMarket?.dayCandles} />}
+      <Box sx={{ px: 6, pb: 3 }}>
+        <Card
+          variant='outlined'
+          sx={{
+            borderRadius: 2,
+            borderColor: isProfit ? 'success.main' : isLoss ? 'error.main' : 'divider'
+          }}
+        >
+          <CardContent sx={{ py: 2 }}>
+            <Grid container spacing={3} alignItems='center'>
+              {/* Qty */}
+              <Grid item xs={6}>
+                <Typography variant='caption' color='text.secondary'>
+                  Holding Qty
+                </Typography>
+                <Typography variant='h6' sx={{ fontWeight: 700 }}>
+                  {totalHoldingQty}
+                </Typography>
+              </Grid>
+
+              {/* Value + P/L */}
+              <Grid item xs={6} textAlign='right'>
+                <Typography variant='caption' color='text.secondary'>
+                  Current Value
+                </Typography>
+                <Typography variant='h6' sx={{ fontWeight: 700 }}>
+                  {TC.CURRENCY}
+                  {currentValue.toLocaleString()}
+                </Typography>
+
+                {totalHoldingQty > 0 && (
+                  <Typography
+                    variant='caption'
+                    sx={{
+                      color: isProfit ? 'success.main' : isLoss ? 'error.main' : 'text.secondary',
+                      fontWeight: 600
+                    }}
+                  >
+                    {isProfit ? '+' : ''}
+                    {pnl.toFixed(2)} ({pnlPercent.toFixed(2)}%)
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+      </Box>
+
+      {todaysMarket?.dayCandles && (
+        <StockGraph candles={todaysMarket?.dayCandles} pln={parseFloat(todaysMarket.percentChange.toFixed(2))} />
+      )}
 
       <CardContent sx={{ pt: theme => `${theme.spacing(3)} !important` }}>
         <Grid container spacing={[5, 0]}>

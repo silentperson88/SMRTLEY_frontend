@@ -7,7 +7,6 @@ import Link from 'next/link'
 // ** MUI Components
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import InputLabel from '@mui/material/InputLabel'
@@ -20,10 +19,6 @@ import MuiCard, { CardProps } from '@mui/material/Card'
 import InputAdornment from '@mui/material/InputAdornment'
 
 // ** Icons Imports
-import Google from 'mdi-material-ui/Google'
-import Github from 'mdi-material-ui/Github'
-import Twitter from 'mdi-material-ui/Twitter'
-import Facebook from 'mdi-material-ui/Facebook'
 import EyeOutline from 'mdi-material-ui/EyeOutline'
 import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
 
@@ -42,7 +37,6 @@ import { ENDURL } from 'src/utils/constants/endurl.utils'
 
 interface State {
   name: string
-  username: string
   email: string
   password: string
   confirmPassword: string
@@ -51,7 +45,6 @@ interface State {
 
 interface FormBody {
   name: string
-  username: string
   email: string
   password: string
 }
@@ -71,7 +64,6 @@ const RegisterPage = () => {
   // ** States
   const [values, setValues] = useState<State>({
     name: '',
-    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -79,7 +71,6 @@ const RegisterPage = () => {
   })
   const [errors, setErrors] = useState<State>({
     name: '',
-    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -91,7 +82,7 @@ const RegisterPage = () => {
   // ** Hook
   const theme = useTheme()
 
-  const { trigger: register, error } = useMutationSWR<{ message: string }, FormBody>(ENDURL.REGISTER)
+  const { trigger: register, error, isMutating } = useMutationSWR<{ message: string }, FormBody>(ENDURL.REGISTER)
 
   useEffect(() => {
     if (error) {
@@ -109,11 +100,10 @@ const RegisterPage = () => {
   }
 
   const validation = () => {
-    const { name, username, email, password, confirmPassword } = values
+    const { name, email, password, confirmPassword } = values
 
     const error = {
       name: '',
-      username: '',
       email: '',
       password: '',
       confirmPassword: ''
@@ -122,17 +112,6 @@ const RegisterPage = () => {
     // Name
     if (!name.trim()) {
       error.name = 'Name is required'
-    }
-
-    // Username
-    if (!username.trim()) {
-      error.username = 'Username is required'
-    } else if (username.includes(' ')) {
-      error.username = 'Username should not contain spaces'
-    } else if (username.length < 3 || username.length > 20) {
-      error.username = 'Username must be 3–20 characters'
-    } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-      error.username = 'Only letters, numbers, and underscore allowed'
     }
 
     // Email
@@ -171,10 +150,9 @@ const RegisterPage = () => {
     e.preventDefault()
     const isValid = validation()
     if (!isValid) return
-    const { name, username, email, password } = values
+    const { name, email, password } = values
     const body: FormBody = {
       name,
-      username,
       email,
       password
     }
@@ -182,13 +160,15 @@ const RegisterPage = () => {
     const res = await register(body)
 
     if (res) {
-      setValues({ ...values, name: '', username: '', email: '', password: '', confirmPassword: '' })
-      setErrors({ ...errors, name: '', username: '', email: '', password: '', confirmPassword: '' })
-      router.push({ pathname: '/pages/login' })
+      setValues({ ...values, name: '', email: '', password: '', confirmPassword: '' })
+      setErrors({ ...errors, name: '', email: '', password: '', confirmPassword: '' })
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('verify_email', email)
+      }
+      router.push({ pathname: '/auth/verify-email' })
     } else {
       setErrors({
         name: '',
-        username: '',
         email: '',
         password: '',
         confirmPassword: '',
@@ -298,17 +278,6 @@ const RegisterPage = () => {
               helperText={errors.name}
             />
             <TextField
-              autoFocus
-              fullWidth
-              id='username'
-              label='Username'
-              sx={{ marginBottom: 4 }}
-              value={values.username}
-              onChange={handleChange('username')}
-              error={Boolean(errors.username)}
-              helperText={errors.username}
-            />
-            <TextField
               fullWidth
               type='email'
               label='Email'
@@ -366,19 +335,27 @@ const RegisterPage = () => {
               />
               <FormHelperText sx={{ color: 'error.main' }}>{errors.confirmPassword}</FormHelperText>
             </FormControl>
-            <Button fullWidth size='large' type='submit' variant='contained' sx={{ marginBottom: 7 }}>
-              Sign up
+            <Button
+              fullWidth
+              size='large'
+              type='submit'
+              variant='contained'
+              sx={{ marginBottom: 7 }}
+              disabled={isMutating}
+            >
+              {isMutating ? 'Creating account...' : 'Sign up'}
             </Button>
             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
               <Typography variant='body2' sx={{ marginRight: 2 }}>
                 Already have an account?
               </Typography>
               <Typography variant='body2'>
-                <Link passHref href='/pages/login'>
+                <Link passHref href='/auth/login'>
                   <LinkStyled>Sign in instead</LinkStyled>
                 </Link>
               </Typography>
             </Box>
+            {/*
             <Divider sx={{ my: 5 }}>or</Divider>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Link href='/' passHref>
@@ -404,6 +381,7 @@ const RegisterPage = () => {
                 </IconButton>
               </Link>
             </Box>
+            */}
           </form>
         </CardContent>
       </Card>

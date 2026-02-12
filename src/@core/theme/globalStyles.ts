@@ -3,6 +3,9 @@ import { Theme } from '@mui/material/styles'
 
 const GlobalStyles = (theme: Theme) => {
   return {
+    body: {
+      backgroundColor: theme.palette.background.default
+    },
     '.ps__rail-y': {
       zIndex: 1,
       right: '0 !important',
