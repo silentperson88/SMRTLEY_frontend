@@ -23,6 +23,7 @@ import themeConfig from 'src/configs/themeConfig'
 
 // ** Component Imports
 import UserLayout from 'src/layouts/UserLayout'
+import WebsiteLayout from 'src/layouts/WebsiteLayout'
 import ThemeComponent from 'src/@core/theme/ThemeComponent'
 
 // ** Contexts
@@ -79,11 +80,40 @@ if (themeConfig.routingLoader) {
 const App = (props: ExtendedAppProps) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
   const theme = useTheme()
+  const [layoutMode, setLayoutMode] = useState<'admin' | 'website'>('admin')
 
   // Variables
-  const getLayout = Component.getLayout ?? (page => <UserLayout>{page}</UserLayout>)
+  const defaultLayout =
+    layoutMode === 'website'
+      ? (page: React.ReactNode) => <WebsiteLayout>{page}</WebsiteLayout>
+      : (page: React.ReactNode) => <UserLayout>{page}</UserLayout>
+  const getLayout = Component.getLayout ?? defaultLayout
   const router = useRouter()
   const [authReady, setAuthReady] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const readLayoutMode = () => {
+      const savedMode = localStorage.getItem('app-layout-mode')
+      setLayoutMode(savedMode === 'website' ? 'website' : 'admin')
+    }
+
+    readLayoutMode()
+
+    const onLayoutModeChanged = () => readLayoutMode()
+    const onStorageChanged = (event: StorageEvent) => {
+      if (event.key === 'app-layout-mode') readLayoutMode()
+    }
+
+    window.addEventListener('layout-mode-changed', onLayoutModeChanged)
+    window.addEventListener('storage', onStorageChanged)
+
+    return () => {
+      window.removeEventListener('layout-mode-changed', onLayoutModeChanged)
+      window.removeEventListener('storage', onStorageChanged)
+    }
+  }, [])
 
   useEffect(() => {
     const publicRoutes = [

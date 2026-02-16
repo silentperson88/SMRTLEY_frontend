@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from 'src/store'
 import { setMyPortfolios, setPortfolioTypes } from 'src/store/slices/portfolio.slice'
 import type { MyPortfolio, PortfolioType } from 'src/types/portfolio'
+import PortfolioSummaryHero from 'src/components/page/PortfolioSummaryHero'
 
 // ------------------------------------------------------
 
@@ -74,9 +75,22 @@ const PortfolioList = () => {
     setOpenCreate(true)
   }
 
+  const totalFund = myPortfolios.reduce((acc, item) => acc + Number(item.initial_fund || 0), 0)
+  const totalInvested = myPortfolios.reduce((acc, item) => acc + Number(item.initial_fund || 0) - Number(item.available_fund || 0), 0)
+  const totalPl = myPortfolios.reduce((acc, item) => acc + Number(item.pnl || 0), 0)
+
   return (
     <>
       <Grid container spacing={6}>
+        <Grid item xs={12}>
+          <PortfolioSummaryHero
+            totalFund={`INR ${totalFund.toLocaleString()}`}
+            totalInvested={`INR ${totalInvested.toLocaleString()}`}
+            totalPl={`${totalPl >= 0 ? '+' : '-'}INR ${Math.abs(totalPl).toLocaleString()}`}
+            isPositivePl={totalPl >= 0}
+            onCreate={() => setOpenCreate(true)}
+          />
+        </Grid>
         {/* Header */}
         <Grid item xs={12}>
           <Box display='flex' justifyContent='space-between' alignItems='center'>

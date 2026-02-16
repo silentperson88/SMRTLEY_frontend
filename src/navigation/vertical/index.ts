@@ -1,79 +1,30 @@
 // ** Icon imports
-import Login from 'mdi-material-ui/Login'
 import Table from 'mdi-material-ui/Table'
-import CubeOutline from 'mdi-material-ui/CubeOutline'
 import HomeOutline from 'mdi-material-ui/HomeOutline'
-import FormatLetterCase from 'mdi-material-ui/FormatLetterCase'
-import AccountCogOutline from 'mdi-material-ui/AccountCogOutline'
-import CreditCardOutline from 'mdi-material-ui/CreditCardOutline'
-import AccountPlusOutline from 'mdi-material-ui/AccountPlusOutline'
-import AlertCircleOutline from 'mdi-material-ui/AlertCircleOutline'
-import GoogleCirclesExtended from 'mdi-material-ui/GoogleCirclesExtended'
 import LogoutVariant from 'mdi-material-ui/LogoutVariant'
+import WalletPlusOutline from 'mdi-material-ui/WalletPlusOutline'
+import CurrencyUsd from 'mdi-material-ui/CurrencyUsd'
 
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
 
 const navigation = (): VerticalNavItemsType => {
-  return [
+  const userItems: VerticalNavItemsType = [
+    {
+      sectionTitle: 'Main'
+    },
+    {
+      title: 'Home',
+      icon: HomeOutline,
+      path: '/home'
+    },
     {
       title: 'Dashboard',
       icon: HomeOutline,
       path: '/'
     },
     {
-      title: 'Account Settings',
-      icon: AccountCogOutline,
-      path: '/account-settings'
-    },
-    {
-      sectionTitle: 'Pages'
-    },
-    {
-      title: 'Login',
-      icon: Login,
-      path: '/auth/login',
-      openInNewTab: true
-    },
-    {
-      title: 'Logout',
-      icon: LogoutVariant,
-      path: '/auth/logout'
-    },
-    {
-      title: 'Register',
-      icon: AccountPlusOutline,
-      path: '/auth/register',
-      openInNewTab: true
-    },
-    {
-      title: 'Error',
-      icon: AlertCircleOutline,
-      path: '/pages/error',
-      openInNewTab: true
-    },
-    {
-      sectionTitle: 'User Interface'
-    },
-    {
-      title: 'Typography',
-      icon: FormatLetterCase,
-      path: '/typography'
-    },
-    {
-      title: 'Icons',
-      path: '/icons',
-      icon: GoogleCirclesExtended
-    },
-    {
-      title: 'Cards',
-      icon: CreditCardOutline,
-      path: '/cards'
-    },
-    {
-      title: 'Tables',
-      icon: Table,
-      path: '/tables'
+      sectionTitle: 'Market'
     },
     {
       title: 'Live Stocks',
@@ -81,9 +32,77 @@ const navigation = (): VerticalNavItemsType => {
       path: '/live-stocks'
     },
     {
+      title: 'IPO',
+      icon: Table,
+      path: '/ipo'
+    },
+    {
+      title: 'Fundamentals',
+      icon: Table,
+      path: '/fundamentals'
+    },
+    {
+      sectionTitle: 'Portfolio'
+    },
+    {
       title: 'My Portfolio',
       icon: Table,
       path: '/portfolio-stocks'
+    },
+    {
+      sectionTitle: 'Wallet'
+    },
+    {
+      title: 'Add Funds',
+      icon: WalletPlusOutline,
+      path: '/?quickAction=add-fund'
+    },
+    {
+      title: 'Transfer Fund',
+      icon: CurrencyUsd,
+      path: '/?quickAction=transfer-fund'
+    },
+    {
+      sectionTitle: 'Session'
+    },
+    {
+      title: 'Logout',
+      icon: LogoutVariant,
+      path: '/auth/logout'
+    }
+  ]
+
+  const superAdminItems: VerticalNavItemsType = [
+    {
+      sectionTitle: 'Main'
+    },
+    {
+      title: 'Home',
+      icon: HomeOutline,
+      path: '/home'
+    },
+    {
+      title: 'Dashboard',
+      icon: HomeOutline,
+      path: '/'
+    },
+    {
+      sectionTitle: 'Market'
+    },
+    {
+      title: 'Live Stocks',
+      icon: Table,
+      path: '/live-stocks'
+    },
+    {
+      title: 'IPO',
+      icon: Table,
+      path: '/ipo'
+    },
+    {
+      title: 'Fundamentals',
+      icon: Table,
+      path: '/fundamentals'
     },
     {
       title: 'Raw Stocks',
@@ -91,11 +110,52 @@ const navigation = (): VerticalNavItemsType => {
       path: '/raw-stocks'
     },
     {
-      icon: CubeOutline,
-      title: 'Form Layouts',
-      path: '/form-layouts'
+      sectionTitle: 'Portfolio'
+    },
+    {
+      title: 'My Portfolio',
+      icon: Table,
+      path: '/portfolio-stocks'
+    },
+    {
+      sectionTitle: 'Wallet'
+    },
+    {
+      title: 'Add Funds',
+      icon: WalletPlusOutline,
+      path: '/?quickAction=add-fund'
+    },
+    {
+      title: 'Transfer Fund',
+      icon: CurrencyUsd,
+      path: '/?quickAction=transfer-fund'
+    },
+    {
+      sectionTitle: 'Session'
+    },
+    {
+      title: 'Logout',
+      icon: LogoutVariant,
+      path: '/auth/logout'
     }
   ]
+
+  if (typeof window === 'undefined') {
+    return userItems
+  }
+
+  try {
+    const rawUser = localStorage.getItem('user')
+    const parsedUser = rawUser ? JSON.parse(rawUser) : null
+    const role = String(parsedUser?.role || '').toUpperCase()
+    const isSuperAdmin = role === 'SUPERADMIN' || role === 'SUPER_ADMIN'
+
+    if (isSuperAdmin) return superAdminItems
+  } catch {
+    // ignore and fallback to limited navigation
+  }
+
+  return userItems
 }
 
 export default navigation
