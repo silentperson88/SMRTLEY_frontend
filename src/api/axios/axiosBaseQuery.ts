@@ -37,7 +37,7 @@ axiosInstance.interceptors.response.use(
     // Handle errors globally
     if (status === 401 && !isAuthApi) {
       localStorage.removeItem('token')
-      window.location.href = '/pages/login'
+      window.location.href = '/auth/login'
     }
 
     return Promise.reject(error)

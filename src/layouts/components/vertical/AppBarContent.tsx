@@ -20,7 +20,7 @@ import UserDropdown from 'src/@core/layouts/components/shared-components/UserDro
 import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import { Button, ClickAwayListener, List, ListItemButton, ListItemText, Paper, Popper } from '@mui/material'
 import { mutate } from 'swr'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
 import { useMutationSWR, usePaginatedSWR, useSimpleSWR } from 'src/hooks/swr/swrhooks'
 import { getErrorMessage } from 'src/api/axios/errorhandler'
@@ -47,8 +47,13 @@ interface SearchList {
   symbol: string
 }
 
+interface StoredUser {
+  role?: string
+}
+
 const AppBarContent = (props: Props) => {
   const [totp, setTotp] = useState<string>('')
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const { showSnackbar } = useSnackbar()
   const inputWrapperRef = useRef<HTMLInputElement | null>(null)
   const router = useRouter()
@@ -82,6 +87,21 @@ const AppBarContent = (props: Props) => {
   }
 
   const { trigger, isMutating } = useMutationSWR<LoginResponse, { data: string }>(ENDURL.POST_SMART_LOGIN)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const rawUser = localStorage.getItem('user')
+      if (!rawUser) return
+
+      const parsedUser = JSON.parse(rawUser) as StoredUser
+      const role = (parsedUser.role || '').toUpperCase()
+      setIsSuperAdmin(role === 'SUPERADMIN')
+    } catch {
+      setIsSuperAdmin(false)
+    }
+  }, [])
 
   const handleAngelLogin = async () => {
     try {
@@ -189,23 +209,25 @@ const AppBarContent = (props: Props) => {
             />
           </Box>
         )} */}
-        {data && !data.isOnline ? (
-          <>
-            <TextField
-              fullWidth
-              label='TOTP'
-              placeholder='TOTP-9:15-15:30'
-              size='small'
-              value={totp}
-              onChange={e => setTotp(e.target.value)}
-            />
-            <Button variant='contained' sx={{ marginRight: 3.5 }} onClick={handleAngelLogin} disabled={isMutating}>
-              Start
-            </Button>
-          </>
-        ) : (
-          <OnlinePredictionIcon color='primary' />
-        )}
+        {isSuperAdmin ? (
+          data && !data.isOnline ? (
+            <>
+              <TextField
+                fullWidth
+                label='TOTP'
+                placeholder='TOTP-9:15-15:30'
+                size='small'
+                value={totp}
+                onChange={e => setTotp(e.target.value)}
+              />
+              <Button variant='contained' sx={{ marginRight: 3.5 }} onClick={handleAngelLogin} disabled={isMutating}>
+                Start
+              </Button>
+            </>
+          ) : (
+            <OnlinePredictionIcon color='primary' />
+          )
+        ) : null}
         <ModeToggler settings={settings} saveSettings={saveSettings} />
         <NotificationDropdown />
         <UserDropdown />

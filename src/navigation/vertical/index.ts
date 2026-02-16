@@ -9,6 +9,7 @@ import CreditCardOutline from 'mdi-material-ui/CreditCardOutline'
 import AccountPlusOutline from 'mdi-material-ui/AccountPlusOutline'
 import AlertCircleOutline from 'mdi-material-ui/AlertCircleOutline'
 import GoogleCirclesExtended from 'mdi-material-ui/GoogleCirclesExtended'
+import LogoutVariant from 'mdi-material-ui/LogoutVariant'
 
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
@@ -33,6 +34,11 @@ const navigation = (): VerticalNavItemsType => {
       icon: Login,
       path: '/auth/login',
       openInNewTab: true
+    },
+    {
+      title: 'Logout',
+      icon: LogoutVariant,
+      path: '/auth/logout'
     },
     {
       title: 'Register',

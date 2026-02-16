@@ -27,13 +27,23 @@ export const ENDURL = {
   // authentication
   REGISTER: 'user/auth/register',
   LOGIN: 'user/auth/login',
+  VERIFY_EMAIL: 'user/auth/verify-email',
+  RESEND_OTP: 'user/auth/resend-verification-otp',
+  FORGOT_PASSWORD: 'user/auth/forgot-password',
+  RESET_PASSWORD: 'user/auth/reset-password',
 
   // Portfolio
   GET_PORTFOLIO_TYPES: 'user/portfolio-types',
-  GET_MY_PORTFOLIOS: 'user/portfolios',
-
-  // GET_PORTFOLIOS: 'ticker/portfolios',
-  // POST_PORTFOLIO: 'ticker/portfolios',
-  // GET_PORTFOLIO_BY_ID: 'ticker/portfolios/:id',
-  // DELETE_PORTFOLIO_BY_ID: 'ticker/portfolios/:id'
+  GET_MY_PORTFOLIOS: 'user/my-portfolios',
+  CREATE_PORTFOLIO: 'user/my-portfolios',
+  GET_MY_PORTFOLIO_BY_ID: 'user/my-portfoliaaaos/:id',
+  CREATE_ORDER: 'user/order/place',
+  GET_STOCK_HOLDINGS: 'user/my-portfolios/holdings',
+  GET_PORTFOLIO_DETAILS: 'user/my-portfolios/:portfolioId/holdings',
+  GET_PORTFOLIO_HOLDING_ORDERS: 'user/my-portfolios/:portfolioId/holdings/:activeStockId/orders',
+  GET_OPEN_ORDERS: 'user/order/open/:portfolioId',
+  GET_OVERVIEW: 'user/dashboard',
+  GET_DASHBOARD: 'user/dashboard',
+  LOAD_WALLET_FUND: 'user/wallet/load',
+  TRANSFER_WALLET_TO_PORTFOLIO: 'user/wallet/transfer-to-portfolio/:portfolioId'
 }

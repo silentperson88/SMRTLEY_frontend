@@ -14,10 +14,10 @@ import CardStatisticsVerticalComponent from 'src/@core/components/card-statistic
 import ApexChartWrapper from 'src/@core/styles/libs/react-apexcharts'
 
 // ** Demo Components Imports
-import Trophy from 'src/views/dashboard/Trophy'
-import TotalEarning from 'src/views/dashboard/TotalEarning'
-import WeeklyOverview from 'src/views/dashboard/WeeklyOverview'
-import SalesByCountries from 'src/views/dashboard/SalesByCountries'
+import Trophy from 'src/views/overview/Trophy'
+import TotalEarning from 'src/views/overview/TotalEarning'
+import WeeklyOverview from 'src/views/overview/WeeklyOverview'
+import SalesByCountries from 'src/views/overview/SalesByCountries'
 import { useSimpleSWR } from 'src/hooks/swr/swrhooks'
 import { useRouter } from 'next/router'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
@@ -25,9 +25,16 @@ import { useEffect, useState } from 'react'
 import CompanyStatisticsCard from 'src/views/stock-fundamentals/companyStatics'
 import ProsCons from 'src/views/stock-fundamentals/prosCons'
 import FundamentalTable, { TableData } from 'src/views/stock-fundamentals/FundamentalTable'
-import { Card, CardHeader, LinearProgress } from '@mui/material'
+import { Box, Card, CardHeader, Chip, LinearProgress, Typography } from '@mui/material'
 import { useLivePrices } from 'src/hooks/socket/useLivePrice'
 import { Candles } from 'src/types/ws'
+import BuySellOrderModal from 'src/views/modal/BuySell'
+import { useDispatch, useSelector } from 'react-redux'
+import { useSWRConfig } from 'swr'
+import type { RootState } from 'src/store'
+import { setMyPortfolios, setPortfolioTypes, setSelectedPortfolioId } from 'src/store/slices/portfolio.slice'
+import type { MyPortfolio, PortfolioType } from 'src/types/portfolio'
+import { TC } from 'src/utils/constants/text.constants'
 
 interface MarketSnapshot {
   marketCap: number
@@ -227,6 +234,29 @@ export interface TodaysMarket {
   dayCandles?: Candles[]
 }
 
+interface BuySellModal {
+  type: 'BUY' | 'SELL'
+  open: boolean
+}
+
+interface HoldingItem {
+  portfolio_id: string
+  portfolio_name: string
+  portfolio_type: {
+    display_name: string
+    risk_level: 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH'
+  }
+  holding: {
+    active_stock_id: string
+    symbol: string
+    quantity: number
+    locked_sell_quantity: number
+    avg_buy_price: number
+    invested_value: number
+    last_updated_at: string
+  }
+}
+
 const Dashboard = () => {
   // get symbol from url
   const [fundamentals, setFundamentals] = useState<Fundamental | null>()
@@ -236,11 +266,50 @@ const Dashboard = () => {
   const [cashFlows, setCashFlows] = useState<TableData | null>()
   const [todaysMarket, setTodaysMarket] = useState<TodaysMarket | null>()
   const [ratios, setRatios] = useState<TableData | null>()
+  const [showBuySellModal, setShowBuySellModal] = useState<BuySellModal>({ type: 'BUY', open: false })
   const router = useRouter()
   const { symbol } = router.query
   const { data } = useSimpleSWR<any>(`${ENDURL.GET_STOCK_FUNDAMENTAL_DETAILS}/${symbol}`)
+  const dispatch = useDispatch()
+  const { mutate } = useSWRConfig()
+  const myPortfolios = useSelector((state: RootState) => state.portfolio.myPortfolios)
+  const selectedPortfolioId = useSelector((state: RootState) => state.portfolio.selectedPortfolioId)
+  const { data: portfolioTypesData } = useSimpleSWR<PortfolioType[]>(ENDURL.GET_PORTFOLIO_TYPES)
+  const { data: myPortfolioData } = useSimpleSWR<MyPortfolio[]>(ENDURL.GET_MY_PORTFOLIOS)
+  const activeStockId = (data?.active_stock_id?._id as string) || ''
+  const { data: holdingsData } = useSimpleSWR<HoldingItem[]>(
+    activeStockId ? (`${ENDURL.GET_STOCK_HOLDINGS}/${activeStockId}` as string) : (null as any)
+  )
 
   const liveStocksData = useLivePrices([data?.master_id?.symbol as string])
+
+  const handleOpenBuySellModal = (type: 'BUY' | 'SELL') => {
+    console.log('handleOpenBuySellModal', type)
+    setShowBuySellModal({ type, open: true })
+  }
+
+  const handleCloseBuySellModal = () => {
+    setShowBuySellModal({ type: 'BUY', open: false })
+  }
+
+  const handleOrderSuccess = () => {
+    if (symbol) mutate(`${ENDURL.GET_STOCK_FUNDAMENTAL_DETAILS}/${symbol}`)
+    if (activeStockId) mutate(`${ENDURL.GET_STOCK_HOLDINGS}?active_stock_id=${activeStockId}`)
+    mutate(ENDURL.GET_PORTFOLIO_TYPES)
+    mutate(ENDURL.GET_MY_PORTFOLIOS)
+  }
+
+  useEffect(() => {
+    if (portfolioTypesData?.length) {
+      dispatch(setPortfolioTypes(portfolioTypesData))
+    }
+  }, [dispatch, portfolioTypesData])
+
+  useEffect(() => {
+    if (myPortfolioData?.length) {
+      dispatch(setMyPortfolios(myPortfolioData))
+    }
+  }, [dispatch, myPortfolioData])
 
   useEffect(() => {
     console.log('liveStocksData', liveStocksData, data)
@@ -248,26 +317,6 @@ const Dashboard = () => {
     if (!symbol) return
 
     const live = liveStocksData?.[symbol]
-
-    // ---------- helper to build daily candle ----------
-    const buildDailyCandle = (candles: Candles, high: number, low: number, close: number) => {
-      if (!candles)
-        return {
-          o: 0,
-          h: 0,
-          l: 0,
-          c: 0,
-          t: '0'
-        }
-
-      return {
-        o: candles.o,
-        h: high,
-        l: low,
-        c: close,
-        t: candles.t
-      }
-    }
 
     // ---------- LIVE DATA ----------
     if (live && Object.keys(live).length > 0) {
@@ -505,6 +554,23 @@ const Dashboard = () => {
     }
   }, [fundamentals])
 
+  const holdings = holdingsData || []
+  const totalHoldingQty = holdings.reduce((sum, item) => sum + (item.holding?.quantity || 0), 0)
+  const totalHoldingValue = holdings.reduce((sum, item) => sum + (item.holding?.invested_value || 0), 0)
+
+  const getRiskColor = (risk: string) => {
+    switch (risk) {
+      case 'LOW':
+        return 'success'
+      case 'MEDIUM':
+        return 'warning'
+      case 'HIGH':
+        return 'error'
+      default:
+        return 'default'
+    }
+  }
+
   return (
     <ApexChartWrapper>
       {!fundamentals ? (
@@ -512,7 +578,123 @@ const Dashboard = () => {
       ) : (
         <Grid container spacing={6}>
           <Grid item xs={12} md={12}>
-            <CompanyStatisticsCard fundamentals={fundamentals} todaysMarket={todaysMarket as TodaysMarket} />
+            <CompanyStatisticsCard
+              fundamentals={fundamentals}
+              todaysMarket={todaysMarket as TodaysMarket}
+              onBuy={() => handleOpenBuySellModal('BUY')}
+              onSell={() => handleOpenBuySellModal('SELL')}
+              totalHoldingQty={totalHoldingQty}
+              totalHoldingValue={totalHoldingValue}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3 }}>
+              <CardHeader title='Holdings By Portfolio' titleTypographyProps={{ variant: 'h6', fontWeight: 600 }} />
+
+              <Box sx={{ px: 6, pb: 6 }}>
+                {holdings.length === 0 ? (
+                  <Typography variant='body2' color='text.secondary'>
+                    No holdings found for this stock.
+                  </Typography>
+                ) : (
+                  <Grid container spacing={4}>
+                    {holdings.map(item => (
+                      <Grid item xs={12} md={6} key={`${item.portfolio_id}-${item.holding.active_stock_id}`}>
+                        <Card
+                          sx={{
+                            height: '100%',
+                            borderRadius: 3,
+                            p: 0,
+                            overflow: 'hidden',
+                            boxShadow: '0 6px 18px rgba(0,0,0,0.06)'
+                          }}
+                        >
+                          {/* Header strip */}
+                          <Box
+                            sx={{
+                              px: 4,
+                              py: 3,
+                              background: theme =>
+                                `linear-gradient(135deg, ${theme.palette.primary.light}22, ${theme.palette.primary.main}11)`
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between'
+                              }}
+                            >
+                              <Box>
+                                <Typography variant='subtitle1' fontWeight={600}>
+                                  {item.portfolio_name}
+                                </Typography>
+                                <Typography variant='caption' color='text.secondary'>
+                                  {item.portfolio_type?.display_name}
+                                </Typography>
+                              </Box>
+
+                              <Chip
+                                label={item.portfolio_type?.risk_level || 'NONE'}
+                                size='small'
+                                color={getRiskColor(item.portfolio_type?.risk_level || 'NONE')}
+                                sx={{ fontWeight: 500 }}
+                              />
+                            </Box>
+                          </Box>
+
+                          {/* Body */}
+                          <Box sx={{ p: 4 }}>
+                            <Grid container spacing={3}>
+                              <Grid item xs={6}>
+                                <Typography variant='caption' color='text.secondary'>
+                                  Quantity
+                                </Typography>
+                                <Typography variant='subtitle1' fontWeight={600}>
+                                  {item.holding?.quantity ?? 0}
+                                </Typography>
+                              </Grid>
+
+                              <Grid item xs={6}>
+                                <Typography variant='caption' color='text.secondary'>
+                                  Avg Buy
+                                </Typography>
+                                <Typography variant='subtitle1' fontWeight={600}>
+                                  {TC.CURRENCY}
+                                  {item.holding?.avg_buy_price.toFixed(2) ?? 0}
+                                </Typography>
+                              </Grid>
+
+                              <Grid item xs={6}>
+                                <Typography variant='caption' color='text.secondary'>
+                                  Invested
+                                </Typography>
+                                <Typography variant='subtitle1' fontWeight={600}>
+                                  {TC.CURRENCY}
+                                  {item.holding?.invested_value.toFixed(2) ?? 0}
+                                </Typography>
+                              </Grid>
+
+                              <Grid item xs={6}>
+                                <Typography variant='caption' color='text.secondary'>
+                                  Last Updated
+                                </Typography>
+                                <Typography variant='body2'>
+                                  {item.holding?.last_updated_at
+                                    ? new Date(item.holding.last_updated_at).toLocaleString()
+                                    : '-'}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Box>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                )}
+              </Box>
+            </Card>
           </Grid>
 
           <Grid item xs={12} md={12} lg={12}>
@@ -624,6 +806,18 @@ const Dashboard = () => {
           </Grid>
         </Grid>
       )}
+      <BuySellOrderModal
+        open={showBuySellModal.open}
+        onClose={handleCloseBuySellModal}
+        mode={showBuySellModal.type}
+        portfolios={myPortfolios}
+        selectedPortfolioId={selectedPortfolioId}
+        onSelectPortfolio={id => dispatch(setSelectedPortfolioId(id))}
+        activeStockId={data?.active_stock_id?._id || ''}
+        stockSymbol={(data?.active_stock_id?.symbol as string) || (data?.master_id?.symbol as string) || ''}
+        ltp={todaysMarket?.ltp || data?.active_stock_id?.ltp || 0}
+        onSuccess={handleOrderSuccess}
+      />
     </ApexChartWrapper>
   )
 }

@@ -1,5 +1,5 @@
 // ** React Imports
-import { createContext, useState, ReactNode } from 'react'
+import { createContext, useEffect, useState, ReactNode } from 'react'
 
 // ** MUI Imports
 import { PaletteMode } from '@mui/material'
@@ -27,6 +27,8 @@ const initialSettings: Settings = {
   contentWidth: themeConfig.contentWidth
 }
 
+const SETTINGS_STORAGE_KEY = 'app-settings'
+
 // ** Create Context
 export const SettingsContext = createContext<SettingsContextValue>({
   saveSettings: () => null,
@@ -37,8 +39,24 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   // ** State
   const [settings, setSettings] = useState<Settings>({ ...initialSettings })
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const raw = localStorage.getItem(SETTINGS_STORAGE_KEY)
+      if (!raw) return
+      const parsed = JSON.parse(raw) as Partial<Settings>
+      setSettings(prev => ({ ...prev, ...parsed }))
+    } catch {
+      // ignore invalid storage payload
+    }
+  }, [])
+
   const saveSettings = (updatedSettings: Settings) => {
     setSettings(updatedSettings)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(updatedSettings))
+    }
   }
 
   return <SettingsContext.Provider value={{ settings, saveSettings }}>{children}</SettingsContext.Provider>

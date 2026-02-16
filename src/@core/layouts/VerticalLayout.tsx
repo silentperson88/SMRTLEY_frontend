@@ -29,13 +29,14 @@ const VerticalLayoutWrapper = styled('div')({
   display: 'flex'
 })
 
-const MainContentWrapper = styled(Box)<BoxProps>({
+const MainContentWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   flexGrow: 1,
   minWidth: 0,
   display: 'flex',
   minHeight: '100vh',
-  flexDirection: 'column'
-})
+  flexDirection: 'column',
+  backgroundColor: theme.palette.background.default
+}))
 
 const ContentWrapper = styled('main')(({ theme }) => ({
   flexGrow: 1,
