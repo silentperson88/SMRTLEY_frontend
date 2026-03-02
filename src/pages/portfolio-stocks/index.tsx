@@ -52,22 +52,22 @@ const PortfolioList = () => {
 
   useEffect(() => {
     if (myPortfolioData?.length) {
-      const newPortfolios: MyPortfolio[] = myPortfolioData.map(item => {
-        return {
-          ...item,
-          portfolio_type_id: {
-            display_name: item.portfolio_type_id.display_name,
-            risk_level: item.portfolio_type_id.risk_level
-          }
-        }
-      })
+      const newPortfolios: MyPortfolio[] = myPortfolioData.map(item => ({
+        ...item,
+        id: (item as any).id,
+        portfolio_type: (item as any).portfolio_type
+      }))
       dispatch(setMyPortfolios(newPortfolios))
     }
   }, [dispatch, myPortfolioData])
 
   useEffect(() => {
     if (!portfolioTypesData?.length) return
-    dispatch(setPortfolioTypes(portfolioTypesData))
+    const normalizedTypes: PortfolioType[] = portfolioTypesData.map(type => ({
+      ...type,
+      id: (type as any).id
+    }))
+    dispatch(setPortfolioTypes(normalizedTypes))
   }, [dispatch, portfolioTypesData])
 
   const handleSelect = (id: string) => {
@@ -104,31 +104,31 @@ const PortfolioList = () => {
         {/* My Portfolios Section */}
         {myPortfolios.length > 0 ? (
           myPortfolios.map(portfolio => (
-            <Grid item xs={12} sm={6} md={4} key={portfolio._id}>
+            <Grid item xs={12} sm={6} md={4} key={portfolio.id}>
               <Card sx={{ height: '100%' }}>
                 <CardContent>
                   <Box display='flex' justifyContent='space-between' alignItems='center' mb={1}>
                     <Typography variant='h6'>{portfolio.name}</Typography>
                     <Chip
-                      label={portfolio.portfolio_type_id.risk_level}
+                      label={portfolio.portfolio_type.risk_level}
                       size='small'
-                      color={getRiskColor(portfolio.portfolio_type_id.risk_level)}
+                      color={getRiskColor(portfolio.portfolio_type.risk_level)}
                     />
                   </Box>
 
                   <Typography variant='body2' color='text.secondary'>
-                    {portfolio.portfolio_type_id.display_name}
+                    {portfolio.portfolio_type.display_name}
                   </Typography>
 
                   <Box mt={2}>
                     <Typography variant='body2'>
-                      💰 Fund: <strong>₹{portfolio.initial_fund}</strong>
+                      Fund: <strong>₹{portfolio.initial_fund}</strong>
                     </Typography>
                     <Typography variant='body2'>
-                      📊 Invested: ₹{portfolio.initial_fund - portfolio.available_fund}
+                      Invested: ₹{portfolio.initial_fund - portfolio.available_fund}
                     </Typography>
                     <Typography variant='body2' color={portfolio?.pnl >= 0 ? 'success.main' : 'error.main'}>
-                      📈 P&L: {portfolio?.pnl >= 0 ? '+' : ''}₹{portfolio?.pnl?.toLocaleString()}
+                      P&L: {portfolio?.pnl >= 0 ? '+' : ''}₹{portfolio?.pnl?.toLocaleString()}
                     </Typography>
                   </Box>
 
@@ -140,7 +140,7 @@ const PortfolioList = () => {
                 <CardActions>
                   <NextLink
                     href={{
-                      pathname: `/portfolio-stocks/${portfolio._id}`
+                      pathname: `/portfolio-stocks/${portfolio.id}`
                     }}
                     passHref
 
@@ -185,7 +185,7 @@ const PortfolioList = () => {
         </Grid>
         {/* Portfolio Cards */}
         {portfolioTypes.map(portfolio => (
-          <Grid item xs={12} sm={6} md={4} key={portfolio._id}>
+          <Grid item xs={12} sm={6} md={4} key={portfolio.id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardContent>
                 <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
@@ -205,7 +205,7 @@ const PortfolioList = () => {
               </CardContent>
 
               <CardActions sx={{ mt: 'auto', px: 4, pb: 4 }}>
-                <Button size='small' variant='contained' onClick={() => handleSelect(portfolio._id)}>
+                <Button size='small' variant='contained' onClick={() => handleSelect(portfolio.id)}>
                   Create
                 </Button>
               </CardActions>

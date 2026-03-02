@@ -94,7 +94,7 @@ const CompanyStatisticsCard = (props: {
       if (marketSnapshot.currentPrice) {
         newStats.push({
           stats: marketSnapshot.currentPrice,
-          title: 'Revenue',
+          title: 'Current Price',
           color: 'secondary',
           icon: <CurrencyUsd sx={{ fontSize: '1.75rem' }} />
         })

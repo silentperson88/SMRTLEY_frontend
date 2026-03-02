@@ -1,17 +1,24 @@
 export interface PortfolioType {
-  _id: string
+  id: string
   code: string
   display_name: string
   description: string
+  fund: number | null
   risk_level: 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH'
+  rules_json?: Record<string, unknown>
   important_notes: string[]
-  initial_fund: number
+  is_active?: boolean
+  created_at?: string
+  updated_at?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface MyPortfolio {
-  _id: string
+  id: string
   name: string
-  portfolio_type_id: {
+  portfolio_type: {
+    id?: string
     display_name: string
     risk_level: 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH'
   }

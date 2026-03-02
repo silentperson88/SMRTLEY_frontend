@@ -29,7 +29,7 @@ interface StockData {
   low: number
   close: number
   percentChange: number
-  _id: string
+  id: string
   status: string
   name: string
 }
@@ -74,10 +74,10 @@ const LiveStocks = () => {
     setSearchValue(value)
   }
 
-  const handleFetchfundamental = async (_id: string) => {
-    console.log(_id)
-    if (_id) {
-      const res = await trigger({ master_id: _id })
+  const handleFetchfundamental = async (id: string) => {
+    console.log(id)
+    if (id) {
+      const res = await trigger({ master_id: id })
       console.log(res)
       showSnackbar('Status updated', 'success')
       mutate([ENDURL.GET_RAW_STOCKS, { page, pageSize, search: searchValue }])

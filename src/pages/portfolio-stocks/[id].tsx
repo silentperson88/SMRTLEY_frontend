@@ -36,7 +36,7 @@ interface Holding {
 }
 
 interface Order {
-  _id: string
+  id: string
   symbol: string
   type: 'BUY' | 'SELL'
   order_type: string
@@ -67,7 +67,7 @@ interface PortfolioResponse {
 }
 
 interface ActiveStockOption {
-  _id: string
+  id: string
   symbol: string
 }
 
@@ -142,7 +142,7 @@ const OrdersTable = ({ orders, title }: { orders: Order[]; title: string }) => {
 
         <TableBody>
           {orders.map(o => (
-            <TableRow key={o._id}>
+            <TableRow key={o.id}>
               <TableCell>
                 <Chip size='small' label={o.type} color={o.type === 'BUY' ? 'success' : 'error'} />
               </TableCell>
@@ -424,7 +424,7 @@ const PortfolioDetailPage = () => {
         onClose={() => setOrderModal({ open: false, mode: 'BUY' })}
         mode={orderModal.mode}
         portfolioId={data.portfolio_id}
-        activeStockId={orderModal.holding?.active_stock_id || selectedStock?._id || ''}
+        activeStockId={orderModal.holding?.active_stock_id || selectedStock?.id || ''}
         stockSymbol={orderModal.holding?.symbol || selectedStock?.symbol || ''}
         ltp={orderModal.holding?.avg_buy_price || 0}
         stockOptions={activeStocks || []}

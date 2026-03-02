@@ -14,7 +14,7 @@ import TableContainer from '@mui/material/TableContainer'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 interface RowType {
-  _id: string
+  id: string
   symbol: string
   type: 'BUY' | 'SELL'
   order_type: string
@@ -62,7 +62,7 @@ const DashboardTable = ({ rows, emptyMessage }: { rows: RowType[]; emptyMessage?
             </TableHead>
             <TableBody>
               {rows.map((row: RowType) => (
-                <TableRow hover key={row._id} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
+                <TableRow hover key={row.id} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
                   <TableCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                       <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{row.symbol}</Typography>

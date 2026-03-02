@@ -411,7 +411,7 @@ const UserDropdown = () => {
             onChange={e => setSelectedPortfolioId(e.target.value)}
           >
             {(portfolios || []).map(portfolio => (
-              <MenuItem key={portfolio._id} value={portfolio._id}>
+              <MenuItem key={portfolio.id} value={portfolio.id}>
                 {portfolio.name}
               </MenuItem>
             ))}

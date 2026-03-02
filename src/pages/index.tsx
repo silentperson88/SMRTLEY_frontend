@@ -98,7 +98,7 @@ interface DashboardResponse {
   amount_distribution: any[]
   recent_sell_performance: { days: number; items: any[] }
   last_trades: {
-    _id: string
+    id: string
     symbol: string
     type: 'BUY' | 'SELL'
     order_type: string

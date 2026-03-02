@@ -13,7 +13,7 @@ import Chip from '@mui/material/Chip'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 interface Column {
-  id: 'srNo' | 'name' | 'symbol' | 'token' | 'exch_seg' | '_id' | 'status'
+  id: 'srNo' | 'name' | 'symbol' | 'token' | 'exch_seg' | 'action' | 'status'
   label: string
   minWidth?: number
   align?: 'right' | 'center'
@@ -27,7 +27,7 @@ const columns: readonly Column[] = [
   { id: 'token', label: 'Token', align: 'center' },
   { id: 'exch_seg', label: 'Exchange', align: 'right' },
   { id: 'status', label: 'Status', minWidth: 170, align: 'center' },
-  { id: '_id', label: 'Action', minWidth: 170, align: 'center' }
+  { id: 'action', label: 'Action', minWidth: 170, align: 'center' }
 ]
 
 interface Data {
@@ -35,7 +35,7 @@ interface Data {
   symbol: string
   token: string
   exch_seg: string
-  _id: string
+  id: string
   status: string
 }
 
@@ -45,7 +45,7 @@ interface RawFormat {
   symbol: JSX.Element
   token: JSX.Element
   exch_seg: JSX.Element
-  _id: JSX.Element
+  action: JSX.Element
   status: JSX.Element
 }
 
@@ -66,7 +66,7 @@ const TableStickyHeader = ({
   handleStockCheck
 }: {
   rawStocksData: Data[]
-  handleStockCheck: (_id: string, token: string, name: string, exch_seg: string) => void
+  handleStockCheck: (id: string, token: string, name: string, exch_seg: string) => void
 }) => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
@@ -75,7 +75,7 @@ const TableStickyHeader = ({
   useEffect(() => {
     // if (rawStocksData.length > 0) {
     const temp: RawFormat[] = rawStocksData.map(
-      ({ name, symbol, token, exch_seg, _id, status }: Data, index: number) => ({
+      ({ name, symbol, token, exch_seg, id, status }: Data, index: number) => ({
         srNo: <Typography>{index + 1}</Typography>,
         name: <Typography>{name}</Typography>,
         symbol: <Typography>{symbol}</Typography>,
@@ -94,11 +94,11 @@ const TableStickyHeader = ({
             }}
           />
         ),
-        _id: (
+        action: (
           <Button
             variant='contained'
             color='primary'
-            onClick={() => handleStockCheck(_id, token, name, exch_seg)}
+            onClick={() => handleStockCheck(id, token, name, exch_seg)}
             disabled={status === 'approved' || status === 'rejected'}
           >
             Check

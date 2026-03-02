@@ -43,6 +43,8 @@ interface LoginResponse {
 }
 
 interface SearchList {
+  id: string
+  company: string
   name: string
   symbol: string
 }
@@ -176,9 +178,9 @@ const AppBarContent = (props: Props) => {
                   </ListItemButton>
                 )}
 
-                {searchList?.map((item: any) => (
+                {searchList?.map(item => (
                   <ListItemButton
-                    key={item._id}
+                    key={item.id}
                     onClick={() => {
                       setSearchValue(item.company)
                       setAnchorEl(null)

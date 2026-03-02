@@ -33,7 +33,7 @@ const TradesTable = ({ trades }: any) => {
 
           <TableBody>
             {trades.map((t: any) => (
-              <TableRow key={t._id}>
+              <TableRow key={t.id}>
                 <TableCell>{t.symbol}</TableCell>
                 <TableCell>
                   <Chip

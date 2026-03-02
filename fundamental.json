@@ -1,0 +1,5117 @@
+{
+    "message": "Success",
+    "data": {
+        "id": "5",
+        "master_id": "3",
+        "active_stock_id": "3",
+        "company": "Punjab National Bank",
+        "company_info": {
+            "about": "Punjab National Bank is India's first Swadeshi Bank. PNB is a Banking and Financial service bank owned by the Government of India with its headquarters is in New Delhi, India. It is the Second largest PSU after SBI.[1]",
+            "links": [
+                {
+                    "url": "http://www.pnbindia.in",
+                    "title": "Website"
+                },
+                {
+                    "url": "https://www.bseindia.com/stock-share-price/punjab-national-bank/PNB/532461/",
+                    "title": "BSE"
+                },
+                {
+                    "url": "https://www.nseindia.com/get-quotes/equity?symbol=PNB",
+                    "title": "NSE"
+                }
+            ],
+            "key_points": "Market Position The bank is among the top 3 Public Sector Banks in India by way of business size, with a strong presence in North and Central India. [1]"
+        },
+        "summary": {
+            "cons": [
+                "Company has low interest coverage ratio.",
+                "Company has a low return on equity of 9.41% over last 3 years.",
+                "Contingent liabilities of Rs.6,93,710 Cr.",
+                "Company might be capitalizing the interest cost",
+                "Promoter holding has decreased over last 3 years: -3.07%"
+            ],
+            "pros": [
+                "Stock is trading at 1.01 times its book value",
+                "Company has delivered good profit growth of 111% CAGR over last 5 years",
+                "Company has been maintaining a healthy dividend payout of 19.2%"
+            ],
+            "market_snapshot": {
+                "roe": 15.2,
+                "roce": 6.32,
+                "high_low": "₹ 135 / 85.5",
+                "pe_ratio": 8.41,
+                "stock_pe": 8.41,
+                "debt_free": null,
+                "book_value": 130,
+                "face_value": 2,
+                "market_cap": 149649,
+                "current_price": 130,
+                "dividend_yield": 2.23
+            }
+        },
+        "peers": {
+            "main_table": {
+                "rows": [
+                    [
+                        "1.",
+                        "SBI",
+                        "1227.80",
+                        "13.98",
+                        "1133288.64",
+                        "1.29",
+                        "22175.72",
+                        "13.07",
+                        "130589.72",
+                        "4.76",
+                        "6.47"
+                    ],
+                    [
+                        "2.",
+                        "Bank of Baroda",
+                        "313.35",
+                        "8.33",
+                        "162097.09",
+                        "2.66",
+                        "5500.66",
+                        "4.40",
+                        "33599.84",
+                        "3.16",
+                        "6.29"
+                    ],
+                    [
+                        "3.",
+                        "Union Bank (I)",
+                        "197.78",
+                        "7.97",
+                        "150961.89",
+                        "2.40",
+                        "5072.69",
+                        "9.73",
+                        "26819.18",
+                        "0.37",
+                        "6.72"
+                    ],
+                    [
+                        "4.",
+                        "Punjab Natl.Bank",
+                        "130.27",
+                        "8.41",
+                        "149649.28",
+                        "2.23",
+                        "5576.54",
+                        "15.72",
+                        "32889.23",
+                        "3.12",
+                        "6.32"
+                    ],
+                    [
+                        "5.",
+                        "Canara Bank",
+                        "156.44",
+                        "7.03",
+                        "141855.26",
+                        "2.56",
+                        "5174.37",
+                        "24.67",
+                        "30937.71",
+                        "0.61",
+                        "6.79"
+                    ],
+                    [
+                        "6.",
+                        "Indian Bank",
+                        "982.75",
+                        "11.00",
+                        "132219.26",
+                        "1.65",
+                        "3147.50",
+                        "8.15",
+                        "17102.21",
+                        "8.45",
+                        "6.38"
+                    ],
+                    [
+                        "7.",
+                        "Bank of India",
+                        "174.13",
+                        "7.77",
+                        "79229.46",
+                        "2.33",
+                        "2814.27",
+                        "6.66",
+                        "19051.83",
+                        "4.01",
+                        "6.17"
+                    ]
+                ],
+                "title": "Peers",
+                "headers": [
+                    "S.No.",
+                    "Name",
+                    "CMP Rs.",
+                    "P/E",
+                    "Mar Cap Rs.Cr.",
+                    "Div Yld %",
+                    "NP Qtr Rs.Cr.",
+                    "Qtr Profit Var %",
+                    "Sales Qtr Rs.Cr.",
+                    "Qtr Sales Var %",
+                    "ROCE %"
+                ],
+                "table_class": "data-table text-nowrap striped mark-visited no-scroll-right highlight-on-hover"
+            }
+        },
+        "other_details": {
+            "profit_loss": {
+                "return_on_equity": {
+                    "title": "Return on Equity",
+                    "entries": [
+                        {
+                            "key": "roe_10y",
+                            "title": "10 Years:",
+                            "value": "2%"
+                        },
+                        {
+                            "key": "roe_5y",
+                            "title": "5 Years:",
+                            "value": "7%"
+                        },
+                        {
+                            "key": "roe_3y",
+                            "title": "3 Years:",
+                            "value": "9%"
+                        },
+                        {
+                            "key": "roe_last_year",
+                            "title": "Last Year:",
+                            "value": "15%"
+                        }
+                    ]
+                },
+                "stock_price_cagr": {
+                    "title": "Stock Price CAGR",
+                    "entries": [
+                        {
+                            "key": "spc_10y",
+                            "title": "10 Years:",
+                            "value": "6%"
+                        },
+                        {
+                            "key": "spc_5y",
+                            "title": "5 Years:",
+                            "value": "26%"
+                        },
+                        {
+                            "key": "spc_3y",
+                            "title": "3 Years:",
+                            "value": "40%"
+                        },
+                        {
+                            "key": "spc_1y",
+                            "title": "1 Year:",
+                            "value": "38%"
+                        }
+                    ]
+                },
+                "compounded_sales_growth": {
+                    "title": "Compounded Sales Growth",
+                    "entries": [
+                        {
+                            "key": "csg_10y",
+                            "title": "10 Years:",
+                            "value": "10%"
+                        },
+                        {
+                            "key": "csg_5y",
+                            "title": "5 Years:",
+                            "value": "18%"
+                        },
+                        {
+                            "key": "csg_3y",
+                            "title": "3 Years:",
+                            "value": "18%"
+                        },
+                        {
+                            "key": "csg_ttm",
+                            "title": "TTM:",
+                            "value": "9%"
+                        }
+                    ]
+                },
+                "compounded_profit_growth": {
+                    "title": "Compounded Profit Growth",
+                    "entries": [
+                        {
+                            "key": "cpg_10y",
+                            "title": "10 Years:",
+                            "value": "18%"
+                        },
+                        {
+                            "key": "cpg_5y",
+                            "title": "5 Years:",
+                            "value": "111%"
+                        },
+                        {
+                            "key": "cpg_3y",
+                            "title": "3 Years:",
+                            "value": "69%"
+                        },
+                        {
+                            "key": "cpg_ttm",
+                            "title": "TTM:",
+                            "value": "6%"
+                        }
+                    ]
+                }
+            }
+        },
+        "documents": {
+            "concalls": {
+                "items": [
+                    {
+                        "label": "Jan 2026",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/9681112c-86c0-4cb1-adde-eae634a50bdb.pdf",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/aedaff30-a173-45db-ac13-188e1257f05c.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/23070468/",
+                            "title": "Concall Summary - Jan 2026"
+                        }
+                    },
+                    {
+                        "label": "Jan 2026",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/106fedf5-6d1b-45b1-b098-7ae8a1423d55.pdf",
+                                "title": "PPT"
+                            },
+                            {
+                                "url": "https://youtu.be/ir6LvgcrdKU",
+                                "title": "REC"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "Oct 2025",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/3ca40325-c3a5-4c2a-b5aa-8916addd47aa.pdf",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/8944432e-dc06-472b-b5ae-67ebefadc6f0.pdf",
+                                "title": "PPT"
+                            },
+                            {
+                                "url": "https://youtu.be/DlVGAy7Yq-o",
+                                "title": "REC"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/23042438/",
+                            "title": "Concall Summary - Oct 2025"
+                        }
+                    },
+                    {
+                        "label": "Aug 2025",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/5eed55d8-1e5c-49d3-b467-3a9eeaa38b18.pdf",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/699e8ea7-311e-403b-80a7-5b4b7a899cb4.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/23024333/",
+                            "title": "Concall Summary - Aug 2025"
+                        }
+                    },
+                    {
+                        "label": "May 2025",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/4fd37f0e-5f4d-4412-ae73-ed2a88e3e657.pdf",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/6b8a6940-9576-471f-85ff-596df26db591.pdf",
+                                "title": "PPT"
+                            },
+                            {
+                                "url": "https://youtu.be/xItkAxKAkEE?si=tZCTEkl-g0mqdLss",
+                                "title": "REC"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/22998475/",
+                            "title": "Concall Summary - May 2025"
+                        }
+                    },
+                    {
+                        "label": "Feb 2025",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/a008ae12-37f5-4e8f-b1f1-e18b963c08f1.pdf",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/586f0628-3393-4402-a07d-7c2b67d6d6ab.pdf",
+                                "title": "PPT"
+                            },
+                            {
+                                "url": "https://youtu.be/wMlqI3I-hWM",
+                                "title": "REC"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/22977164/",
+                            "title": "Concall Summary - Feb 2025"
+                        }
+                    },
+                    {
+                        "label": "Nov 2024",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/6408c7a4-528d-4f56-a134-61fe3b2596e1.pdf",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/72498c3d-a180-4064-930a-465a8826557d.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/22954373/",
+                            "title": "Concall Summary - Nov 2024"
+                        }
+                    },
+                    {
+                        "label": "Aug 2024",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/b3ae264f-8f2f-4cbc-92ab-fbc85a49ba4d.pdf",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/5009d1f9-f10a-4b99-88fa-bdfb98743966.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/22933178/",
+                            "title": "Concall Summary - Aug 2024"
+                        }
+                    },
+                    {
+                        "label": "Jul 2024",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/82e8719a-f898-4616-b2bf-2d0479af8e5b.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "May 2024",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/536633d8-b171-48dc-8047-52bfaaf20450.pdf",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/6f2b5300-2894-4ee2-b789-10e58c3f7066.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/22884778/",
+                            "title": "Concall Summary - May 2024"
+                        }
+                    },
+                    {
+                        "label": "Feb 2024",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/328ee86a-85d7-4bf9-a70d-58149ad04a3f.pdf",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/09466e53-b2a6-4e60-bff7-2a7edf7fca25.pdf",
+                                "title": "PPT"
+                            },
+                            {
+                                "url": "https://www.youtube.com/watch?v=KIVKU7iAKf4",
+                                "title": "REC"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/18984830/",
+                            "title": "Concall Summary - Feb 2024"
+                        }
+                    },
+                    {
+                        "label": "Nov 2023",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/0f13d2b3-01a9-435a-82bd-ae9d74e3c5fb.pdf",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/5e80bf3c-f20e-47a8-a336-76afa11cac0d.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/15747498/",
+                            "title": "Concall Summary - Nov 2023"
+                        }
+                    },
+                    {
+                        "label": "Jul 2023",
+                        "links": [
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=ovtkljrcfsQ7GLXqURBsWA==",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=N6QAX8vo23LoCJX/2Gmw0g==",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/13397653/",
+                            "title": "Concall Summary - Jul 2023"
+                        }
+                    },
+                    {
+                        "label": "May 2023",
+                        "links": [
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=XCereXYa+Zb49JkPg3tnxQ==",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=UmVMgjZ/HGcKe8hon9CPmA==",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/11972797/",
+                            "title": "Concall Summary - May 2023"
+                        }
+                    },
+                    {
+                        "label": "May 2023",
+                        "links": [
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=UmVMgjZ/HGcKe8hon9CPmA==",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "Jan 2023",
+                        "links": [
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=CmB87XtJvRL3Aq3aP4miHw==",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=l4gXHpIcfaZU+5LmCMRPxQ==",
+                                "title": "PPT"
+                            },
+                            {
+                                "url": "https://www.youtube.com/watch?v=nJIvJb-y2JY",
+                                "title": "REC"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/10206362/",
+                            "title": "Concall Summary - Jan 2023"
+                        }
+                    },
+                    {
+                        "label": "Nov 2022",
+                        "links": [
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=x5SQbdGGoOufxiaP4loUOA==",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=LCYStHo3ZW1hcRaYeoNCPQ==",
+                                "title": "PPT"
+                            },
+                            {
+                                "url": "https://www.youtube.com/watch?v=-0pMgmtdUFU",
+                                "title": "REC"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/10206364/",
+                            "title": "Concall Summary - Oct 2022"
+                        }
+                    },
+                    {
+                        "label": "Jul 2022",
+                        "links": [
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=37NHkQfx3Z/gX2QsMuxrUA==",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=mlYCXPIX2Bw8n5Aoe4xRIg==",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/10206366/",
+                            "title": "Concall Summary - Jul 2022"
+                        }
+                    },
+                    {
+                        "label": "Apr 2022",
+                        "links": [
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=9m9yVijy0tWh3zErE9LQeg==",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "Jan 2022",
+                        "links": [
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=He3Dp3+wIBwQ7jIzvzolcg==",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=fMb+rVfagN7zhHEsKkShvQ==",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/10206369/",
+                            "title": "Concall Summary - Jan 2022"
+                        }
+                    },
+                    {
+                        "label": "Oct 2021",
+                        "links": [
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=Qas7SYGLx2+K1AzCeMgWDQ==",
+                                "title": "Transcript"
+                            },
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=6JIpELMcn2rbbY09fZvrzg==",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": {
+                            "url": "/concalls/summary/10206371/",
+                            "title": "Concall Summary - Oct 2021"
+                        }
+                    },
+                    {
+                        "label": "Jul 2021",
+                        "links": [
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=pMeXGclwjzIU/Paur/aUgg==",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "Mar 2021",
+                        "links": [
+                            {
+                                "url": "https://www.pnbindia.in/downloadprocess.aspx?fid=tKPFyLksGJAwYONvLB2yig==",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "Nov 2020",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/be27a121-a149-46aa-b22f-bb70af764242.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "May 2019",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/edee5698-5dee-4fe2-8cb7-d8d10c4b1157.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "Aug 2018",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/CorpAttachment/2018/8/f27b669e-9afb-49af-b92e-1cf9b905a824.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "Aug 2017",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/CorpAttachment/2017/8/9490c6ea-6afc-429e-ae81-2d750b669e1e.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "May 2017",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/xml-data/corpfiling/CorpAttachment/2017/5/c68543c8-3b24-40db-b8a9-b018fd78e288.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "Nov 2016",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/stockinfo/AnnPdfOpen.aspx?Pname=020CCCCE_1D30_4468_A796_2FEC81B065C6_180423.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    },
+                    {
+                        "label": "Aug 2016",
+                        "links": [
+                            {
+                                "url": "https://www.bseindia.com/stockinfo/AnnPdfOpen.aspx?Pname=2AF9F640_97F5_4608_9232_ED6D75FA997C_180456.pdf",
+                                "title": "PPT"
+                            }
+                        ],
+                        "ai_summary": null
+                    }
+                ],
+                "title": "Concalls"
+            },
+            "announcements": {
+                "items": [
+                    {
+                        "url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/91c5b613-809b-45fb-aa14-395980b5928f.pdf",
+                        "title": "Announcement under Regulation 30 (LODR)-Analyst / Investor Meet - Outcome",
+                        "subtitle": "43m - PNB participated in Goldman Sachs Asia Financials Corporate Day on 23 Feb 2026; only public information shared."
+                    },
+                    {
+                        "url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/1f791c5c-b0ea-429d-b3ab-79db05bb8817.pdf",
+                        "title": "Announcement under Regulation 30 (LODR)-Analyst / Investor Meet - Intimation",
+                        "subtitle": "20 Feb - PNB to attend Kotak 'Chasing Growth 2026' investor meetings in Mumbai on 26 Feb 2026 from 12:00pm."
+                    },
+                    {
+                        "url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/55a6e4d6-1602-4589-a5fb-0b052880b830.pdf",
+                        "title": "Announcement under Regulation 30 (LODR)-Analyst / Investor Meet - Intimation",
+                        "subtitle": "18 Feb - PNB to participate in Goldman Sachs 2026 Asia Financials Corporate Day on 23 Feb 2026, virtual meeting from 12:00pm."
+                    },
+                    {
+                        "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/86725329-32af-4497-bdae-8129a51abcfb.pdf",
+                        "title": "Intimation Under Regulation 30 Of SEBI (LODR) Regulations 2015",
+                        "subtitle": "10 Feb - PNB: branches/offices may be affected on 12-Feb-2026 due to AIBEA/BEFI/AIBOA strike."
+                    },
+                    {
+                        "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/bda79baf-b0a4-4c62-abeb-6ec8868c9be1.pdf",
+                        "title": "Disclosure Under Regulation 30 Of SEBI (LODR) Regulations, 2015",
+                        "subtitle": "2 Feb - RBI imposed penalties of Rs.2,50,000 and Rs.1,10,000 on PNB for currency chest note shortage, received 02.02.2026."
+                    }
+                ],
+                "title": "Announcements",
+                "all_link": "https://www.bseindia.com/stock-share-price/punjab-national-bank/PNB/532461/corp-announcements/"
+            },
+            "annual_reports": {
+                "items": [
+                    {
+                        "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/1192d645-9fe8-49d5-b6ca-cfffc8781746.pdf",
+                        "title": "Financial Year 2024",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/01b4a055-de00-4725-acb2-3925a86b10f0.pdf",
+                        "title": "Financial Year 2023",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/73163532461.pdf",
+                        "title": "Financial Year 2022",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/68736532461.pdf",
+                        "title": "Financial Year 2021",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/5324610320.pdf",
+                        "title": "Financial Year 2020",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/5324610319.pdf",
+                        "title": "Financial Year 2019",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/5324610318.pdf",
+                        "title": "Financial Year 2018",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/5324610317.pdf",
+                        "title": "Financial Year 2017",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/5324610316.pdf",
+                        "title": "Financial Year 2016",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/5324610315.pdf",
+                        "title": "Financial Year 2015",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/5324610314.pdf",
+                        "title": "Financial Year 2014",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/5324610313.pdf",
+                        "title": "Financial Year 2013",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/5324610312.pdf",
+                        "title": "Financial Year 2012",
+                        "subtitle": "from bse"
+                    },
+                    {
+                        "url": "https://archives.nseindia.com/annual_reports/AR_PNB_2011_2012_29062012100845.zip",
+                        "title": "Financial Year 2012",
+                        "subtitle": "from nse"
+                    },
+                    {
+                        "url": "https://www.bseindia.com/bseplus/AnnualReport/532461/5324610311.pdf",
+                        "title": "Financial Year 2011",
+                        "subtitle": "from bse"
+                    }
+                ],
+                "title": "Annual reports"
+            },
+            "credit_ratings": {
+                "items": [
+                    {
+                        "url": "https://www.brickworkratings.com/Admin/PressRelease/X-PUNJAB-NATIONAL-BANK-15Dec2025.pdf",
+                        "title": "Rating update",
+                        "subtitle": "15 Dec 2025 from brickwork"
+                    },
+                    {
+                        "url": "https://www.crisil.com/mnt/winshare/Ratings/RatingList/RatingDocs/PunjabNationalBank_December 12_ 2025_RR_384839.html",
+                        "title": "Rating update",
+                        "subtitle": "12 Dec 2025 from crisil"
+                    },
+                    {
+                        "url": "https://www.careratings.com/upload/CompanyFiles/PR/202512121200_Punjab_National_Bank.pdf",
+                        "title": "Rating update",
+                        "subtitle": "8 Dec 2025 from care"
+                    },
+                    {
+                        "url": "https://www.icra.in/Rationale/ShowRationaleReport/?Id=139447",
+                        "title": "Rating update",
+                        "subtitle": "5 Dec 2025 from icra"
+                    },
+                    {
+                        "url": "https://www.careratings.com/upload/CompanyFiles/PR/202509140910_Punjab_National_Bank.pdf",
+                        "title": "Rating update",
+                        "subtitle": "30 Sep 2025 from care"
+                    },
+                    {
+                        "url": "https://www.indiaratings.co.in/pressrelease/75108",
+                        "title": "Rating update",
+                        "subtitle": "17 Feb 2025 from fitch"
+                    }
+                ],
+                "title": "Credit ratings"
+            }
+        },
+        "last_updated_at": "2026-02-23T14:27:41.664Z",
+        "created_at": "2026-02-23T14:24:20.111Z",
+        "updated_at": "2026-02-23T14:27:41.667Z",
+        "quarters_table": {
+            "rows": {
+                "eps": {
+                    "title": "EPS in Rs",
+                    "values": [
+                        0.64,
+                        1.69,
+                        1.22,
+                        1.81,
+                        2.21,
+                        3.04,
+                        3.61,
+                        4.1,
+                        4.18,
+                        4.34,
+                        1.84,
+                        4.46,
+                        4.83
+                    ],
+                    "children": []
+                },
+                "raw_pdf": {
+                    "title": "Raw PDF",
+                    "values": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "children": []
+                },
+                "revenue": {
+                    "title": "Revenue",
+                    "values": [
+                        22808,
+                        24305,
+                        25673,
+                        26858,
+                        27852,
+                        28682,
+                        29145,
+                        30447,
+                        31895,
+                        32523,
+                        32572,
+                        32513,
+                        32889
+                    ],
+                    "children": [
+                        {
+                            "title": "YOY Sales Growth %",
+                            "values": [
+                                16.49,
+                                27.32,
+                                34.11,
+                                30.45,
+                                22.11,
+                                18.01,
+                                13.52,
+                                13.37,
+                                14.52,
+                                13.39,
+                                11.76,
+                                6.78,
+                                3.12
+                            ]
+                        }
+                    ]
+                },
+                "expenses": {
+                    "title": "Expenses",
+                    "values": [
+                        11578,
+                        10813,
+                        10990,
+                        10259,
+                        9449,
+                        9831,
+                        8473,
+                        8592,
+                        7494,
+                        9142,
+                        9197,
+                        8299,
+                        9298
+                    ],
+                    "children": [
+                        {
+                            "title": "Employee Cost %",
+                            "values": [
+                                19.69,
+                                18.95,
+                                17.62,
+                                15.79,
+                                15.1,
+                                19.78,
+                                15.76,
+                                19.04,
+                                16.66,
+                                17.97,
+                                16.05,
+                                14.79,
+                                15.65
+                            ]
+                        }
+                    ]
+                },
+                "interest": {
+                    "title": "Interest",
+                    "values": [
+                        13513,
+                        14690,
+                        16064,
+                        16820,
+                        17444,
+                        18206,
+                        18536,
+                        19790,
+                        20738,
+                        21640,
+                        21828,
+                        21858,
+                        22164
+                    ],
+                    "children": []
+                },
+                "net_profit": {
+                    "title": "Net Profit",
+                    "values": [
+                        715,
+                        1876,
+                        1363,
+                        1990,
+                        2441,
+                        3363,
+                        3991,
+                        4739,
+                        4811,
+                        5011,
+                        2167,
+                        5121,
+                        5577
+                    ],
+                    "children": [
+                        {
+                            "title": "Profit from Associates",
+                            "values": [
+                                55,
+                                135,
+                                152,
+                                225,
+                                189,
+                                262,
+                                275,
+                                307,
+                                162,
+                                368,
+                                335,
+                                272,
+                                387
+                            ]
+                        },
+                        {
+                            "title": "Minority share",
+                            "values": [
+                                -7,
+                                -12,
+                                -21,
+                                0,
+                                -8,
+                                -21,
+                                -16,
+                                -25,
+                                -10,
+                                -22,
+                                -47,
+                                5,
+                                -21
+                            ]
+                        },
+                        {
+                            "title": "Profit excl Excep",
+                            "values": [
+                                715,
+                                1876,
+                                1363,
+                                1990,
+                                2441,
+                                3363,
+                                3991,
+                                4739,
+                                4811,
+                                5011,
+                                2167,
+                                5121,
+                                5577
+                            ]
+                        },
+                        {
+                            "title": "Profit for PE",
+                            "values": [
+                                708,
+                                1864,
+                                1342,
+                                1990,
+                                2433,
+                                3342,
+                                3976,
+                                4714,
+                                4801,
+                                4989,
+                                2120,
+                                5125,
+                                5556
+                            ]
+                        },
+                        {
+                            "title": "Profit for EPS",
+                            "values": [
+                                708,
+                                1864,
+                                1342,
+                                1990,
+                                2433,
+                                3342,
+                                3976,
+                                4714,
+                                4801,
+                                4989,
+                                2120,
+                                5125,
+                                5556
+                            ]
+                        },
+                        {
+                            "title": "YOY Profit Growth %",
+                            "values": [
+                                -43,
+                                451,
+                                376,
+                                303,
+                                243,
+                                79,
+                                196,
+                                137,
+                                97,
+                                49,
+                                -47,
+                                9,
+                                16
+                            ]
+                        }
+                    ]
+                },
+                "tax_percent": {
+                    "title": "Tax %",
+                    "values": [
+                        37,
+                        34,
+                        39,
+                        36,
+                        38,
+                        37,
+                        35,
+                        34,
+                        34,
+                        29,
+                        74,
+                        26,
+                        19
+                    ],
+                    "children": []
+                },
+                "depreciation": {
+                    "title": "Depreciation",
+                    "values": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "children": []
+                },
+                "other_income": {
+                    "title": "Other Income",
+                    "values": [
+                        3325,
+                        3827,
+                        3360,
+                        2999,
+                        2676,
+                        4294,
+                        3615,
+                        4664,
+                        3392,
+                        4776,
+                        5427,
+                        4171,
+                        5013
+                    ],
+                    "children": [
+                        {
+                            "title": "Other income normal",
+                            "values": [
+                                3325,
+                                3827,
+                                3360,
+                                2999,
+                                2676,
+                                4294,
+                                3615,
+                                4664,
+                                3392,
+                                4776,
+                                5427,
+                                4171,
+                                5013
+                            ]
+                        }
+                    ]
+                },
+                "profit_before_tax": {
+                    "title": "Profit before tax",
+                    "values": [
+                        1043,
+                        2630,
+                        1979,
+                        2778,
+                        3634,
+                        4940,
+                        5751,
+                        6729,
+                        7055,
+                        6518,
+                        6973,
+                        6527,
+                        6440
+                    ],
+                    "children": []
+                }
+            },
+            "title": "Quarterly Results",
+            "headers": [
+                "Dec 2022",
+                "Mar 2023",
+                "Jun 2023",
+                "Sep 2023",
+                "Dec 2023",
+                "Mar 2024",
+                "Jun 2024",
+                "Sep 2024",
+                "Dec 2024",
+                "Mar 2025",
+                "Jun 2025",
+                "Sep 2025",
+                "Dec 2025"
+            ],
+            "unmatched_rows": [
+                {
+                    "label": "Financing Profit",
+                    "Dec 2022": "-2,282",
+                    "Dec 2023": "959",
+                    "Dec 2024": "3,663",
+                    "Dec 2025": "1,426",
+                    "Jun 2023": "-1,381",
+                    "Jun 2024": "2,136",
+                    "Jun 2025": "1,547",
+                    "Mar 2023": "-1,197",
+                    "Mar 2024": "646",
+                    "Mar 2025": "1,742",
+                    "Sep 2023": "-221",
+                    "Sep 2024": "2,065",
+                    "Sep 2025": "2,356"
+                },
+                {
+                    "label": "Financing Margin %",
+                    "Dec 2022": "-10%",
+                    "Dec 2023": "3%",
+                    "Dec 2024": "11%",
+                    "Dec 2025": "4%",
+                    "Jun 2023": "-5%",
+                    "Jun 2024": "7%",
+                    "Jun 2025": "5%",
+                    "Mar 2023": "-5%",
+                    "Mar 2024": "2%",
+                    "Mar 2025": "5%",
+                    "Sep 2023": "-1%",
+                    "Sep 2024": "7%",
+                    "Sep 2025": "7%"
+                },
+                {
+                    "label": "Gross NPA %",
+                    "Dec 2022": "",
+                    "Dec 2023": "",
+                    "Dec 2024": "",
+                    "Dec 2025": "",
+                    "Jun 2023": "",
+                    "Jun 2024": "",
+                    "Jun 2025": "",
+                    "Mar 2023": "",
+                    "Mar 2024": "",
+                    "Mar 2025": "",
+                    "Sep 2023": "",
+                    "Sep 2024": "",
+                    "Sep 2025": ""
+                },
+                {
+                    "label": "Net NPA %",
+                    "Dec 2022": "",
+                    "Dec 2023": "",
+                    "Dec 2024": "",
+                    "Dec 2025": "",
+                    "Jun 2023": "",
+                    "Jun 2024": "",
+                    "Jun 2025": "",
+                    "Mar 2023": "",
+                    "Mar 2024": "",
+                    "Mar 2025": "",
+                    "Sep 2023": "",
+                    "Sep 2024": "",
+                    "Sep 2025": ""
+                }
+            ]
+        },
+        "profit_loss_table": {
+            "rows": {
+                "eps": {
+                    "title": "EPS in Rs",
+                    "values": [
+                        19.98,
+                        18.33,
+                        -18.79,
+                        5.58,
+                        -43.88,
+                        -20.79,
+                        0.65,
+                        2.45,
+                        3.51,
+                        3.04,
+                        8.27,
+                        16.08,
+                        15.47
+                    ],
+                    "children": []
+                },
+                "revenue": {
+                    "title": "Revenue",
+                    "values": [
+                        44958,
+                        48710,
+                        50804,
+                        48058,
+                        48725,
+                        52147,
+                        54918,
+                        81935,
+                        76242,
+                        86845,
+                        109065,
+                        124010,
+                        130497
+                    ],
+                    "children": [
+                        {
+                            "title": "Sales Growth %",
+                            "values": [
+                                4.38,
+                                8.34,
+                                4.3,
+                                -5.4,
+                                1.39,
+                                7.02,
+                                5.31,
+                                49.19,
+                                -6.95,
+                                13.91,
+                                25.58,
+                                13.7,
+                                null
+                            ]
+                        }
+                    ]
+                },
+                "expenses": {
+                    "title": "Expenses",
+                    "values": [
+                        16112,
+                        18760,
+                        27453,
+                        22533,
+                        43345,
+                        39645,
+                        25867,
+                        38601,
+                        36026,
+                        41502,
+                        39623,
+                        33893,
+                        35936
+                    ],
+                    "children": [
+                        {
+                            "title": "Manufacturing Cost %",
+                            "values": [
+                                0.34,
+                                0.41,
+                                0.44,
+                                0.49,
+                                0.55,
+                                0.55,
+                                0.6,
+                                0.6,
+                                0.74,
+                                0.91,
+                                0.74,
+                                0.71,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Employee Cost %",
+                            "values": [
+                                14.72,
+                                15.34,
+                                12.93,
+                                11.41,
+                                18.97,
+                                13.52,
+                                12.86,
+                                15.01,
+                                15.7,
+                                17.21,
+                                17.1,
+                                17.38,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Other Cost %",
+                            "values": [
+                                20.77,
+                                22.77,
+                                40.67,
+                                34.98,
+                                69.44,
+                                61.96,
+                                33.64,
+                                31.5,
+                                30.81,
+                                29.67,
+                                18.49,
+                                9.24,
+                                null
+                            ]
+                        }
+                    ]
+                },
+                "interest": {
+                    "title": "Interest",
+                    "values": [
+                        28220,
+                        31343,
+                        34331,
+                        32722,
+                        33530,
+                        34656,
+                        36997,
+                        50805,
+                        46823,
+                        51817,
+                        68534,
+                        80704,
+                        87490
+                    ],
+                    "children": []
+                },
+                "net_profit": {
+                    "title": "Net Profit",
+                    "values": [
+                        3674,
+                        3525,
+                        -3510,
+                        1239,
+                        -12111,
+                        -9550,
+                        485,
+                        2695,
+                        3908,
+                        3359,
+                        9157,
+                        18553,
+                        17875
+                    ],
+                    "children": [
+                        {
+                            "title": "Profit from Associates",
+                            "values": [
+                                139,
+                                184,
+                                153,
+                                338,
+                                473,
+                                476,
+                                122,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Minority share",
+                            "values": [
+                                -57,
+                                -126,
+                                -180,
+                                -52,
+                                -2,
+                                -20,
+                                -46,
+                                -133,
+                                -47,
+                                -10,
+                                -50,
+                                -72,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Exceptional items AT",
+                            "values": [
+                                3,
+                                3,
+                                2,
+                                5,
+                                3,
+                                18,
+                                0,
+                                -13,
+                                14,
+                                2,
+                                4,
+                                3,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Profit excl Excep",
+                            "values": [
+                                3671,
+                                3522,
+                                -3512,
+                                1234,
+                                -12114,
+                                -9568,
+                                485,
+                                2707,
+                                3893,
+                                3357,
+                                9153,
+                                18550,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Profit for PE",
+                            "values": [
+                                3614,
+                                3397,
+                                -3692,
+                                1182,
+                                -12116,
+                                -9588,
+                                438,
+                                2574,
+                                3847,
+                                3347,
+                                9103,
+                                18477,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Profit for EPS",
+                            "values": [
+                                3617,
+                                3400,
+                                -3690,
+                                1187,
+                                -12113,
+                                -9570,
+                                438,
+                                2562,
+                                3861,
+                                3348,
+                                9107,
+                                18480,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Profit Growth %",
+                            "values": [
+                                -27,
+                                -6,
+                                -209,
+                                132,
+                                -1125,
+                                21,
+                                105,
+                                487,
+                                49,
+                                -13,
+                                172,
+                                103,
+                                null
+                            ]
+                        }
+                    ]
+                },
+                "tax_percent": {
+                    "title": "Tax %",
+                    "values": [
+                        29,
+                        24,
+                        -31,
+                        41,
+                        -37,
+                        -35,
+                        56,
+                        38,
+                        19,
+                        35,
+                        35,
+                        29,
+                        null
+                    ],
+                    "children": []
+                },
+                "depreciation": {
+                    "title": "Depreciation",
+                    "values": [
+                        367,
+                        384,
+                        413,
+                        430,
+                        581,
+                        584,
+                        614,
+                        982,
+                        896,
+                        905,
+                        906,
+                        958,
+                        0
+                    ],
+                    "children": []
+                },
+                "other_income": {
+                    "title": "Other Income",
+                    "values": [
+                        4710,
+                        6175,
+                        6100,
+                        9168,
+                        8883,
+                        7367,
+                        9388,
+                        12777,
+                        12329,
+                        12529,
+                        14158,
+                        17560,
+                        19387
+                    ],
+                    "children": [
+                        {
+                            "title": "Exceptional items",
+                            "values": [
+                                5,
+                                3,
+                                2,
+                                5,
+                                3,
+                                18,
+                                0,
+                                -13,
+                                14,
+                                3,
+                                7,
+                                4,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Other income normal",
+                            "values": [
+                                4706,
+                                6172,
+                                6097,
+                                9162,
+                                8881,
+                                7349,
+                                9388,
+                                12790,
+                                12315,
+                                12526,
+                                14151,
+                                17556,
+                                null
+                            ]
+                        }
+                    ]
+                },
+                "profit_before_tax": {
+                    "title": "Profit before tax",
+                    "values": [
+                        4969,
+                        4397,
+                        -5293,
+                        1540,
+                        -19849,
+                        -15370,
+                        827,
+                        4325,
+                        4826,
+                        5151,
+                        14160,
+                        26015,
+                        26458
+                    ],
+                    "children": []
+                },
+                "dividend_payout_percent": {
+                    "title": "Dividend Payout %",
+                    "values": [
+                        10,
+                        18,
+                        -2,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        18,
+                        21,
+                        18,
+                        18,
+                        null
+                    ],
+                    "children": []
+                }
+            },
+            "title": "Profit & Loss",
+            "headers": [
+                "Mar 2014",
+                "Mar 2015",
+                "Mar 2016",
+                "Mar 2017",
+                "Mar 2018",
+                "Mar 2019",
+                "Mar 2020",
+                "Mar 2021",
+                "Mar 2022",
+                "Mar 2023",
+                "Mar 2024",
+                "Mar 2025",
+                "TTM"
+            ],
+            "unmatched_rows": [
+                {
+                    "TTM": "7,071",
+                    "label": "Financing Profit",
+                    "Mar 2014": "626",
+                    "Mar 2015": "-1,394",
+                    "Mar 2016": "-10,980",
+                    "Mar 2017": "-7,197",
+                    "Mar 2018": "-28,151",
+                    "Mar 2019": "-22,153",
+                    "Mar 2020": "-7,946",
+                    "Mar 2021": "-7,470",
+                    "Mar 2022": "-6,607",
+                    "Mar 2023": "-6,473",
+                    "Mar 2024": "908",
+                    "Mar 2025": "9,413"
+                },
+                {
+                    "TTM": "5%",
+                    "label": "Financing Margin %",
+                    "Mar 2014": "1%",
+                    "Mar 2015": "-3%",
+                    "Mar 2016": "-22%",
+                    "Mar 2017": "-15%",
+                    "Mar 2018": "-58%",
+                    "Mar 2019": "-42%",
+                    "Mar 2020": "-14%",
+                    "Mar 2021": "-9%",
+                    "Mar 2022": "-9%",
+                    "Mar 2023": "-7%",
+                    "Mar 2024": "1%",
+                    "Mar 2025": "8%"
+                }
+            ]
+        },
+        "balance_sheet_table": {
+            "rows": {
+                "cwip": {
+                    "title": "CWIP",
+                    "values": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "children": []
+                },
+                "reserves": {
+                    "title": "Reserves",
+                    "values": [
+                        37731,
+                        41669,
+                        41412,
+                        42990,
+                        40965,
+                        45164,
+                        62529,
+                        90439,
+                        95380,
+                        100678,
+                        108185,
+                        130839,
+                        139948
+                    ],
+                    "children": []
+                },
+                "investments": {
+                    "title": "Investments",
+                    "values": [
+                        149225,
+                        156762,
+                        165126,
+                        191527,
+                        204419,
+                        210578,
+                        253782,
+                        404369,
+                        388586,
+                        416914,
+                        446421,
+                        524840,
+                        531967
+                    ],
+                    "children": []
+                },
+                "fixed_assets": {
+                    "title": "Fixed Assets",
+                    "values": [
+                        3490,
+                        3656,
+                        5308,
+                        6298,
+                        6371,
+                        6246,
+                        7262,
+                        11049,
+                        10696,
+                        12084,
+                        12348,
+                        13083,
+                        15624
+                    ],
+                    "children": [
+                        {
+                            "title": "Building",
+                            "values": [
+                                2825.3,
+                                2892.21,
+                                4510.92,
+                                5539.34,
+                                5566.46,
+                                5539.78,
+                                6802.37,
+                                10469.73,
+                                10505.91,
+                                12093.05,
+                                12220.64,
+                                11319.35,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Computers",
+                            "values": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                1127.53,
+                                1233.94,
+                                1287.72,
+                                1395.18,
+                                1671.71,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Furniture n fittings",
+                            "values": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                8818.44,
+                                9217.64,
+                                0,
+                                0,
+                                0,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Other fixed assets",
+                            "values": [
+                                3552.82,
+                                3995.09,
+                                4243.08,
+                                4533.12,
+                                5104.48,
+                                5435.87,
+                                5600.28,
+                                25.33,
+                                25.33,
+                                9892.56,
+                                10828.07,
+                                10371.54,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Gross Block",
+                            "values": [
+                                6378.12,
+                                6887.3,
+                                8754,
+                                10072.46,
+                                10670.94,
+                                10975.65,
+                                12402.65,
+                                20441.03,
+                                20982.82,
+                                23273.33,
+                                24443.89,
+                                23362.6,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Accumulated Depreciation",
+                            "values": [
+                                2887.68,
+                                3231.53,
+                                3445.88,
+                                3774.7,
+                                4299.95,
+                                4729.43,
+                                5140.67,
+                                9392.33,
+                                10286.61,
+                                11189.37,
+                                12096.05,
+                                10279.3,
+                                null
+                            ]
+                        }
+                    ]
+                },
+                "other_assets": {
+                    "title": "Other Assets",
+                    "values": [
+                        422105,
+                        475594,
+                        542358,
+                        535486,
+                        566738,
+                        573295,
+                        590413,
+                        864307,
+                        940019,
+                        1064651,
+                        1139867,
+                        1319620,
+                        1373344
+                    ],
+                    "children": [
+                        {
+                            "title": "Cash Equivalents",
+                            "values": [
+                                20261,
+                                22145,
+                                24255,
+                                23302,
+                                26909,
+                                30472,
+                                35842,
+                                40769,
+                                82614,
+                                74478,
+                                61772,
+                                61154,
+                                65250
+                            ]
+                        },
+                        {
+                            "title": "Loans n Advances",
+                            "values": [
+                                1010,
+                                1588,
+                                1630,
+                                901,
+                                2852,
+                                3231,
+                                3533,
+                                10001,
+                                12030,
+                                13172,
+                                11062,
+                                9373,
+                                1144448
+                            ]
+                        },
+                        {
+                            "title": "Other asset items",
+                            "values": [
+                                400834,
+                                451861,
+                                516473,
+                                511284,
+                                536978,
+                                539593,
+                                551038,
+                                813537,
+                                845375,
+                                977001,
+                                1067033,
+                                1249093,
+                                163646
+                            ]
+                        }
+                    ]
+                },
+                "total_assets": {
+                    "title": "Total Assets",
+                    "values": [
+                        574820,
+                        636011,
+                        712793,
+                        733311,
+                        777528,
+                        790120,
+                        851457,
+                        1279725,
+                        1339301,
+                        1493649,
+                        1598636,
+                        1857544,
+                        1920935
+                    ],
+                    "children": []
+                },
+                "equity_capital": {
+                    "title": "Equity Capital",
+                    "values": [
+                        362,
+                        371,
+                        393,
+                        426,
+                        552,
+                        921,
+                        1348,
+                        2096,
+                        2202,
+                        2202,
+                        2202,
+                        2299,
+                        2299
+                    ],
+                    "children": []
+                },
+                "other_liabilities": {
+                    "title": "Other Liabilities",
+                    "values": [
+                        16490,
+                        19522,
+                        18932,
+                        16909,
+                        22242,
+                        15333,
+                        14814,
+                        21176,
+                        28113,
+                        30273,
+                        36438,
+                        41579,
+                        40395
+                    ],
+                    "children": [
+                        {
+                            "title": "Non controlling int",
+                            "values": [
+                                423,
+                                549,
+                                729,
+                                781,
+                                309,
+                                288,
+                                361,
+                                487,
+                                473,
+                                459,
+                                561,
+                                628,
+                                658
+                            ]
+                        },
+                        {
+                            "title": "Trade Payables",
+                            "values": [
+                                2513,
+                                2399,
+                                2520,
+                                2570,
+                                2433,
+                                2046,
+                                1824,
+                                3220,
+                                3082,
+                                3719,
+                                3361,
+                                4431,
+                                0
+                            ]
+                        },
+                        {
+                            "title": "Other liability items",
+                            "values": [
+                                13554,
+                                16574,
+                                15684,
+                                13558,
+                                19500,
+                                12999,
+                                12629,
+                                17469,
+                                24558,
+                                26095,
+                                32516,
+                                36520,
+                                39737
+                            ]
+                        }
+                    ]
+                },
+                "total_liabilities": {
+                    "title": "Total Liabilities",
+                    "values": [
+                        574820,
+                        636011,
+                        712793,
+                        733311,
+                        777528,
+                        790120,
+                        851457,
+                        1279725,
+                        1339301,
+                        1493649,
+                        1598636,
+                        1857544,
+                        1920935
+                    ],
+                    "children": []
+                }
+            },
+            "title": "Balance Sheet",
+            "headers": [
+                "Mar 2014",
+                "Mar 2015",
+                "Mar 2016",
+                "Mar 2017",
+                "Mar 2018",
+                "Mar 2019",
+                "Mar 2020",
+                "Mar 2021",
+                "Mar 2022",
+                "Mar 2023",
+                "Mar 2024",
+                "Mar 2025",
+                "Sep 2025"
+            ],
+            "unmatched_rows": [
+                {
+                    "label": "Deposits",
+                    "Mar 2014": "476,325",
+                    "Mar 2015": "537,758",
+                    "Mar 2016": "570,383",
+                    "Mar 2017": "629,651",
+                    "Mar 2018": "648,439",
+                    "Mar 2019": "681,874",
+                    "Mar 2020": "710,254",
+                    "Mar 2021": "1,113,717",
+                    "Mar 2022": "1,154,234",
+                    "Mar 2023": "1,290,347",
+                    "Mar 2024": "1,379,225",
+                    "Mar 2025": "1,577,020",
+                    "Sep 2025": "1,629,131"
+                },
+                {
+                    "label": "Borrowing",
+                    "Mar 2014": "43,912",
+                    "Mar 2015": "36,692",
+                    "Mar 2016": "81,674",
+                    "Mar 2017": "43,336",
+                    "Mar 2018": "65,330",
+                    "Mar 2019": "46,828",
+                    "Mar 2020": "62,512",
+                    "Mar 2021": "52,298",
+                    "Mar 2022": "59,372",
+                    "Mar 2023": "70,149",
+                    "Mar 2024": "72,586",
+                    "Mar 2025": "105,807",
+                    "Sep 2025": "109,162"
+                }
+            ]
+        },
+        "cash_flow_table": {
+            "rows": {
+                "net_cash_flow": {
+                    "title": "Net Cash Flow",
+                    "values": [
+                        18733,
+                        11393,
+                        18790,
+                        12330,
+                        6109,
+                        -20192,
+                        460,
+                        35579,
+                        20859,
+                        23135,
+                        -25928,
+                        19359
+                    ],
+                    "children": []
+                },
+                "cash_from_financing_activity": {
+                    "title": "Cash from Financing Activity",
+                    "values": [
+                        2129,
+                        7451,
+                        5975,
+                        -9767,
+                        7460,
+                        13969,
+                        13591,
+                        5415,
+                        2032,
+                        1275,
+                        3518,
+                        -1138
+                    ],
+                    "children": [
+                        {
+                            "title": "Proceeds from shares",
+                            "values": [
+                                643,
+                                1327,
+                                2009,
+                                1066,
+                                10486,
+                                14810,
+                                16091,
+                                3777,
+                                1793,
+                                0,
+                                0,
+                                4988
+                            ]
+                        },
+                        {
+                            "title": "Proceeds from debentures",
+                            "values": [
+                                0,
+                                7391,
+                                6418,
+                                0,
+                                0,
+                                0,
+                                0,
+                                3505,
+                                2454,
+                                4462,
+                                7102,
+                                0
+                            ]
+                        },
+                        {
+                            "title": "Redemption of debentures",
+                            "values": [
+                                0,
+                                0,
+                                0,
+                                -9135,
+                                -1212,
+                                -2215,
+                                -1190,
+                                0,
+                                0,
+                                0,
+                                0,
+                                -1426
+                            ]
+                        },
+                        {
+                            "title": "Interest paid fin",
+                            "values": [
+                                -939,
+                                -1224,
+                                -1647,
+                                -1624,
+                                -1807,
+                                0,
+                                -1353,
+                                -1993,
+                                -2202,
+                                -2468,
+                                -2970,
+                                -3116
+                            ]
+                        },
+                        {
+                            "title": "Dividends paid",
+                            "values": [
+                                -1487,
+                                -42,
+                                -805,
+                                -75,
+                                -7,
+                                -7,
+                                -30,
+                                0,
+                                0,
+                                -705,
+                                -716,
+                                -1652
+                            ]
+                        },
+                        {
+                            "title": "Other financing items",
+                            "values": [
+                                3912,
+                                0,
+                                0,
+                                0,
+                                0,
+                                1380,
+                                73,
+                                126,
+                                -13,
+                                -14,
+                                101,
+                                68
+                            ]
+                        }
+                    ]
+                },
+                "cash_from_investing_activity": {
+                    "title": "Cash from Investing Activity",
+                    "values": [
+                        -302,
+                        -872,
+                        -1352,
+                        159,
+                        392,
+                        -629,
+                        -338,
+                        -787,
+                        -1204,
+                        -732,
+                        -1506,
+                        -1578
+                    ],
+                    "children": [
+                        {
+                            "title": "Fixed assets purchased",
+                            "values": [
+                                -430,
+                                -546,
+                                -606,
+                                -496,
+                                -652,
+                                -440,
+                                -338,
+                                -787,
+                                -536,
+                                -552,
+                                -1175,
+                                -1601
+                            ]
+                        },
+                        {
+                            "title": "Fixed assets sold",
+                            "values": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                31,
+                                16
+                            ]
+                        },
+                        {
+                            "title": "Investments sold",
+                            "values": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                8
+                            ]
+                        },
+                        {
+                            "title": "Investment income",
+                            "values": [
+                                128,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                            ]
+                        },
+                        {
+                            "title": "Dividends received",
+                            "values": [
+                                0,
+                                0,
+                                23,
+                                96,
+                                140,
+                                149,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                            ]
+                        },
+                        {
+                            "title": "Invest in subsidiaries",
+                            "values": [
+                                0,
+                                -326,
+                                -769,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                -668,
+                                -180,
+                                -363,
+                                0
+                            ]
+                        },
+                        {
+                            "title": "Redemp n Canc of Shares",
+                            "values": [
+                                0,
+                                0,
+                                0,
+                                559,
+                                904,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                            ]
+                        },
+                        {
+                            "title": "Acquisition of companies",
+                            "values": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                -338,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0
+                            ]
+                        }
+                    ]
+                },
+                "cash_from_operating_activity": {
+                    "title": "Cash from Operating Activity",
+                    "values": [
+                        16906,
+                        4814,
+                        14167,
+                        21938,
+                        -1742,
+                        -33532,
+                        -12793,
+                        30950,
+                        20032,
+                        22592,
+                        -27939,
+                        22075
+                    ],
+                    "children": [
+                        {
+                            "title": "Profit from operations",
+                            "values": [
+                                13311,
+                                14563,
+                                15358,
+                                17270,
+                                8305,
+                                13580,
+                                16862,
+                                26551,
+                                24532,
+                                28086,
+                                29560,
+                                30049
+                            ]
+                        },
+                        {
+                            "title": "Loans Advances",
+                            "values": [
+                                -50411,
+                                -46780,
+                                -60250,
+                                7438,
+                                -39447,
+                                -48883,
+                                -29243,
+                                4879,
+                                -68538,
+                                -118493,
+                                -116625,
+                                -146654
+                            ]
+                        },
+                        {
+                            "title": "Operating investments",
+                            "values": [
+                                -15329,
+                                -6626,
+                                -8095,
+                                -27445,
+                                -15353,
+                                -6986,
+                                -42716,
+                                -19674,
+                                15305,
+                                -29448,
+                                -27599,
+                                -73272
+                            ]
+                        },
+                        {
+                            "title": "Operating borrowings",
+                            "values": [
+                                8031,
+                                -7219,
+                                16051,
+                                -29203,
+                                23206,
+                                -16287,
+                                16875,
+                                -30006,
+                                4620,
+                                6315,
+                                -4665,
+                                34646
+                            ]
+                        },
+                        {
+                            "title": "Operating Deposits",
+                            "values": [
+                                62203,
+                                54042,
+                                55137,
+                                59268,
+                                18788,
+                                33435,
+                                28380,
+                                35746,
+                                40518,
+                                136113,
+                                88878,
+                                197795
+                            ]
+                        },
+                        {
+                            "title": "Other WC items",
+                            "values": [
+                                825,
+                                -610,
+                                -2463,
+                                -3974,
+                                4540,
+                                -8361,
+                                -753,
+                                -15942,
+                                5225,
+                                1224,
+                                4387,
+                                -15373
+                            ]
+                        },
+                        {
+                            "title": "Working capital changes",
+                            "values": [
+                                5320,
+                                -7193,
+                                381,
+                                6085,
+                                -8265,
+                                -47082,
+                                -27457,
+                                -24997,
+                                -2871,
+                                -4289,
+                                -55625,
+                                -2857
+                            ]
+                        },
+                        {
+                            "title": "Direct taxes",
+                            "values": [
+                                -1725,
+                                -2556,
+                                -1572,
+                                -1417,
+                                -1782,
+                                -30,
+                                -2198,
+                                -314,
+                                -1629,
+                                -1204,
+                                -1875,
+                                -5117
+                            ]
+                        },
+                        {
+                            "title": "Other operating items",
+                            "values": [
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                0,
+                                29711,
+                                0,
+                                0,
+                                0,
+                                0
+                            ]
+                        }
+                    ]
+                }
+            },
+            "title": "Cash Flow",
+            "headers": [
+                "Mar 2014",
+                "Mar 2015",
+                "Mar 2016",
+                "Mar 2017",
+                "Mar 2018",
+                "Mar 2019",
+                "Mar 2020",
+                "Mar 2021",
+                "Mar 2022",
+                "Mar 2023",
+                "Mar 2024",
+                "Mar 2025"
+            ],
+            "unmatched_rows": []
+        },
+        "ratios_table": {
+            "rows": {},
+            "title": "Ratios",
+            "headers": [
+                "Mar 2014",
+                "Mar 2015",
+                "Mar 2016",
+                "Mar 2017",
+                "Mar 2018",
+                "Mar 2019",
+                "Mar 2020",
+                "Mar 2021",
+                "Mar 2022",
+                "Mar 2023",
+                "Mar 2024",
+                "Mar 2025"
+            ],
+            "unmatched_rows": [
+                {
+                    "label": "ROE %",
+                    "Mar 2014": "10%",
+                    "Mar 2015": "8%",
+                    "Mar 2016": "-9%",
+                    "Mar 2017": "3%",
+                    "Mar 2018": "-29%",
+                    "Mar 2019": "-22%",
+                    "Mar 2020": "1%",
+                    "Mar 2021": "3%",
+                    "Mar 2022": "4%",
+                    "Mar 2023": "3%",
+                    "Mar 2024": "9%",
+                    "Mar 2025": "15%"
+                }
+            ]
+        },
+        "shareholdings_table": {
+            "rows": {
+                "diis": {
+                    "title": "DIIs",
+                    "values": [
+                        13.53,
+                        13.44,
+                        13.8,
+                        13.74,
+                        12.37,
+                        10.76,
+                        11.61,
+                        14.31,
+                        14.67,
+                        15.06,
+                        15.54,
+                        16.09
+                    ],
+                    "children": [
+                        {
+                            "title": "Life Insurance Corporation Of India",
+                            "values": [
+                                8.34,
+                                8.34,
+                                8.34,
+                                8.34,
+                                8.34,
+                                8.18,
+                                7.91,
+                                8.32,
+                                9.15,
+                                9.18,
+                                9.18,
+                                8.85
+                            ]
+                        },
+                        {
+                            "title": "Sbi Contra Fund",
+                            "values": [
+                                null,
+                                null,
+                                1.17,
+                                1.07,
+                                null,
+                                null,
+                                null,
+                                1.7,
+                                1.72,
+                                2.41,
+                                2.48,
+                                2.67
+                            ]
+                        },
+                        {
+                            "title": "Quant Mutual Fund - Quant Small Cap Fund",
+                            "values": [
+                                1.09,
+                                1.1,
+                                null,
+                                null,
+                                1.05,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null
+                            ]
+                        }
+                    ]
+                },
+                "fiis": {
+                    "title": "FIIs",
+                    "values": [
+                        1.71,
+                        1.82,
+                        2.65,
+                        3.1,
+                        4.82,
+                        5.51,
+                        8.42,
+                        5.7,
+                        5.71,
+                        5.52,
+                        5.67,
+                        5.93
+                    ],
+                    "children": [
+                        {
+                            "title": "Citigroup Global Markets Mauritius Private Limited - Odi",
+                            "values": [
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                1.15,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null
+                            ]
+                        }
+                    ]
+                },
+                "public": {
+                    "title": "Public",
+                    "values": [
+                        11.61,
+                        11.57,
+                        10.41,
+                        10,
+                        9.67,
+                        10.57,
+                        9.89,
+                        9.91,
+                        9.54,
+                        9.34,
+                        8.7,
+                        7.91
+                    ],
+                    "children": [
+                        {
+                            "title": "No. of Shareholders",
+                            "values": [
+                                2067202,
+                                2030100,
+                                2083546,
+                                2163625,
+                                2353625,
+                                2529283,
+                                2579491,
+                                2640520,
+                                2653665,
+                                2574693,
+                                2455484,
+                                2309003
+                            ]
+                        }
+                    ]
+                },
+                "promoters": {
+                    "title": "Promoters",
+                    "values": [
+                        73.15,
+                        73.15,
+                        73.15,
+                        73.15,
+                        73.15,
+                        73.15,
+                        70.08,
+                        70.08,
+                        70.08,
+                        70.08,
+                        70.08,
+                        70.08
+                    ],
+                    "children": [
+                        {
+                            "title": "Central Government (Through President of India)",
+                            "values": [
+                                73.15,
+                                73.15,
+                                73.15,
+                                73.15,
+                                73.15,
+                                73.15,
+                                70.08,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Government of India (Through President of India)",
+                            "values": [
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                70.08,
+                                70.08,
+                                null,
+                                null,
+                                null
+                            ]
+                        },
+                        {
+                            "title": "Central Government (President Of India)",
+                            "values": [
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                70.08,
+                                70.08,
+                                70.08
+                            ]
+                        }
+                    ]
+                }
+            },
+            "title": "Shareholding Pattern",
+            "headers": [
+                "Mar 2023",
+                "Jun 2023",
+                "Sep 2023",
+                "Dec 2023",
+                "Mar 2024",
+                "Jun 2024",
+                "Sep 2024",
+                "Dec 2024",
+                "Mar 2025",
+                "Jun 2025",
+                "Sep 2025",
+                "Dec 2025"
+            ],
+            "unmatched_rows": []
+        },
+        "tables": {
+            "quarters": {
+                "rows": {
+                    "eps": {
+                        "title": "EPS in Rs",
+                        "values": [
+                            0.64,
+                            1.69,
+                            1.22,
+                            1.81,
+                            2.21,
+                            3.04,
+                            3.61,
+                            4.1,
+                            4.18,
+                            4.34,
+                            1.84,
+                            4.46,
+                            4.83
+                        ],
+                        "children": []
+                    },
+                    "raw_pdf": {
+                        "title": "Raw PDF",
+                        "values": [
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                        ],
+                        "children": []
+                    },
+                    "revenue": {
+                        "title": "Revenue",
+                        "values": [
+                            22808,
+                            24305,
+                            25673,
+                            26858,
+                            27852,
+                            28682,
+                            29145,
+                            30447,
+                            31895,
+                            32523,
+                            32572,
+                            32513,
+                            32889
+                        ],
+                        "children": [
+                            {
+                                "title": "YOY Sales Growth %",
+                                "values": [
+                                    16.49,
+                                    27.32,
+                                    34.11,
+                                    30.45,
+                                    22.11,
+                                    18.01,
+                                    13.52,
+                                    13.37,
+                                    14.52,
+                                    13.39,
+                                    11.76,
+                                    6.78,
+                                    3.12
+                                ]
+                            }
+                        ]
+                    },
+                    "expenses": {
+                        "title": "Expenses",
+                        "values": [
+                            11578,
+                            10813,
+                            10990,
+                            10259,
+                            9449,
+                            9831,
+                            8473,
+                            8592,
+                            7494,
+                            9142,
+                            9197,
+                            8299,
+                            9298
+                        ],
+                        "children": [
+                            {
+                                "title": "Employee Cost %",
+                                "values": [
+                                    19.69,
+                                    18.95,
+                                    17.62,
+                                    15.79,
+                                    15.1,
+                                    19.78,
+                                    15.76,
+                                    19.04,
+                                    16.66,
+                                    17.97,
+                                    16.05,
+                                    14.79,
+                                    15.65
+                                ]
+                            }
+                        ]
+                    },
+                    "interest": {
+                        "title": "Interest",
+                        "values": [
+                            13513,
+                            14690,
+                            16064,
+                            16820,
+                            17444,
+                            18206,
+                            18536,
+                            19790,
+                            20738,
+                            21640,
+                            21828,
+                            21858,
+                            22164
+                        ],
+                        "children": []
+                    },
+                    "net_profit": {
+                        "title": "Net Profit",
+                        "values": [
+                            715,
+                            1876,
+                            1363,
+                            1990,
+                            2441,
+                            3363,
+                            3991,
+                            4739,
+                            4811,
+                            5011,
+                            2167,
+                            5121,
+                            5577
+                        ],
+                        "children": [
+                            {
+                                "title": "Profit from Associates",
+                                "values": [
+                                    55,
+                                    135,
+                                    152,
+                                    225,
+                                    189,
+                                    262,
+                                    275,
+                                    307,
+                                    162,
+                                    368,
+                                    335,
+                                    272,
+                                    387
+                                ]
+                            },
+                            {
+                                "title": "Minority share",
+                                "values": [
+                                    -7,
+                                    -12,
+                                    -21,
+                                    0,
+                                    -8,
+                                    -21,
+                                    -16,
+                                    -25,
+                                    -10,
+                                    -22,
+                                    -47,
+                                    5,
+                                    -21
+                                ]
+                            },
+                            {
+                                "title": "Profit excl Excep",
+                                "values": [
+                                    715,
+                                    1876,
+                                    1363,
+                                    1990,
+                                    2441,
+                                    3363,
+                                    3991,
+                                    4739,
+                                    4811,
+                                    5011,
+                                    2167,
+                                    5121,
+                                    5577
+                                ]
+                            },
+                            {
+                                "title": "Profit for PE",
+                                "values": [
+                                    708,
+                                    1864,
+                                    1342,
+                                    1990,
+                                    2433,
+                                    3342,
+                                    3976,
+                                    4714,
+                                    4801,
+                                    4989,
+                                    2120,
+                                    5125,
+                                    5556
+                                ]
+                            },
+                            {
+                                "title": "Profit for EPS",
+                                "values": [
+                                    708,
+                                    1864,
+                                    1342,
+                                    1990,
+                                    2433,
+                                    3342,
+                                    3976,
+                                    4714,
+                                    4801,
+                                    4989,
+                                    2120,
+                                    5125,
+                                    5556
+                                ]
+                            },
+                            {
+                                "title": "YOY Profit Growth %",
+                                "values": [
+                                    -43,
+                                    451,
+                                    376,
+                                    303,
+                                    243,
+                                    79,
+                                    196,
+                                    137,
+                                    97,
+                                    49,
+                                    -47,
+                                    9,
+                                    16
+                                ]
+                            }
+                        ]
+                    },
+                    "tax_percent": {
+                        "title": "Tax %",
+                        "values": [
+                            37,
+                            34,
+                            39,
+                            36,
+                            38,
+                            37,
+                            35,
+                            34,
+                            34,
+                            29,
+                            74,
+                            26,
+                            19
+                        ],
+                        "children": []
+                    },
+                    "depreciation": {
+                        "title": "Depreciation",
+                        "values": [
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        ],
+                        "children": []
+                    },
+                    "other_income": {
+                        "title": "Other Income",
+                        "values": [
+                            3325,
+                            3827,
+                            3360,
+                            2999,
+                            2676,
+                            4294,
+                            3615,
+                            4664,
+                            3392,
+                            4776,
+                            5427,
+                            4171,
+                            5013
+                        ],
+                        "children": [
+                            {
+                                "title": "Other income normal",
+                                "values": [
+                                    3325,
+                                    3827,
+                                    3360,
+                                    2999,
+                                    2676,
+                                    4294,
+                                    3615,
+                                    4664,
+                                    3392,
+                                    4776,
+                                    5427,
+                                    4171,
+                                    5013
+                                ]
+                            }
+                        ]
+                    },
+                    "profit_before_tax": {
+                        "title": "Profit before tax",
+                        "values": [
+                            1043,
+                            2630,
+                            1979,
+                            2778,
+                            3634,
+                            4940,
+                            5751,
+                            6729,
+                            7055,
+                            6518,
+                            6973,
+                            6527,
+                            6440
+                        ],
+                        "children": []
+                    }
+                },
+                "title": "Quarterly Results",
+                "headers": [
+                    "Dec 2022",
+                    "Mar 2023",
+                    "Jun 2023",
+                    "Sep 2023",
+                    "Dec 2023",
+                    "Mar 2024",
+                    "Jun 2024",
+                    "Sep 2024",
+                    "Dec 2024",
+                    "Mar 2025",
+                    "Jun 2025",
+                    "Sep 2025",
+                    "Dec 2025"
+                ],
+                "unmatched_rows": [
+                    {
+                        "label": "Financing Profit",
+                        "Dec 2022": "-2,282",
+                        "Dec 2023": "959",
+                        "Dec 2024": "3,663",
+                        "Dec 2025": "1,426",
+                        "Jun 2023": "-1,381",
+                        "Jun 2024": "2,136",
+                        "Jun 2025": "1,547",
+                        "Mar 2023": "-1,197",
+                        "Mar 2024": "646",
+                        "Mar 2025": "1,742",
+                        "Sep 2023": "-221",
+                        "Sep 2024": "2,065",
+                        "Sep 2025": "2,356"
+                    },
+                    {
+                        "label": "Financing Margin %",
+                        "Dec 2022": "-10%",
+                        "Dec 2023": "3%",
+                        "Dec 2024": "11%",
+                        "Dec 2025": "4%",
+                        "Jun 2023": "-5%",
+                        "Jun 2024": "7%",
+                        "Jun 2025": "5%",
+                        "Mar 2023": "-5%",
+                        "Mar 2024": "2%",
+                        "Mar 2025": "5%",
+                        "Sep 2023": "-1%",
+                        "Sep 2024": "7%",
+                        "Sep 2025": "7%"
+                    },
+                    {
+                        "label": "Gross NPA %",
+                        "Dec 2022": "",
+                        "Dec 2023": "",
+                        "Dec 2024": "",
+                        "Dec 2025": "",
+                        "Jun 2023": "",
+                        "Jun 2024": "",
+                        "Jun 2025": "",
+                        "Mar 2023": "",
+                        "Mar 2024": "",
+                        "Mar 2025": "",
+                        "Sep 2023": "",
+                        "Sep 2024": "",
+                        "Sep 2025": ""
+                    },
+                    {
+                        "label": "Net NPA %",
+                        "Dec 2022": "",
+                        "Dec 2023": "",
+                        "Dec 2024": "",
+                        "Dec 2025": "",
+                        "Jun 2023": "",
+                        "Jun 2024": "",
+                        "Jun 2025": "",
+                        "Mar 2023": "",
+                        "Mar 2024": "",
+                        "Mar 2025": "",
+                        "Sep 2023": "",
+                        "Sep 2024": "",
+                        "Sep 2025": ""
+                    }
+                ]
+            },
+            "profit_loss": {
+                "rows": {
+                    "eps": {
+                        "title": "EPS in Rs",
+                        "values": [
+                            19.98,
+                            18.33,
+                            -18.79,
+                            5.58,
+                            -43.88,
+                            -20.79,
+                            0.65,
+                            2.45,
+                            3.51,
+                            3.04,
+                            8.27,
+                            16.08,
+                            15.47
+                        ],
+                        "children": []
+                    },
+                    "revenue": {
+                        "title": "Revenue",
+                        "values": [
+                            44958,
+                            48710,
+                            50804,
+                            48058,
+                            48725,
+                            52147,
+                            54918,
+                            81935,
+                            76242,
+                            86845,
+                            109065,
+                            124010,
+                            130497
+                        ],
+                        "children": [
+                            {
+                                "title": "Sales Growth %",
+                                "values": [
+                                    4.38,
+                                    8.34,
+                                    4.3,
+                                    -5.4,
+                                    1.39,
+                                    7.02,
+                                    5.31,
+                                    49.19,
+                                    -6.95,
+                                    13.91,
+                                    25.58,
+                                    13.7,
+                                    null
+                                ]
+                            }
+                        ]
+                    },
+                    "expenses": {
+                        "title": "Expenses",
+                        "values": [
+                            16112,
+                            18760,
+                            27453,
+                            22533,
+                            43345,
+                            39645,
+                            25867,
+                            38601,
+                            36026,
+                            41502,
+                            39623,
+                            33893,
+                            35936
+                        ],
+                        "children": [
+                            {
+                                "title": "Manufacturing Cost %",
+                                "values": [
+                                    0.34,
+                                    0.41,
+                                    0.44,
+                                    0.49,
+                                    0.55,
+                                    0.55,
+                                    0.6,
+                                    0.6,
+                                    0.74,
+                                    0.91,
+                                    0.74,
+                                    0.71,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Employee Cost %",
+                                "values": [
+                                    14.72,
+                                    15.34,
+                                    12.93,
+                                    11.41,
+                                    18.97,
+                                    13.52,
+                                    12.86,
+                                    15.01,
+                                    15.7,
+                                    17.21,
+                                    17.1,
+                                    17.38,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Other Cost %",
+                                "values": [
+                                    20.77,
+                                    22.77,
+                                    40.67,
+                                    34.98,
+                                    69.44,
+                                    61.96,
+                                    33.64,
+                                    31.5,
+                                    30.81,
+                                    29.67,
+                                    18.49,
+                                    9.24,
+                                    null
+                                ]
+                            }
+                        ]
+                    },
+                    "interest": {
+                        "title": "Interest",
+                        "values": [
+                            28220,
+                            31343,
+                            34331,
+                            32722,
+                            33530,
+                            34656,
+                            36997,
+                            50805,
+                            46823,
+                            51817,
+                            68534,
+                            80704,
+                            87490
+                        ],
+                        "children": []
+                    },
+                    "net_profit": {
+                        "title": "Net Profit",
+                        "values": [
+                            3674,
+                            3525,
+                            -3510,
+                            1239,
+                            -12111,
+                            -9550,
+                            485,
+                            2695,
+                            3908,
+                            3359,
+                            9157,
+                            18553,
+                            17875
+                        ],
+                        "children": [
+                            {
+                                "title": "Profit from Associates",
+                                "values": [
+                                    139,
+                                    184,
+                                    153,
+                                    338,
+                                    473,
+                                    476,
+                                    122,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Minority share",
+                                "values": [
+                                    -57,
+                                    -126,
+                                    -180,
+                                    -52,
+                                    -2,
+                                    -20,
+                                    -46,
+                                    -133,
+                                    -47,
+                                    -10,
+                                    -50,
+                                    -72,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Exceptional items AT",
+                                "values": [
+                                    3,
+                                    3,
+                                    2,
+                                    5,
+                                    3,
+                                    18,
+                                    0,
+                                    -13,
+                                    14,
+                                    2,
+                                    4,
+                                    3,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Profit excl Excep",
+                                "values": [
+                                    3671,
+                                    3522,
+                                    -3512,
+                                    1234,
+                                    -12114,
+                                    -9568,
+                                    485,
+                                    2707,
+                                    3893,
+                                    3357,
+                                    9153,
+                                    18550,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Profit for PE",
+                                "values": [
+                                    3614,
+                                    3397,
+                                    -3692,
+                                    1182,
+                                    -12116,
+                                    -9588,
+                                    438,
+                                    2574,
+                                    3847,
+                                    3347,
+                                    9103,
+                                    18477,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Profit for EPS",
+                                "values": [
+                                    3617,
+                                    3400,
+                                    -3690,
+                                    1187,
+                                    -12113,
+                                    -9570,
+                                    438,
+                                    2562,
+                                    3861,
+                                    3348,
+                                    9107,
+                                    18480,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Profit Growth %",
+                                "values": [
+                                    -27,
+                                    -6,
+                                    -209,
+                                    132,
+                                    -1125,
+                                    21,
+                                    105,
+                                    487,
+                                    49,
+                                    -13,
+                                    172,
+                                    103,
+                                    null
+                                ]
+                            }
+                        ]
+                    },
+                    "tax_percent": {
+                        "title": "Tax %",
+                        "values": [
+                            29,
+                            24,
+                            -31,
+                            41,
+                            -37,
+                            -35,
+                            56,
+                            38,
+                            19,
+                            35,
+                            35,
+                            29,
+                            null
+                        ],
+                        "children": []
+                    },
+                    "depreciation": {
+                        "title": "Depreciation",
+                        "values": [
+                            367,
+                            384,
+                            413,
+                            430,
+                            581,
+                            584,
+                            614,
+                            982,
+                            896,
+                            905,
+                            906,
+                            958,
+                            0
+                        ],
+                        "children": []
+                    },
+                    "other_income": {
+                        "title": "Other Income",
+                        "values": [
+                            4710,
+                            6175,
+                            6100,
+                            9168,
+                            8883,
+                            7367,
+                            9388,
+                            12777,
+                            12329,
+                            12529,
+                            14158,
+                            17560,
+                            19387
+                        ],
+                        "children": [
+                            {
+                                "title": "Exceptional items",
+                                "values": [
+                                    5,
+                                    3,
+                                    2,
+                                    5,
+                                    3,
+                                    18,
+                                    0,
+                                    -13,
+                                    14,
+                                    3,
+                                    7,
+                                    4,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Other income normal",
+                                "values": [
+                                    4706,
+                                    6172,
+                                    6097,
+                                    9162,
+                                    8881,
+                                    7349,
+                                    9388,
+                                    12790,
+                                    12315,
+                                    12526,
+                                    14151,
+                                    17556,
+                                    null
+                                ]
+                            }
+                        ]
+                    },
+                    "profit_before_tax": {
+                        "title": "Profit before tax",
+                        "values": [
+                            4969,
+                            4397,
+                            -5293,
+                            1540,
+                            -19849,
+                            -15370,
+                            827,
+                            4325,
+                            4826,
+                            5151,
+                            14160,
+                            26015,
+                            26458
+                        ],
+                        "children": []
+                    },
+                    "dividend_payout_percent": {
+                        "title": "Dividend Payout %",
+                        "values": [
+                            10,
+                            18,
+                            -2,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            18,
+                            21,
+                            18,
+                            18,
+                            null
+                        ],
+                        "children": []
+                    }
+                },
+                "title": "Profit & Loss",
+                "headers": [
+                    "Mar 2014",
+                    "Mar 2015",
+                    "Mar 2016",
+                    "Mar 2017",
+                    "Mar 2018",
+                    "Mar 2019",
+                    "Mar 2020",
+                    "Mar 2021",
+                    "Mar 2022",
+                    "Mar 2023",
+                    "Mar 2024",
+                    "Mar 2025",
+                    "TTM"
+                ],
+                "unmatched_rows": [
+                    {
+                        "TTM": "7,071",
+                        "label": "Financing Profit",
+                        "Mar 2014": "626",
+                        "Mar 2015": "-1,394",
+                        "Mar 2016": "-10,980",
+                        "Mar 2017": "-7,197",
+                        "Mar 2018": "-28,151",
+                        "Mar 2019": "-22,153",
+                        "Mar 2020": "-7,946",
+                        "Mar 2021": "-7,470",
+                        "Mar 2022": "-6,607",
+                        "Mar 2023": "-6,473",
+                        "Mar 2024": "908",
+                        "Mar 2025": "9,413"
+                    },
+                    {
+                        "TTM": "5%",
+                        "label": "Financing Margin %",
+                        "Mar 2014": "1%",
+                        "Mar 2015": "-3%",
+                        "Mar 2016": "-22%",
+                        "Mar 2017": "-15%",
+                        "Mar 2018": "-58%",
+                        "Mar 2019": "-42%",
+                        "Mar 2020": "-14%",
+                        "Mar 2021": "-9%",
+                        "Mar 2022": "-9%",
+                        "Mar 2023": "-7%",
+                        "Mar 2024": "1%",
+                        "Mar 2025": "8%"
+                    }
+                ]
+            },
+            "balance_sheet": {
+                "rows": {
+                    "cwip": {
+                        "title": "CWIP",
+                        "values": [
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        ],
+                        "children": []
+                    },
+                    "reserves": {
+                        "title": "Reserves",
+                        "values": [
+                            37731,
+                            41669,
+                            41412,
+                            42990,
+                            40965,
+                            45164,
+                            62529,
+                            90439,
+                            95380,
+                            100678,
+                            108185,
+                            130839,
+                            139948
+                        ],
+                        "children": []
+                    },
+                    "investments": {
+                        "title": "Investments",
+                        "values": [
+                            149225,
+                            156762,
+                            165126,
+                            191527,
+                            204419,
+                            210578,
+                            253782,
+                            404369,
+                            388586,
+                            416914,
+                            446421,
+                            524840,
+                            531967
+                        ],
+                        "children": []
+                    },
+                    "fixed_assets": {
+                        "title": "Fixed Assets",
+                        "values": [
+                            3490,
+                            3656,
+                            5308,
+                            6298,
+                            6371,
+                            6246,
+                            7262,
+                            11049,
+                            10696,
+                            12084,
+                            12348,
+                            13083,
+                            15624
+                        ],
+                        "children": [
+                            {
+                                "title": "Building",
+                                "values": [
+                                    2825.3,
+                                    2892.21,
+                                    4510.92,
+                                    5539.34,
+                                    5566.46,
+                                    5539.78,
+                                    6802.37,
+                                    10469.73,
+                                    10505.91,
+                                    12093.05,
+                                    12220.64,
+                                    11319.35,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Computers",
+                                "values": [
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    1127.53,
+                                    1233.94,
+                                    1287.72,
+                                    1395.18,
+                                    1671.71,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Furniture n fittings",
+                                "values": [
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    8818.44,
+                                    9217.64,
+                                    0,
+                                    0,
+                                    0,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Other fixed assets",
+                                "values": [
+                                    3552.82,
+                                    3995.09,
+                                    4243.08,
+                                    4533.12,
+                                    5104.48,
+                                    5435.87,
+                                    5600.28,
+                                    25.33,
+                                    25.33,
+                                    9892.56,
+                                    10828.07,
+                                    10371.54,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Gross Block",
+                                "values": [
+                                    6378.12,
+                                    6887.3,
+                                    8754,
+                                    10072.46,
+                                    10670.94,
+                                    10975.65,
+                                    12402.65,
+                                    20441.03,
+                                    20982.82,
+                                    23273.33,
+                                    24443.89,
+                                    23362.6,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Accumulated Depreciation",
+                                "values": [
+                                    2887.68,
+                                    3231.53,
+                                    3445.88,
+                                    3774.7,
+                                    4299.95,
+                                    4729.43,
+                                    5140.67,
+                                    9392.33,
+                                    10286.61,
+                                    11189.37,
+                                    12096.05,
+                                    10279.3,
+                                    null
+                                ]
+                            }
+                        ]
+                    },
+                    "other_assets": {
+                        "title": "Other Assets",
+                        "values": [
+                            422105,
+                            475594,
+                            542358,
+                            535486,
+                            566738,
+                            573295,
+                            590413,
+                            864307,
+                            940019,
+                            1064651,
+                            1139867,
+                            1319620,
+                            1373344
+                        ],
+                        "children": [
+                            {
+                                "title": "Cash Equivalents",
+                                "values": [
+                                    20261,
+                                    22145,
+                                    24255,
+                                    23302,
+                                    26909,
+                                    30472,
+                                    35842,
+                                    40769,
+                                    82614,
+                                    74478,
+                                    61772,
+                                    61154,
+                                    65250
+                                ]
+                            },
+                            {
+                                "title": "Loans n Advances",
+                                "values": [
+                                    1010,
+                                    1588,
+                                    1630,
+                                    901,
+                                    2852,
+                                    3231,
+                                    3533,
+                                    10001,
+                                    12030,
+                                    13172,
+                                    11062,
+                                    9373,
+                                    1144448
+                                ]
+                            },
+                            {
+                                "title": "Other asset items",
+                                "values": [
+                                    400834,
+                                    451861,
+                                    516473,
+                                    511284,
+                                    536978,
+                                    539593,
+                                    551038,
+                                    813537,
+                                    845375,
+                                    977001,
+                                    1067033,
+                                    1249093,
+                                    163646
+                                ]
+                            }
+                        ]
+                    },
+                    "total_assets": {
+                        "title": "Total Assets",
+                        "values": [
+                            574820,
+                            636011,
+                            712793,
+                            733311,
+                            777528,
+                            790120,
+                            851457,
+                            1279725,
+                            1339301,
+                            1493649,
+                            1598636,
+                            1857544,
+                            1920935
+                        ],
+                        "children": []
+                    },
+                    "equity_capital": {
+                        "title": "Equity Capital",
+                        "values": [
+                            362,
+                            371,
+                            393,
+                            426,
+                            552,
+                            921,
+                            1348,
+                            2096,
+                            2202,
+                            2202,
+                            2202,
+                            2299,
+                            2299
+                        ],
+                        "children": []
+                    },
+                    "other_liabilities": {
+                        "title": "Other Liabilities",
+                        "values": [
+                            16490,
+                            19522,
+                            18932,
+                            16909,
+                            22242,
+                            15333,
+                            14814,
+                            21176,
+                            28113,
+                            30273,
+                            36438,
+                            41579,
+                            40395
+                        ],
+                        "children": [
+                            {
+                                "title": "Non controlling int",
+                                "values": [
+                                    423,
+                                    549,
+                                    729,
+                                    781,
+                                    309,
+                                    288,
+                                    361,
+                                    487,
+                                    473,
+                                    459,
+                                    561,
+                                    628,
+                                    658
+                                ]
+                            },
+                            {
+                                "title": "Trade Payables",
+                                "values": [
+                                    2513,
+                                    2399,
+                                    2520,
+                                    2570,
+                                    2433,
+                                    2046,
+                                    1824,
+                                    3220,
+                                    3082,
+                                    3719,
+                                    3361,
+                                    4431,
+                                    0
+                                ]
+                            },
+                            {
+                                "title": "Other liability items",
+                                "values": [
+                                    13554,
+                                    16574,
+                                    15684,
+                                    13558,
+                                    19500,
+                                    12999,
+                                    12629,
+                                    17469,
+                                    24558,
+                                    26095,
+                                    32516,
+                                    36520,
+                                    39737
+                                ]
+                            }
+                        ]
+                    },
+                    "total_liabilities": {
+                        "title": "Total Liabilities",
+                        "values": [
+                            574820,
+                            636011,
+                            712793,
+                            733311,
+                            777528,
+                            790120,
+                            851457,
+                            1279725,
+                            1339301,
+                            1493649,
+                            1598636,
+                            1857544,
+                            1920935
+                        ],
+                        "children": []
+                    }
+                },
+                "title": "Balance Sheet",
+                "headers": [
+                    "Mar 2014",
+                    "Mar 2015",
+                    "Mar 2016",
+                    "Mar 2017",
+                    "Mar 2018",
+                    "Mar 2019",
+                    "Mar 2020",
+                    "Mar 2021",
+                    "Mar 2022",
+                    "Mar 2023",
+                    "Mar 2024",
+                    "Mar 2025",
+                    "Sep 2025"
+                ],
+                "unmatched_rows": [
+                    {
+                        "label": "Deposits",
+                        "Mar 2014": "476,325",
+                        "Mar 2015": "537,758",
+                        "Mar 2016": "570,383",
+                        "Mar 2017": "629,651",
+                        "Mar 2018": "648,439",
+                        "Mar 2019": "681,874",
+                        "Mar 2020": "710,254",
+                        "Mar 2021": "1,113,717",
+                        "Mar 2022": "1,154,234",
+                        "Mar 2023": "1,290,347",
+                        "Mar 2024": "1,379,225",
+                        "Mar 2025": "1,577,020",
+                        "Sep 2025": "1,629,131"
+                    },
+                    {
+                        "label": "Borrowing",
+                        "Mar 2014": "43,912",
+                        "Mar 2015": "36,692",
+                        "Mar 2016": "81,674",
+                        "Mar 2017": "43,336",
+                        "Mar 2018": "65,330",
+                        "Mar 2019": "46,828",
+                        "Mar 2020": "62,512",
+                        "Mar 2021": "52,298",
+                        "Mar 2022": "59,372",
+                        "Mar 2023": "70,149",
+                        "Mar 2024": "72,586",
+                        "Mar 2025": "105,807",
+                        "Sep 2025": "109,162"
+                    }
+                ]
+            },
+            "cash_flow": {
+                "rows": {
+                    "net_cash_flow": {
+                        "title": "Net Cash Flow",
+                        "values": [
+                            18733,
+                            11393,
+                            18790,
+                            12330,
+                            6109,
+                            -20192,
+                            460,
+                            35579,
+                            20859,
+                            23135,
+                            -25928,
+                            19359
+                        ],
+                        "children": []
+                    },
+                    "cash_from_financing_activity": {
+                        "title": "Cash from Financing Activity",
+                        "values": [
+                            2129,
+                            7451,
+                            5975,
+                            -9767,
+                            7460,
+                            13969,
+                            13591,
+                            5415,
+                            2032,
+                            1275,
+                            3518,
+                            -1138
+                        ],
+                        "children": [
+                            {
+                                "title": "Proceeds from shares",
+                                "values": [
+                                    643,
+                                    1327,
+                                    2009,
+                                    1066,
+                                    10486,
+                                    14810,
+                                    16091,
+                                    3777,
+                                    1793,
+                                    0,
+                                    0,
+                                    4988
+                                ]
+                            },
+                            {
+                                "title": "Proceeds from debentures",
+                                "values": [
+                                    0,
+                                    7391,
+                                    6418,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    3505,
+                                    2454,
+                                    4462,
+                                    7102,
+                                    0
+                                ]
+                            },
+                            {
+                                "title": "Redemption of debentures",
+                                "values": [
+                                    0,
+                                    0,
+                                    0,
+                                    -9135,
+                                    -1212,
+                                    -2215,
+                                    -1190,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    -1426
+                                ]
+                            },
+                            {
+                                "title": "Interest paid fin",
+                                "values": [
+                                    -939,
+                                    -1224,
+                                    -1647,
+                                    -1624,
+                                    -1807,
+                                    0,
+                                    -1353,
+                                    -1993,
+                                    -2202,
+                                    -2468,
+                                    -2970,
+                                    -3116
+                                ]
+                            },
+                            {
+                                "title": "Dividends paid",
+                                "values": [
+                                    -1487,
+                                    -42,
+                                    -805,
+                                    -75,
+                                    -7,
+                                    -7,
+                                    -30,
+                                    0,
+                                    0,
+                                    -705,
+                                    -716,
+                                    -1652
+                                ]
+                            },
+                            {
+                                "title": "Other financing items",
+                                "values": [
+                                    3912,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    1380,
+                                    73,
+                                    126,
+                                    -13,
+                                    -14,
+                                    101,
+                                    68
+                                ]
+                            }
+                        ]
+                    },
+                    "cash_from_investing_activity": {
+                        "title": "Cash from Investing Activity",
+                        "values": [
+                            -302,
+                            -872,
+                            -1352,
+                            159,
+                            392,
+                            -629,
+                            -338,
+                            -787,
+                            -1204,
+                            -732,
+                            -1506,
+                            -1578
+                        ],
+                        "children": [
+                            {
+                                "title": "Fixed assets purchased",
+                                "values": [
+                                    -430,
+                                    -546,
+                                    -606,
+                                    -496,
+                                    -652,
+                                    -440,
+                                    -338,
+                                    -787,
+                                    -536,
+                                    -552,
+                                    -1175,
+                                    -1601
+                                ]
+                            },
+                            {
+                                "title": "Fixed assets sold",
+                                "values": [
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    31,
+                                    16
+                                ]
+                            },
+                            {
+                                "title": "Investments sold",
+                                "values": [
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    8
+                                ]
+                            },
+                            {
+                                "title": "Investment income",
+                                "values": [
+                                    128,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                ]
+                            },
+                            {
+                                "title": "Dividends received",
+                                "values": [
+                                    0,
+                                    0,
+                                    23,
+                                    96,
+                                    140,
+                                    149,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                ]
+                            },
+                            {
+                                "title": "Invest in subsidiaries",
+                                "values": [
+                                    0,
+                                    -326,
+                                    -769,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    -668,
+                                    -180,
+                                    -363,
+                                    0
+                                ]
+                            },
+                            {
+                                "title": "Redemp n Canc of Shares",
+                                "values": [
+                                    0,
+                                    0,
+                                    0,
+                                    559,
+                                    904,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                ]
+                            },
+                            {
+                                "title": "Acquisition of companies",
+                                "values": [
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    -338,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                ]
+                            }
+                        ]
+                    },
+                    "cash_from_operating_activity": {
+                        "title": "Cash from Operating Activity",
+                        "values": [
+                            16906,
+                            4814,
+                            14167,
+                            21938,
+                            -1742,
+                            -33532,
+                            -12793,
+                            30950,
+                            20032,
+                            22592,
+                            -27939,
+                            22075
+                        ],
+                        "children": [
+                            {
+                                "title": "Profit from operations",
+                                "values": [
+                                    13311,
+                                    14563,
+                                    15358,
+                                    17270,
+                                    8305,
+                                    13580,
+                                    16862,
+                                    26551,
+                                    24532,
+                                    28086,
+                                    29560,
+                                    30049
+                                ]
+                            },
+                            {
+                                "title": "Loans Advances",
+                                "values": [
+                                    -50411,
+                                    -46780,
+                                    -60250,
+                                    7438,
+                                    -39447,
+                                    -48883,
+                                    -29243,
+                                    4879,
+                                    -68538,
+                                    -118493,
+                                    -116625,
+                                    -146654
+                                ]
+                            },
+                            {
+                                "title": "Operating investments",
+                                "values": [
+                                    -15329,
+                                    -6626,
+                                    -8095,
+                                    -27445,
+                                    -15353,
+                                    -6986,
+                                    -42716,
+                                    -19674,
+                                    15305,
+                                    -29448,
+                                    -27599,
+                                    -73272
+                                ]
+                            },
+                            {
+                                "title": "Operating borrowings",
+                                "values": [
+                                    8031,
+                                    -7219,
+                                    16051,
+                                    -29203,
+                                    23206,
+                                    -16287,
+                                    16875,
+                                    -30006,
+                                    4620,
+                                    6315,
+                                    -4665,
+                                    34646
+                                ]
+                            },
+                            {
+                                "title": "Operating Deposits",
+                                "values": [
+                                    62203,
+                                    54042,
+                                    55137,
+                                    59268,
+                                    18788,
+                                    33435,
+                                    28380,
+                                    35746,
+                                    40518,
+                                    136113,
+                                    88878,
+                                    197795
+                                ]
+                            },
+                            {
+                                "title": "Other WC items",
+                                "values": [
+                                    825,
+                                    -610,
+                                    -2463,
+                                    -3974,
+                                    4540,
+                                    -8361,
+                                    -753,
+                                    -15942,
+                                    5225,
+                                    1224,
+                                    4387,
+                                    -15373
+                                ]
+                            },
+                            {
+                                "title": "Working capital changes",
+                                "values": [
+                                    5320,
+                                    -7193,
+                                    381,
+                                    6085,
+                                    -8265,
+                                    -47082,
+                                    -27457,
+                                    -24997,
+                                    -2871,
+                                    -4289,
+                                    -55625,
+                                    -2857
+                                ]
+                            },
+                            {
+                                "title": "Direct taxes",
+                                "values": [
+                                    -1725,
+                                    -2556,
+                                    -1572,
+                                    -1417,
+                                    -1782,
+                                    -30,
+                                    -2198,
+                                    -314,
+                                    -1629,
+                                    -1204,
+                                    -1875,
+                                    -5117
+                                ]
+                            },
+                            {
+                                "title": "Other operating items",
+                                "values": [
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    29711,
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "title": "Cash Flow",
+                "headers": [
+                    "Mar 2014",
+                    "Mar 2015",
+                    "Mar 2016",
+                    "Mar 2017",
+                    "Mar 2018",
+                    "Mar 2019",
+                    "Mar 2020",
+                    "Mar 2021",
+                    "Mar 2022",
+                    "Mar 2023",
+                    "Mar 2024",
+                    "Mar 2025"
+                ],
+                "unmatched_rows": []
+            },
+            "ratios": {
+                "rows": {},
+                "title": "Ratios",
+                "headers": [
+                    "Mar 2014",
+                    "Mar 2015",
+                    "Mar 2016",
+                    "Mar 2017",
+                    "Mar 2018",
+                    "Mar 2019",
+                    "Mar 2020",
+                    "Mar 2021",
+                    "Mar 2022",
+                    "Mar 2023",
+                    "Mar 2024",
+                    "Mar 2025"
+                ],
+                "unmatched_rows": [
+                    {
+                        "label": "ROE %",
+                        "Mar 2014": "10%",
+                        "Mar 2015": "8%",
+                        "Mar 2016": "-9%",
+                        "Mar 2017": "3%",
+                        "Mar 2018": "-29%",
+                        "Mar 2019": "-22%",
+                        "Mar 2020": "1%",
+                        "Mar 2021": "3%",
+                        "Mar 2022": "4%",
+                        "Mar 2023": "3%",
+                        "Mar 2024": "9%",
+                        "Mar 2025": "15%"
+                    }
+                ]
+            },
+            "shareholdings": {
+                "rows": {
+                    "diis": {
+                        "title": "DIIs",
+                        "values": [
+                            13.53,
+                            13.44,
+                            13.8,
+                            13.74,
+                            12.37,
+                            10.76,
+                            11.61,
+                            14.31,
+                            14.67,
+                            15.06,
+                            15.54,
+                            16.09
+                        ],
+                        "children": [
+                            {
+                                "title": "Life Insurance Corporation Of India",
+                                "values": [
+                                    8.34,
+                                    8.34,
+                                    8.34,
+                                    8.34,
+                                    8.34,
+                                    8.18,
+                                    7.91,
+                                    8.32,
+                                    9.15,
+                                    9.18,
+                                    9.18,
+                                    8.85
+                                ]
+                            },
+                            {
+                                "title": "Sbi Contra Fund",
+                                "values": [
+                                    null,
+                                    null,
+                                    1.17,
+                                    1.07,
+                                    null,
+                                    null,
+                                    null,
+                                    1.7,
+                                    1.72,
+                                    2.41,
+                                    2.48,
+                                    2.67
+                                ]
+                            },
+                            {
+                                "title": "Quant Mutual Fund - Quant Small Cap Fund",
+                                "values": [
+                                    1.09,
+                                    1.1,
+                                    null,
+                                    null,
+                                    1.05,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ]
+                            }
+                        ]
+                    },
+                    "fiis": {
+                        "title": "FIIs",
+                        "values": [
+                            1.71,
+                            1.82,
+                            2.65,
+                            3.1,
+                            4.82,
+                            5.51,
+                            8.42,
+                            5.7,
+                            5.71,
+                            5.52,
+                            5.67,
+                            5.93
+                        ],
+                        "children": [
+                            {
+                                "title": "Citigroup Global Markets Mauritius Private Limited - Odi",
+                                "values": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    1.15,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ]
+                            }
+                        ]
+                    },
+                    "public": {
+                        "title": "Public",
+                        "values": [
+                            11.61,
+                            11.57,
+                            10.41,
+                            10,
+                            9.67,
+                            10.57,
+                            9.89,
+                            9.91,
+                            9.54,
+                            9.34,
+                            8.7,
+                            7.91
+                        ],
+                        "children": [
+                            {
+                                "title": "No. of Shareholders",
+                                "values": [
+                                    2067202,
+                                    2030100,
+                                    2083546,
+                                    2163625,
+                                    2353625,
+                                    2529283,
+                                    2579491,
+                                    2640520,
+                                    2653665,
+                                    2574693,
+                                    2455484,
+                                    2309003
+                                ]
+                            }
+                        ]
+                    },
+                    "promoters": {
+                        "title": "Promoters",
+                        "values": [
+                            73.15,
+                            73.15,
+                            73.15,
+                            73.15,
+                            73.15,
+                            73.15,
+                            70.08,
+                            70.08,
+                            70.08,
+                            70.08,
+                            70.08,
+                            70.08
+                        ],
+                        "children": [
+                            {
+                                "title": "Central Government (Through President of India)",
+                                "values": [
+                                    73.15,
+                                    73.15,
+                                    73.15,
+                                    73.15,
+                                    73.15,
+                                    73.15,
+                                    70.08,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Government of India (Through President of India)",
+                                "values": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    70.08,
+                                    70.08,
+                                    null,
+                                    null,
+                                    null
+                                ]
+                            },
+                            {
+                                "title": "Central Government (President Of India)",
+                                "values": [
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    70.08,
+                                    70.08,
+                                    70.08
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "title": "Shareholding Pattern",
+                "headers": [
+                    "Mar 2023",
+                    "Jun 2023",
+                    "Sep 2023",
+                    "Dec 2023",
+                    "Mar 2024",
+                    "Jun 2024",
+                    "Sep 2024",
+                    "Dec 2024",
+                    "Mar 2025",
+                    "Jun 2025",
+                    "Sep 2025",
+                    "Dec 2025"
+                ],
+                "unmatched_rows": []
+            }
+        }
+    }
+}

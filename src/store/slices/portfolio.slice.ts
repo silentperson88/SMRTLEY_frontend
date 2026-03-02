@@ -23,7 +23,7 @@ const portfolioSlice = createSlice({
     setMyPortfolios(state, action: PayloadAction<MyPortfolio[]>) {
       state.myPortfolios = action.payload
       if (!state.selectedPortfolioId && action.payload.length > 0) {
-        state.selectedPortfolioId = action.payload[0]._id
+        state.selectedPortfolioId = action.payload[0].id
       }
     },
     setSelectedPortfolioId(state, action: PayloadAction<string | null>) {

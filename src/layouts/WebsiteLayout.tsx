@@ -32,7 +32,7 @@ import { usePaginatedSWR } from 'src/hooks/swr/swrhooks'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
 
 interface SearchList {
-  _id: string
+  id: string
   company: string
   name: string
 }
@@ -172,7 +172,7 @@ const WebsiteLayout = ({ children }: Props) => {
                         )}
                         {searchList?.map(item => (
                           <ListItemButton
-                            key={item._id}
+                            key={item.id}
                             onClick={() => {
                               setSearchValue(item.company)
                               setSearchOpen(false)

@@ -21,6 +21,9 @@ export const ENDURL = {
   Fetch_STOCK_FUNDAMENTAL: 'ticker/fundamentals/fetch',
   GET_STOCK_FUNDAMENTAL_DETAILS: 'ticker/fundamentals',
 
+  // IPO GMP
+  FETCH_IPO_GMP: 'ticker/ipo-gmp',
+
   // Master Stock
   GET_MASTER_STOCKS: 'ticker/master',
 
@@ -47,3 +50,4 @@ export const ENDURL = {
   LOAD_WALLET_FUND: 'user/wallet/load',
   TRANSFER_WALLET_TO_PORTFOLIO: 'user/wallet/transfer-to-portfolio/:portfolioId'
 }
+
