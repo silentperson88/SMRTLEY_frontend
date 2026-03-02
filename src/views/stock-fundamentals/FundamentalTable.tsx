@@ -1,3 +1,5 @@
+import { useMemo, useState } from 'react'
+
 // ** MUI Imports
 import Card from '@mui/material/Card'
 import Table from '@mui/material/Table'
@@ -8,15 +10,24 @@ import TableCell from '@mui/material/TableCell'
 import Typography from '@mui/material/Typography'
 import TableContainer from '@mui/material/TableContainer'
 import { styled } from '@mui/material/styles'
+import IconButton from '@mui/material/IconButton'
 
 // ** Types Imports
 
-type TableCell = string | number
-type TableRow = TableCell[]
+type CellValue = string | number
+
+export interface TableDataRow {
+  id: string
+  label: string
+  cells: CellValue[]
+  level: number
+  parentId?: string
+  hasChildren?: boolean
+}
 
 export interface TableData {
   columns: string[]
-  rows: TableRow[]
+  rows: TableDataRow[]
 }
 
 // Styled TableCell for the sticky column header
@@ -38,6 +49,32 @@ const StickyBodyCell = styled(TableCell)(({ theme }) => ({
 
 const FundamentalTable = (props: { data: TableData }) => {
   const { columns, rows } = props?.data
+  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({})
+
+  const visibleRows = useMemo(
+    () =>
+      rows.filter(row => {
+        if (!row.parentId) return true
+
+        let currentParentId = row.parentId
+        while (currentParentId) {
+          if (!expandedIds[currentParentId]) return false
+          const parent = rows.find(r => r.id === currentParentId)
+          if (!parent || !parent.parentId) break
+          currentParentId = parent.parentId
+        }
+
+        return true
+      }),
+    [rows, expandedIds]
+  )
+
+  const toggleRow = (rowId: string) => {
+    setExpandedIds(prev => ({
+      ...prev,
+      [rowId]: !prev[rowId]
+    }))
+  }
 
   return (
     <Card>
@@ -57,17 +94,24 @@ const FundamentalTable = (props: { data: TableData }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row: TableRow, rowIndex: number) => (
-              <TableRow hover key={rowIndex} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
-                {row.map((cell, cellIndex) =>
-                  cellIndex === 0 ? (
-                    <StickyBodyCell key={cellIndex} sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
-                      <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{cell}</Typography>
-                    </StickyBodyCell>
-                  ) : (
-                    <TableCell key={cellIndex}>{cell ?? 0}</TableCell>
-                  )
-                )}
+            {visibleRows.map(row => (
+              <TableRow hover key={row.id} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
+                <StickyBodyCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
+                  <Typography sx={{ display: 'flex', alignItems: 'center', fontWeight: 500, fontSize: '0.875rem !important' }}>
+                    <span style={{ display: 'inline-block', width: `${row.level * 14}px` }} />
+                    {row.hasChildren ? (
+                      <IconButton size='small' onClick={() => toggleRow(row.id)} sx={{ mr: 1 }}>
+                        {expandedIds[row.id] ? '-' : '+'}
+                      </IconButton>
+                    ) : (
+                      <span style={{ display: 'inline-block', width: '28px', marginRight: '8px' }} />
+                    )}
+                    {row.label}
+                  </Typography>
+                </StickyBodyCell>
+                {row.cells.map((cell, cellIndex) => (
+                  <TableCell key={cellIndex}>{cell ?? '-'}</TableCell>
+                ))}
               </TableRow>
             ))}
           </TableBody>

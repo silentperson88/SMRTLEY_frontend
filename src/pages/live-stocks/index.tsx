@@ -15,6 +15,8 @@ import { useSnackbar } from 'src/layouts/components/SnackbarContext'
 import { mutate } from 'swr'
 import { useDispatch, useSelector } from 'react-redux'
 import { requestSubscribe } from 'src/store/slices/subscribeMarket.slice'
+import { useRouter } from 'next/router'
+import MarketOverviewBanner from 'src/components/page/MarketOverviewBanner'
 
 interface StockData {
   master_id?: string
@@ -27,7 +29,7 @@ interface StockData {
   low: number
   close: number
   percentChange: number
-  _id: string
+  id: string
   status: string
   name: string
 }
@@ -37,6 +39,7 @@ interface FetchFundaMentalResponse {
 }
 
 const LiveStocks = () => {
+  const router = useRouter()
   const page = 1
   const pageSize = 50
   const [searchValue, setSearchValue] = useState<string>('')
@@ -71,10 +74,10 @@ const LiveStocks = () => {
     setSearchValue(value)
   }
 
-  const handleFetchfundamental = async (_id: string) => {
-    console.log(_id)
-    if (_id) {
-      const res = await trigger({ master_id: _id })
+  const handleFetchfundamental = async (id: string) => {
+    console.log(id)
+    if (id) {
+      const res = await trigger({ master_id: id })
       console.log(res)
       showSnackbar('Status updated', 'success')
       mutate([ENDURL.GET_RAW_STOCKS, { page, pageSize, search: searchValue }])
@@ -100,6 +103,13 @@ const LiveStocks = () => {
 
   return (
     <Grid container spacing={6}>
+      <Grid item xs={12}>
+        <MarketOverviewBanner
+          trackedCount={mergedStocksData.length}
+          scopeLabel={searchValue ? 'Filtered' : 'All'}
+          onPrimaryAction={() => router.push('/portfolio-stocks')}
+        />
+      </Grid>
       <Grid item xs={12}>
         <Typography variant='body2'>Search by name, symbol, token</Typography>
         <TextField

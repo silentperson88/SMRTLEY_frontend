@@ -29,6 +29,8 @@ import { ENDURL } from 'src/utils/constants/endurl.utils'
 import { TC } from 'src/utils/constants/text.constants'
 import { Typography } from '@mui/material'
 import { mutate } from 'swr'
+import PageHero from 'src/components/page/PageHero'
+import { useRouter } from 'next/router'
 
 interface DashboardResponse {
   total_pl: number
@@ -96,7 +98,7 @@ interface DashboardResponse {
   amount_distribution: any[]
   recent_sell_performance: { days: number; items: any[] }
   last_trades: {
-    _id: string
+    id: string
     symbol: string
     type: 'BUY' | 'SELL'
     order_type: string
@@ -109,6 +111,7 @@ interface DashboardResponse {
 
 const Overview = () => {
   const { data, isLoading } = useSimpleSWR<DashboardResponse>(ENDURL.GET_DASHBOARD)
+  const router = useRouter()
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -137,6 +140,25 @@ const Overview = () => {
   return (
     <ApexChartWrapper>
       <Grid container spacing={6}>
+        <Grid item xs={12}>
+          <PageHero
+            title='Manage Your Wealth Smarter'
+            subtitle='Your summary for your account growth, portfolio trends and active holdings.'
+            primaryInfoLabel='Total Fund'
+            primaryInfoValue={`${TC.CURRENCY}${data.account_totals.total_wallet_value.toLocaleString()}`}
+            actionLabel='Create New Portfolio'
+            onAction={() => router.push('/portfolio-stocks')}
+            panelTitle='Your current portfolio'
+            panelSubtitle='Snapshot of your active investment account'
+            panelLeftLabel='Invested Value'
+            panelLeftValue={`${TC.CURRENCY}${data.account_totals.invested_value.toLocaleString()}`}
+            panelRightLabel='Net P/L'
+            panelRightValue={`${data.account_totals.total_pl >= 0 ? '+' : '-'}${TC.CURRENCY}${Math.abs(
+              data.account_totals.total_pl
+            ).toLocaleString()}`}
+            panelRightValueColor={data.account_totals.total_pl >= 0 ? 'success.main' : 'error.main'}
+          />
+        </Grid>
         <Grid item xs={12} md={4}>
           <Trophy totalPl={data.total_pl} message={data.total_pl === 0 ? TC.DASHBOARD_MESSAGES.QUOTE : undefined} />
         </Grid>

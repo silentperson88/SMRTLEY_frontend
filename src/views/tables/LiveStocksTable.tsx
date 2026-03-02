@@ -36,7 +36,7 @@ const columns: readonly Column[] = [
 
 interface Data {
   master_id?: string
-  _id: string
+  id: string
   name: string
   symbol: string
   token: string
@@ -68,7 +68,7 @@ const TableStickyHeader = ({
   handleFetchfundamental
 }: {
   rawStocksData: Data[]
-  handleFetchfundamental: (_id: any) => void
+  handleFetchfundamental: (id: string) => void
 }) => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)

@@ -29,8 +29,8 @@ interface BuySellOrderModalProps {
   onSelectPortfolio?: (id: string) => void
   activeStockId: string
   stockSymbol: string
-  stockOptions?: { _id: string; symbol: string }[]
-  onSelectStock?: (stock: { _id: string; symbol: string }) => void
+  stockOptions?: { id: string; symbol: string }[]
+  onSelectStock?: (stock: { id: string; symbol: string }) => void
   ltp?: number
   onSuccess?: () => void
 }
@@ -53,7 +53,7 @@ interface OrderResponse {
       executed_at: '2026-02-07T10:16:23.417Z'
     }
   ]
-  _id: string
+  id: string
   sell_allocation: []
 }
 
@@ -166,7 +166,7 @@ export default function BuySellOrderModal({
                 onChange={e => onSelectPortfolio?.(e.target.value as string)}
               >
                 {portfolios.map(p => (
-                  <MenuItem key={p._id} value={p._id}>
+                  <MenuItem key={p.id} value={p.id}>
                     {p.name}
                   </MenuItem>
                 ))}
@@ -186,7 +186,7 @@ export default function BuySellOrderModal({
                 }}
               >
                 {stockOptions.map(s => (
-                  <MenuItem key={s._id} value={s.symbol}>
+                  <MenuItem key={s.id} value={s.symbol}>
                     {s.symbol}
                   </MenuItem>
                 ))}

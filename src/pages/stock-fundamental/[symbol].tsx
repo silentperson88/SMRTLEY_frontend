@@ -24,8 +24,9 @@ import { ENDURL } from 'src/utils/constants/endurl.utils'
 import { useEffect, useState } from 'react'
 import CompanyStatisticsCard from 'src/views/stock-fundamentals/companyStatics'
 import ProsCons from 'src/views/stock-fundamentals/prosCons'
-import FundamentalTable, { TableData } from 'src/views/stock-fundamentals/FundamentalTable'
-import { Box, Card, CardHeader, Chip, LinearProgress, Typography } from '@mui/material'
+import FundamentalTable, { TableData, TableDataRow } from 'src/views/stock-fundamentals/FundamentalTable'
+import { Box, Button, Card, CardHeader, Chip, Grid as MuiGrid, LinearProgress, Typography } from '@mui/material'
+import Link from '@mui/material/Link'
 import { useLivePrices } from 'src/hooks/socket/useLivePrice'
 import { Candles } from 'src/types/ws'
 import BuySellOrderModal from 'src/views/modal/BuySell'
@@ -52,177 +53,198 @@ interface MarketSnapshot {
   date: string
 }
 
-interface YearlyPnL {
-  date: string
-  sales: number
-  revenue: number
-  expenses: number
-  operatingProfit: number
-  financingProfit: number
-  financingMargin: number
-  opm: number
-  otherIncome: number
-  interest: number
-  depreciation: number
-  profitBeforeTax: number
-  tax: number
-  netProfit: number
-  epsInRs: number
-  dividendPayout: number
-}
-
-interface QuarterlyResults {
-  date: string
-  revenue: number
-  sales: number
-  expenses: number
-  operatingProfit: number
-  financingProfit: number
-  financingMargin: number
-  opm: number
-  otherIncome: number
-  interest: number
-  depreciation: number
-  profitBeforeTax: number
-  tax: number
-  netProfit: number
-  epsInRs: number
-  rawPdf: string
-}
-
-interface BalanceSheet {
-  date: string
-  equityCapital: number
-  reserves: number
-  borrowings: number
-  otherLiabilities: number
-  totalLiabilities: number
-  fixedAssets: number
-  cwip: number
-  investments: number
-  otherAssets: number
-  totalAssets: number
-}
-
-interface CashFlows {
-  date: string
-  cashFromOperatingActivity: number
-  cashFromInvestingActivity: number
-  cashFromFinancingActivity: number
-  netCashFlow: number
-}
-
-interface Ratios {
-  date: string
-  debtorDays: number
-  inventoryDays: number
-  payableDays: number
-  cashConversionCycle: number
-  workingCapitalDays: number
-  roce: number
-  roe: number
-}
-
 export interface Fundamental {
   companyName: string
   marketSnapshot: MarketSnapshot
   pros: string[]
   cons: string[]
-  quarterlyResults: QuarterlyResults[]
-  yearlyPnl: YearlyPnL[]
-  balanceSheet: BalanceSheet[]
-  cashFlows: CashFlows[]
-  ratios: Ratios[]
 }
 
-interface QuarterlyResultsEntryMap {
-  name: string
-  key: keyof QuarterlyResults
+interface FundamentalTableRowNode {
+  title: string
+  values?: Array<string | number | null>
+  children?: FundamentalTableRowNode[]
 }
 
-interface BalanceSheetEntryMap {
-  name: string
-  key: keyof BalanceSheet
+interface FundamentalApiTable {
+  title?: string
+  headers?: string[]
+  rows?: Record<string, FundamentalTableRowNode>
+  unmatched_rows?: Array<Record<string, string | number | null>>
 }
 
-interface CashFlowsEntryMap {
-  name: string
-  key: keyof CashFlows
+interface FundamentalPeerTable {
+  title?: string
+  headers?: string[]
+  rows?: Array<Array<string | number | null>>
 }
 
-interface RatiosEntryMap {
-  name: string
-  key: keyof Ratios
+interface FundamentalApiPayload {
+  company?: string
+  last_updated_at?: string
+  summary?: {
+    pros?: string[]
+    cons?: string[]
+    market_snapshot?: {
+      roe?: number
+      roce?: number
+      high_low?: string
+      pe_ratio?: number
+      stock_pe?: number
+      book_value?: number
+      face_value?: number
+      market_cap?: number
+      current_price?: number
+      dividend_yield?: number
+    }
+  }
+  tables?: {
+    quarters?: FundamentalApiTable
+    profit_loss?: FundamentalApiTable
+    balance_sheet?: FundamentalApiTable
+    cash_flow?: FundamentalApiTable
+    ratios?: FundamentalApiTable
+    shareholdings?: FundamentalApiTable
+  }
+  peers?: {
+    main_table?: FundamentalPeerTable
+  }
+  other_details?: {
+    profit_loss?: Record<
+      string,
+      {
+        title?: string
+        entries?: Array<{
+          key?: string
+          title?: string
+          value?: string | number
+        }>
+      }
+    >
+  }
+  documents?: {
+    announcements?: {
+      title?: string
+      all_link?: string
+      items?: Array<{ url?: string; title?: string; subtitle?: string }>
+    }
+    annual_reports?: {
+      title?: string
+      items?: Array<{ url?: string; title?: string; subtitle?: string }>
+    }
+    credit_ratings?: {
+      title?: string
+      items?: Array<{ url?: string; title?: string; subtitle?: string }>
+    }
+    concalls?: {
+      title?: string
+      items?: Array<{
+        label?: string
+        links?: Array<{ url?: string; title?: string }>
+        ai_summary?: { url?: string; title?: string } | null
+      }>
+    }
+  }
+  active_stock_id?: string
 }
 
-interface YearlyPnLEntryMap {
-  name: string
-  key: keyof YearlyPnL
+const toNumber = (value: unknown, fallback = 0): number => {
+  const parsed = Number(value)
+
+  return Number.isFinite(parsed) ? parsed : fallback
 }
 
-const quarterlyResultType: QuarterlyResultsEntryMap[] = [
-  { name: 'Revenue', key: 'revenue' },
-  { name: 'Sales', key: 'sales' },
-  { name: 'Expenses', key: 'expenses' },
-  { name: 'Operating Profit', key: 'operatingProfit' },
-  { name: 'Financing Profit', key: 'financingProfit' },
-  { name: 'Financing Margin', key: 'financingMargin' },
-  { name: 'OPM', key: 'opm' },
-  { name: 'Other Income', key: 'otherIncome' },
-  { name: 'Interest', key: 'interest' },
-  { name: 'Depreciation', key: 'depreciation' },
-  { name: 'Profit Before Tax', key: 'profitBeforeTax' },
-  { name: 'Tax', key: 'tax' },
-  { name: 'Net Profit', key: 'netProfit' }
-]
+const parseHighLow = (highLow?: string): { high: number; low: number } => {
+  if (!highLow) return { high: 0, low: 0 }
 
-const yearlyPnlType: YearlyPnLEntryMap[] = [
-  { name: 'Sales', key: 'sales' },
-  { name: 'Revenue', key: 'revenue' },
-  { name: 'Expenses', key: 'expenses' },
-  { name: 'Operating Profit', key: 'operatingProfit' },
-  { name: 'Financing Profit', key: 'financingProfit' },
-  { name: 'Financing Margin', key: 'financingMargin' },
-  { name: 'OPM', key: 'opm' },
-  { name: 'Other Income', key: 'otherIncome' },
-  { name: 'Interest', key: 'interest' },
-  { name: 'Depreciation', key: 'depreciation' },
-  { name: 'Profit Before Tax', key: 'profitBeforeTax' },
-  { name: 'Tax', key: 'tax' },
-  { name: 'Net Profit', key: 'netProfit' },
-  { name: 'Eps in Rs', key: 'epsInRs' },
-  { name: 'Dividend Payout', key: 'dividendPayout' }
-]
+  const matches = highLow.match(/[\d.]+/g)
+  if (!matches || matches.length < 2) return { high: 0, low: 0 }
 
-const balanceSheetType: BalanceSheetEntryMap[] = [
-  { name: 'Equity Capital', key: 'equityCapital' },
-  { name: 'Reserves', key: 'reserves' },
-  { name: 'Borrowings', key: 'borrowings' },
-  { name: 'Other Liabilities', key: 'otherLiabilities' },
-  { name: 'Total Liabilities', key: 'totalLiabilities' },
-  { name: 'Fixed Assets', key: 'fixedAssets' },
-  { name: 'CWIP', key: 'cwip' },
-  { name: 'Investments', key: 'investments' },
-  { name: 'Other Assets', key: 'otherAssets' },
-  { name: 'Total Assets', key: 'totalAssets' }
-]
+  return {
+    high: toNumber(matches[0], 0),
+    low: toNumber(matches[1], 0)
+  }
+}
 
-const cashFlowsType: CashFlowsEntryMap[] = [
-  { name: 'Cash From Operating Activity', key: 'cashFromOperatingActivity' },
-  { name: 'Cash From Investing Activity', key: 'cashFromInvestingActivity' },
-  { name: 'Cash From Financing Activity', key: 'cashFromFinancingActivity' },
-  { name: 'Net Cash Flow', key: 'netCashFlow' }
-]
+const flattenTableRows = (
+  node: FundamentalTableRowNode,
+  depth: number,
+  headersLength: number,
+  collector: TableDataRow[],
+  id: string,
+  parentId?: string
+) => {
+  const values = (node.values || []).slice(0, headersLength).map(value => (value === null ? '-' : value))
+  const padded = values.concat(Array(Math.max(headersLength - values.length, 0)).fill('-'))
 
-const ratiosType: RatiosEntryMap[] = [
-  { name: 'Debtor Days', key: 'debtorDays' },
-  { name: 'Inventory Days', key: 'inventoryDays' },
-  { name: 'Payable Days', key: 'payableDays' },
-  { name: 'Cash Conversion Cycle', key: 'cashConversionCycle' },
-  { name: 'Working Capital Days', key: 'workingCapitalDays' },
-  { name: 'ROCE', key: 'roce' },
-  { name: 'ROE', key: 'roe' }
-]
+  collector.push({
+    id,
+    label: node.title,
+    cells: padded,
+    level: depth,
+    parentId,
+    hasChildren: Boolean(node.children?.length)
+  })
+  ;(node.children || []).forEach((child, index) =>
+    flattenTableRows(child, depth + 1, headersLength, collector, `${id}.${index + 1}`, id)
+  )
+}
+
+const mapTableFromApi = (table?: FundamentalApiTable): TableData | null => {
+  if (!table?.headers?.length) return null
+
+  const headers = table.headers
+  const rows: TableDataRow[] = []
+
+  Object.values(table.rows || {}).forEach((node, index) =>
+    flattenTableRows(node, 0, headers.length, rows, String(index + 1))
+  )
+  ;(table.unmatched_rows || []).forEach((item, index) => {
+    const label = String(item.label || '-')
+    const values = headers.map(header => {
+      const value = item[header]
+
+      return value === null || value === undefined || value === '' ? '-' : value
+    })
+    rows.push({
+      id: `u.${index + 1}`,
+      label,
+      cells: values,
+      level: 0,
+      hasChildren: false
+    })
+  })
+
+  if (!rows.length) return null
+
+  return {
+    columns: ['', ...headers],
+    rows
+  }
+}
+
+const mapPeersTableFromApi = (table?: FundamentalPeerTable): TableData | null => {
+  if (!table?.headers?.length || !table.rows?.length) return null
+
+  const rows: TableDataRow[] = table.rows.map((row, index) => {
+    const safeRow = row || []
+
+    return {
+      id: `peer.${index + 1}`,
+      label: String(safeRow[0] ?? `${index + 1}`),
+      cells: safeRow
+        .slice(1)
+        .map(value => (value === null || value === undefined || value === '' ? '-' : value)) as Array<string | number>,
+      level: 0,
+      hasChildren: false
+    }
+  })
+
+  return {
+    columns: [table.headers[0], ...table.headers.slice(1)],
+    rows
+  }
+}
 
 export interface TodaysMarket {
   ltp: number
@@ -257,31 +279,55 @@ interface HoldingItem {
   }
 }
 
+interface GrowthMetricCard {
+  title: string
+  entries: Array<{
+    title: string
+    value: string | number
+  }>
+}
+
+const renameMetricTitle = (title: string): string => {
+  const normalized = title.trim().toLowerCase()
+  if (normalized === 'compounded sales growth') return 'Revenue CAGR'
+  if (normalized === 'compounded profit growth') return 'Earnings CAGR'
+  if (normalized === 'stock price cagr') return 'Price CAGR'
+  if (normalized === 'return on equity') return 'Equity Return Trend'
+
+  return title
+}
+
 const Dashboard = () => {
   // get symbol from url
   const [fundamentals, setFundamentals] = useState<Fundamental | null>()
+  const [peersTable, setPeersTable] = useState<TableData | null>()
   const [yearlyResult, setYearlyResult] = useState<TableData | null>()
   const [quarterlyResult, setQuarterlyResult] = useState<TableData | null>()
   const [balanceSheet, setBalanceSheet] = useState<TableData | null>()
   const [cashFlows, setCashFlows] = useState<TableData | null>()
   const [todaysMarket, setTodaysMarket] = useState<TodaysMarket | null>()
   const [ratios, setRatios] = useState<TableData | null>()
+  const [shareholdingTable, setShareholdingTable] = useState<TableData | null>()
   const [showBuySellModal, setShowBuySellModal] = useState<BuySellModal>({ type: 'BUY', open: false })
+  const [growthMetricCards, setGrowthMetricCards] = useState<GrowthMetricCard[]>([])
   const router = useRouter()
   const { symbol } = router.query
-  const { data } = useSimpleSWR<any>(`${ENDURL.GET_STOCK_FUNDAMENTAL_DETAILS}/${symbol}`)
+  const symbolCode = typeof symbol === 'string' ? symbol : ''
+  const { data } = useSimpleSWR<FundamentalApiPayload>(
+    symbolCode ? `${ENDURL.GET_STOCK_FUNDAMENTAL_DETAILS}/${symbolCode}` : (null as any)
+  )
   const dispatch = useDispatch()
   const { mutate } = useSWRConfig()
   const myPortfolios = useSelector((state: RootState) => state.portfolio.myPortfolios)
   const selectedPortfolioId = useSelector((state: RootState) => state.portfolio.selectedPortfolioId)
   const { data: portfolioTypesData } = useSimpleSWR<PortfolioType[]>(ENDURL.GET_PORTFOLIO_TYPES)
   const { data: myPortfolioData } = useSimpleSWR<MyPortfolio[]>(ENDURL.GET_MY_PORTFOLIOS)
-  const activeStockId = (data?.active_stock_id?._id as string) || ''
+  const activeStockId = data?.active_stock_id || ''
   const { data: holdingsData } = useSimpleSWR<HoldingItem[]>(
     activeStockId ? (`${ENDURL.GET_STOCK_HOLDINGS}/${activeStockId}` as string) : (null as any)
   )
 
-  const liveStocksData = useLivePrices([data?.master_id?.symbol as string])
+  const liveStocksData = useLivePrices(symbolCode ? [symbolCode] : [])
 
   const handleOpenBuySellModal = (type: 'BUY' | 'SELL') => {
     console.log('handleOpenBuySellModal', type)
@@ -293,8 +339,8 @@ const Dashboard = () => {
   }
 
   const handleOrderSuccess = () => {
-    if (symbol) mutate(`${ENDURL.GET_STOCK_FUNDAMENTAL_DETAILS}/${symbol}`)
-    if (activeStockId) mutate(`${ENDURL.GET_STOCK_HOLDINGS}?active_stock_id=${activeStockId}`)
+    if (symbolCode) mutate(`${ENDURL.GET_STOCK_FUNDAMENTAL_DETAILS}/${symbolCode}`)
+    if (activeStockId) mutate(`${ENDURL.GET_STOCK_HOLDINGS}/${activeStockId}`)
     mutate(ENDURL.GET_PORTFOLIO_TYPES)
     mutate(ENDURL.GET_MY_PORTFOLIOS)
   }
@@ -312,251 +358,93 @@ const Dashboard = () => {
   }, [dispatch, myPortfolioData])
 
   useEffect(() => {
-    console.log('liveStocksData', liveStocksData, data)
-    const symbol = (data?.master_id?.symbol as string) || ''
-    if (!symbol) return
+    const live = symbolCode ? liveStocksData?.[symbolCode] : null
+    const snapshot = data?.summary?.market_snapshot
+    const parsedHighLow = parseHighLow(snapshot?.high_low)
+    const fallbackLtp = toNumber(snapshot?.current_price, 0)
 
-    const live = liveStocksData?.[symbol]
-
-    // ---------- LIVE DATA ----------
     if (live && Object.keys(live).length > 0) {
-      // const high = Math.max(...live.dayCandles.map((item: Candles) => item.h))
-      // const low = Math.min(...live.dayCandles.map((item: Candles) => item.l))
-      // const close = live.dayCandles[live.dayCandles.length - 1].c
-      // const dailyCandle = live.dayCandles.map((item: Candles) => buildDailyCandle(item, high, low, close))
+      const open = toNumber(live.open, 0)
+      const ltp = toNumber(live.ltp, fallbackLtp)
 
       setTodaysMarket({
-        ltp: live?.ltp || 0,
-        open: live?.open || 0,
-        high: live?.high || 0,
-        low: live?.low || 0,
-        close: live?.close || 0,
-        percentChange: ((live?.ltp - live.open) / live.open) * 100,
-        dayCandles: live?.dayCandles || [] // ✅ FIX
+        ltp,
+        open,
+        high: toNumber(live.high, parsedHighLow.high),
+        low: toNumber(live.low, parsedHighLow.low),
+        close: toNumber(live.close, ltp),
+        percentChange: open ? ((ltp - open) / open) * 100 : 0,
+        dayCandles: (live.dayCandles || []) as Candles[]
       })
 
       return
     }
 
-    // ---------- FALLBACK (DB DATA) ----------
-    if (data?.active_stock_id) {
-      const s = data.active_stock_id
-
-      setTodaysMarket({
-        ltp: s.ltp || 0,
-        open: s.open || 0,
-        high: s.high || 0,
-        low: s.low || 0,
-        close: s.close || 0,
-        percentChange: s.open ? ((s.ltp - s.open) / s.open) * 100 : 0
-      })
-    }
-  }, [data, liveStocksData])
+    setTodaysMarket({
+      ltp: fallbackLtp,
+      open: 0,
+      high: parsedHighLow.high,
+      low: parsedHighLow.low,
+      close: fallbackLtp,
+      percentChange: 0,
+      dayCandles: []
+    })
+  }, [data, liveStocksData, symbolCode])
 
   useEffect(() => {
-    console.log('data', data)
-    if (data) {
-      const marketSnapshot: MarketSnapshot = {
-        marketCap: data?.summary?.market_snapshot?.market_cap,
-        currentPrice: data?.active_stock_id?.ltp || data?.summary?.market_snapshot?.current_price,
-        peRatio: data?.summary?.market_snapshot?.peRatio || null,
-        roce: data?.summary?.market_snapshot?.roce || null,
-        roe: data?.summary?.market_snapshot?.roe || null,
-        bookValue: data?.summary?.market_snapshot?.book_value || null,
-        dividendYield: data?.summary?.market_snapshot?.dividend_yield || null,
-        faceValue: data?.summary?.market_snapshot?.faceValue || null,
-        high: data?.summary?.market_snapshot?.high || data?.active_stock_id?.high,
-        low: data?.summary?.market_snapshot?.low || data?.active_stock_id?.low,
-        open: data?.active_stock_id?.open || null,
-        close: data?.active_stock_id?.close || null,
-        date: data?.active_stock_id?.lastUpdate || null
-      }
+    if (!data) return
 
-      const yearlyPnl: YearlyPnL[] = data?.financials?.yearly_pnl?.map((item: any) => ({
-        date: item?.date,
-        sales: item?.sales,
-        revenue: item?.revenue,
-        expenses: item?.expenses,
-        operatingProfit: item?.operating_profit,
-        financingProfit: item?.financing_profit,
-        financingMargin: item?.financing_margin,
-        opm: item?.opm,
-        otherIncome: item?.other_income,
-        interest: item?.interest,
-        depreciation: item?.depreciation,
-        profitBeforeTax: item?.profit_before_tax,
-        tax: item?.tax,
-        netProfit: item?.net_profit,
-        epsInRs: item?.eps,
-        dividendPayout: item?.dividend_payout
-      }))
+    const snapshot = data.summary?.market_snapshot
+    const parsedHighLow = parseHighLow(snapshot?.high_low)
 
-      const quarterlyResults: QuarterlyResults[] = data?.financials?.quarterly_results?.map((item: any) => ({
-        date: item?.date || null,
-        sales: item?.sales || null,
-        revenue: item?.revenue || null,
-        expenses: item?.expenses || null,
-        operatingProfit: item?.operating_profit || null,
-        financingProfit: item?.financing_profit || null,
-        financingMargin: item?.financing_margin || null,
-        opm: item?.opm || null,
-        otherIncome: item?.other_income || null,
-        interest: item?.interest || null,
-        depreciation: item?.depreciation || null,
-        profitBeforeTax: item?.profit_before_tax || null,
-        tax: item?.tax || null,
-        netProfit: item?.net_profit || null,
-        epsInRs: item?.eps_in_rs || null,
-        rawPdf: item?.raw_pdf || null
-      }))
+    setFundamentals({
+      companyName: data.company || symbolCode.toUpperCase(),
+      marketSnapshot: {
+        marketCap: toNumber(snapshot?.market_cap, 0),
+        currentPrice: toNumber(todaysMarket?.ltp, toNumber(snapshot?.current_price, 0)),
+        peRatio: toNumber(snapshot?.pe_ratio ?? snapshot?.stock_pe, 0),
+        roce: toNumber(snapshot?.roce, 0),
+        roe: toNumber(snapshot?.roe, 0),
+        bookValue: toNumber(snapshot?.book_value, 0),
+        dividendYield: toNumber(snapshot?.dividend_yield, 0),
+        faceValue: toNumber(snapshot?.face_value, 0),
+        high: toNumber(todaysMarket?.high, parsedHighLow.high),
+        low: toNumber(todaysMarket?.low, parsedHighLow.low),
+        open: toNumber(todaysMarket?.open, 0),
+        close: toNumber(todaysMarket?.close, 0),
+        date: data.last_updated_at || ''
+      },
+      pros: data.summary?.pros || [],
+      cons: data.summary?.cons || []
+    })
 
-      const balanceSheet: BalanceSheet[] = data?.statements?.balance_sheet?.map((item: any) => ({
-        date: item?.date || null,
-        equityCapital: item?.equity_capital || null,
-        reserves: item?.reserves || null,
-        borrowings: item?.borrowings || null,
-        otherLiabilities: item?.other_liabilities || null,
-        totalLiabilities: item?.total_liabilities || null,
-        fixedAssets: item?.fixed_assets || null,
-        cwip: item?.cwip || null,
-        investments: item?.investments || null,
-        otherAssets: item?.other_assets || null,
-        totalAssets: item?.total_assets || null
-      }))
-
-      const cashFlows: CashFlows[] = data?.statements?.cash_flows?.map((item: any) => ({
-        date: item.date,
-        cashFromOperatingActivity: item.cash_from_operating_activity,
-        cashFromInvestingActivity: item.cash_from_investing_activity,
-        cashFromFinancingActivity: item.cash_from_financing_activity,
-        netCashFlow: item.net_cash_flow
-      }))
-
-      const ratios: Ratios[] = data?.ratios?.map((item: any) => ({
-        date: item?.date || null,
-        debtorDays: item?.debtor_days || null,
-        inventoryDays: item?.inventory_days || null,
-        payableDays: item?.payable_days || null,
-        cashConversionCycle: item?.cash_conversion_cycle || null,
-        workingCapitalDays: item?.working_capital_days || null,
-        roce: item?.roce || null,
-        roe: item?.roe || null
-      }))
-
-      setFundamentals({
-        companyName: data?.company,
-        marketSnapshot,
-        pros: data?.summary?.pros,
-        cons: data?.summary?.cons,
-        yearlyPnl,
-        quarterlyResults,
-        balanceSheet,
-        cashFlows,
-        ratios
-      })
-    }
-  }, [data])
-
-  const generateTableData = (type: string, stockFundamental: Fundamental) => {
-    switch (type) {
-      case 'quarterly': {
-        if (!stockFundamental?.quarterlyResults?.length) return
-
-        setQuarterlyResult({
-          // first column is metric name, rest are dates
-          columns: ['', ...stockFundamental.quarterlyResults.map((item: QuarterlyResults) => item.date)],
-
-          // each row = [metricName, q1Value, q2Value, ...]
-          rows: quarterlyResultType
-            .map(type => [
-              type.name,
-              ...stockFundamental.quarterlyResults.map((item: QuarterlyResults) => item[type.key])
-            ])
-            .filter(row => row.filter(item => item !== undefined && item !== null && item !== 0).length > 1)
-        })
-      }
-
-      // return quarterlyResult
-      case 'yearly':
-        if (!stockFundamental?.yearlyPnl?.length) return
-
-        setYearlyResult({
-          // first column is metric name, rest are dates
-          columns: ['', ...stockFundamental.yearlyPnl.map((item: YearlyPnL) => item.date)],
-
-          // each row = [metricName, q1Value, q2Value, ...]
-          rows: yearlyPnlType
-            .map(type => [type.name, ...stockFundamental.yearlyPnl.map((item: YearlyPnL) => item[type.key])])
-            .filter(row => row.filter(item => item !== undefined && item !== null && item !== 0).length > 1)
-        })
-
-      case 'balanceSheet':
-        if (!stockFundamental?.balanceSheet?.length) return
-
-        setBalanceSheet({
-          // first column is metric name, rest are dates
-          columns: ['', ...stockFundamental.balanceSheet.map((item: BalanceSheet) => item.date)],
-
-          // each row = [metricName, q1Value, q2Value, ...]
-          rows: balanceSheetType
-            .map(type => [type.name, ...stockFundamental.balanceSheet.map((item: BalanceSheet) => item[type.key])])
-            .filter(row => row.filter(item => item !== undefined && item !== null && item !== 0).length > 1)
-        })
-
-      case 'cashFlows':
-        if (!stockFundamental?.cashFlows?.length) return
-
-        setCashFlows({
-          // first column is metric name, rest are dates
-          columns: ['', ...stockFundamental.cashFlows.map((item: CashFlows) => item.date)],
-
-          // each row = [metricName, q1Value, q2Value, ...]
-          rows: cashFlowsType
-            .map(type => [type.name, ...stockFundamental.cashFlows.map((item: CashFlows) => item[type.key])])
-            .filter(row => row.filter(item => item !== undefined && item !== null && item !== 0).length > 1)
-        })
-
-      case 'ratios':
-        if (!stockFundamental?.ratios?.length) return
-
-        setRatios({
-          // first column is metric name, rest are dates
-          columns: ['', ...stockFundamental.ratios.map((item: Ratios) => item.date)],
-
-          // each row = [metricName, q1Value, q2Value, ...]
-          rows: ratiosType
-            .map(type => [type.name, ...stockFundamental.ratios.map((item: Ratios) => item[type.key])])
-            .filter(row => row.filter(item => item !== undefined && item !== null && item !== 0).length > 1)
-        })
-
-      default:
-        break
-    }
-  }
-
-  useEffect(() => {
-    if (fundamentals?.quarterlyResults?.length) generateTableData('quarterly', fundamentals)
-
-    if (fundamentals?.yearlyPnl?.length) generateTableData('yearly', fundamentals)
-
-    if (fundamentals?.balanceSheet?.length) generateTableData('balanceSheet', fundamentals)
-
-    if (fundamentals?.cashFlows?.length) generateTableData('cashFlows', fundamentals)
-
-    if (fundamentals?.ratios?.length) generateTableData('ratios', fundamentals)
-
-    return () => {
-      setQuarterlyResult(null)
-      setYearlyResult(null)
-      setBalanceSheet(null)
-      setCashFlows(null)
-      setRatios(null)
-    }
-  }, [fundamentals])
-
+    setQuarterlyResult(mapTableFromApi(data.tables?.quarters))
+    setYearlyResult(mapTableFromApi(data.tables?.profit_loss))
+    setBalanceSheet(mapTableFromApi(data.tables?.balance_sheet))
+    setCashFlows(mapTableFromApi(data.tables?.cash_flow))
+    setRatios(mapTableFromApi(data.tables?.ratios))
+    setPeersTable(mapPeersTableFromApi(data.peers?.main_table))
+    setShareholdingTable(mapTableFromApi(data.tables?.shareholdings))
+    setGrowthMetricCards(
+      Object.values(data.other_details?.profit_loss || {})
+        .filter(item => item?.title && item?.entries?.length)
+        .map(item => ({
+          title: renameMetricTitle(item.title || ''),
+          entries: (item.entries || []).map(entry => ({
+            title: entry.title || '',
+            value: entry.value ?? '-'
+          }))
+        }))
+    )
+  }, [data, symbolCode, todaysMarket])
   const holdings = holdingsData || []
   const totalHoldingQty = holdings.reduce((sum, item) => sum + (item.holding?.quantity || 0), 0)
   const totalHoldingValue = holdings.reduce((sum, item) => sum + (item.holding?.invested_value || 0), 0)
+  const documents = data?.documents
+  const announcements = documents?.announcements?.items || []
+  const annualReports = documents?.annual_reports?.items || []
+  const creditRatings = documents?.credit_ratings?.items || []
+  const concalls = documents?.concalls?.items || []
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -701,10 +589,19 @@ const Dashboard = () => {
             <ProsCons fundamentals={fundamentals} />
           </Grid>
 
+          {peersTable && (
+            <Grid item xs={12}>
+              <Card>
+                <CardHeader title='Peer Benchmark' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <FundamentalTable data={peersTable} />
+              </Card>
+            </Grid>
+          )}
+
           {quarterlyResult && (
             <Grid item xs={12}>
               <Card>
-                <CardHeader title='Quarterly Results' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <CardHeader title='Quarterly Performance' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
                 <FundamentalTable data={quarterlyResult} />
               </Card>
             </Grid>
@@ -713,16 +610,49 @@ const Dashboard = () => {
           {yearlyResult && (
             <Grid item xs={12}>
               <Card>
-                <CardHeader title='Yearly PnL' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <CardHeader title='Income Statement' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
                 <FundamentalTable data={yearlyResult} />
               </Card>
+            </Grid>
+          )}
+
+          {growthMetricCards.length > 0 && (
+            <Grid item xs={12}>
+              <Grid container spacing={4}>
+                {growthMetricCards.map(card => (
+                  <Grid item xs={12} sm={6} lg={3} key={card.title}>
+                    <Card variant='outlined'>
+                      <CardHeader
+                        title={card.title}
+                        titleTypographyProps={{ variant: 'h6', sx: { fontWeight: 600, fontSize: '1.1rem' } }}
+                        sx={{ pb: 1 }}
+                      />
+                      <Box sx={{ px: 4, pb: 4 }}>
+                        {card.entries.map(entry => (
+                          <Box
+                            key={`${card.title}-${entry.title}`}
+                            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}
+                          >
+                            <Typography variant='body1' color='text.secondary'>
+                              {entry.title}
+                            </Typography>
+                            <Typography variant='body1' sx={{ fontWeight: 600 }}>
+                              {entry.value}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
             </Grid>
           )}
 
           {balanceSheet && (
             <Grid item xs={12}>
               <Card>
-                <CardHeader title='Balance Sheet' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <CardHeader title='Financial Position' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
                 <FundamentalTable data={balanceSheet} />
               </Card>
             </Grid>
@@ -731,7 +661,7 @@ const Dashboard = () => {
           {cashFlows && (
             <Grid item xs={12}>
               <Card>
-                <CardHeader title='Cash Flows' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <CardHeader title='Cash Movement' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
                 <FundamentalTable data={cashFlows} />
               </Card>
             </Grid>
@@ -740,8 +670,128 @@ const Dashboard = () => {
           {ratios && (
             <Grid item xs={12}>
               <Card>
-                <CardHeader title='Ratios' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <CardHeader title='Key Ratios' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
                 <FundamentalTable data={ratios} />
+              </Card>
+            </Grid>
+          )}
+
+          {shareholdingTable && (
+            <Grid item xs={12}>
+              <Card>
+                <CardHeader title='Ownership Structure' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <FundamentalTable data={shareholdingTable} />
+              </Card>
+            </Grid>
+          )}
+
+          {(announcements.length > 0 ||
+            annualReports.length > 0 ||
+            creditRatings.length > 0 ||
+            concalls.length > 0) && (
+            <Grid item xs={12}>
+              <Card>
+                <CardHeader title='Research Library' titleTypographyProps={{ variant: 'h4' }} />
+                <Box sx={{ px: 4, pb: 4 }}>
+                  <MuiGrid container spacing={4}>
+                    <MuiGrid item xs={12} md={6} lg={4}>
+                      <Card variant='outlined'>
+                        <CardHeader
+                          title='Regulatory Updates'
+                          titleTypographyProps={{ variant: 'h6' }}
+                          sx={{ pb: 1 }}
+                        />
+                        <Box sx={{ px: 4, pb: 4 }}>
+                          {announcements.slice(0, 4).map((item, index) => (
+                            <Box key={`announcement-${index}`} sx={{ mb: 3 }}>
+                              <Link href={item.url || '#'} target='_blank' rel='noopener noreferrer' underline='hover'>
+                                {item.title || '-'}
+                              </Link>
+                              <Typography variant='body2' color='text.secondary'>
+                                {item.subtitle || ''}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Box>
+                      </Card>
+                    </MuiGrid>
+
+                    <MuiGrid item xs={12} sm={6} lg={2}>
+                      <Card variant='outlined'>
+                        <CardHeader title='Yearly Filings' titleTypographyProps={{ variant: 'h6' }} sx={{ pb: 1 }} />
+                        <Box sx={{ px: 4, pb: 4 }}>
+                          {annualReports.slice(0, 6).map((item, index) => (
+                            <Box key={`annual-${index}`} sx={{ mb: 3 }}>
+                              <Link href={item.url || '#'} target='_blank' rel='noopener noreferrer' underline='hover'>
+                                {item.title || '-'}
+                              </Link>
+                              <Typography variant='body2' color='text.secondary'>
+                                {item.subtitle || ''}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Box>
+                      </Card>
+                    </MuiGrid>
+
+                    <MuiGrid item xs={12} sm={6} lg={2}>
+                      <Card variant='outlined'>
+                        <CardHeader title='Rating Actions' titleTypographyProps={{ variant: 'h6' }} sx={{ pb: 1 }} />
+                        <Box sx={{ px: 4, pb: 4 }}>
+                          {creditRatings.slice(0, 6).map((item, index) => (
+                            <Box key={`rating-${index}`} sx={{ mb: 3 }}>
+                              <Link href={item.url || '#'} target='_blank' rel='noopener noreferrer' underline='hover'>
+                                {item.title || '-'}
+                              </Link>
+                              <Typography variant='body2' color='text.secondary'>
+                                {item.subtitle || ''}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Box>
+                      </Card>
+                    </MuiGrid>
+
+                    <MuiGrid item xs={12} lg={4}>
+                      <Card variant='outlined'>
+                        <CardHeader title='Earnings Calls' titleTypographyProps={{ variant: 'h6' }} sx={{ pb: 1 }} />
+                        <Box sx={{ px: 4, pb: 4 }}>
+                          {concalls.slice(0, 8).map((item, index) => (
+                            <Box
+                              key={`concall-${index}`}
+                              sx={{
+                                mb: 2.5,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                gap: 2
+                              }}
+                            >
+                              <Typography variant='body1' color='text.secondary' sx={{ minWidth: 84 }}>
+                                {item.label || '-'}
+                              </Typography>
+                              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                                {(item.links || []).map((linkItem, linkIndex) => (
+                                  <Button
+                                    key={`concall-link-${index}-${linkIndex}`}
+                                    size='small'
+                                    variant='outlined'
+                                    component='a'
+                                    href={linkItem.url || '#'}
+                                    target='_blank'
+                                    rel='noopener noreferrer'
+                                  >
+                                    {linkItem.title || 'Link'}
+                                  </Button>
+                                ))}
+                              </Box>
+                            </Box>
+                          ))}
+                        </Box>
+                      </Card>
+                    </MuiGrid>
+                  </MuiGrid>
+                </Box>
               </Card>
             </Grid>
           )}
@@ -813,9 +863,9 @@ const Dashboard = () => {
         portfolios={myPortfolios}
         selectedPortfolioId={selectedPortfolioId}
         onSelectPortfolio={id => dispatch(setSelectedPortfolioId(id))}
-        activeStockId={data?.active_stock_id?._id || ''}
-        stockSymbol={(data?.active_stock_id?.symbol as string) || (data?.master_id?.symbol as string) || ''}
-        ltp={todaysMarket?.ltp || data?.active_stock_id?.ltp || 0}
+        activeStockId={activeStockId}
+        stockSymbol={symbolCode}
+        ltp={todaysMarket?.ltp || 0}
         onSuccess={handleOrderSuccess}
       />
     </ApexChartWrapper>

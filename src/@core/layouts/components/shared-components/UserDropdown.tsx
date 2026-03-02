@@ -1,5 +1,5 @@
 // ** React Imports
-import { Fragment, SyntheticEvent, useMemo, useState } from 'react'
+import { Fragment, SyntheticEvent, useEffect, useMemo, useState } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
@@ -24,6 +24,8 @@ import { styled } from '@mui/material/styles'
 import LogoutVariant from 'mdi-material-ui/LogoutVariant'
 import WalletPlusOutline from 'mdi-material-ui/WalletPlusOutline'
 import CurrencyUsd from 'mdi-material-ui/CurrencyUsd'
+import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined'
+import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined'
 
 import { mutate } from 'swr'
 import { useMutationSWR, useSimpleSWR } from 'src/hooks/swr/swrhooks'
@@ -86,6 +88,7 @@ const UserDropdown = () => {
   const [transferAmount, setTransferAmount] = useState<string>('')
   const [transferAmountError, setTransferAmountError] = useState<string>('')
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<string>('')
+  const [layoutMode, setLayoutMode] = useState<'admin' | 'website'>('admin')
 
   const router = useRouter()
   const { showSnackbar } = useSnackbar()
@@ -102,6 +105,36 @@ const UserDropdown = () => {
     { message?: string },
     { amount: number }
   >(selectedPortfolioId ? ENDURL.TRANSFER_WALLET_TO_PORTFOLIO.replace(':portfolioId', selectedPortfolioId) : '')
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mode = localStorage.getItem('app-layout-mode')
+    setLayoutMode(mode === 'website' ? 'website' : 'admin')
+  }, [])
+
+  useEffect(() => {
+    if (!router.isReady) return
+
+    const quickAction = router.query.quickAction
+    if (quickAction !== 'add-fund' && quickAction !== 'transfer-fund') return
+
+    if (quickAction === 'add-fund') {
+      resetAddFundState()
+      setIsAddFundOpen(true)
+    }
+
+    if (quickAction === 'transfer-fund') {
+      if (isPortfoliosLoading) return
+      if (!portfolios || portfolios.length === 0) {
+        showSnackbar('Create portfolio first.', 'error')
+      } else {
+        resetTransferState()
+        setIsTransferOpen(true)
+      }
+    }
+
+    router.replace({ pathname: router.pathname }, undefined, { shallow: true })
+  }, [router, isPortfoliosLoading, portfolios, showSnackbar])
 
   const handleDropdownOpen = (event: SyntheticEvent) => {
     setAnchorEl(event.currentTarget)
@@ -217,6 +250,48 @@ const UserDropdown = () => {
     setAnchorEl(null)
   }
 
+  const handleToggleLayout = () => {
+    const nextMode: 'admin' | 'website' = layoutMode === 'admin' ? 'website' : 'admin'
+    setLayoutMode(nextMode)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('app-layout-mode', nextMode)
+      window.dispatchEvent(new Event('layout-mode-changed'))
+    }
+    handleDropdownClose()
+  }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const onOpenAddFund = () => {
+      resetAddFundState()
+      setIsAddFundOpen(true)
+    }
+
+    const onOpenTransferFund = () => {
+      if (isPortfoliosLoading) {
+        showSnackbar('Loading portfolios. Please try again.', 'error')
+        return
+      }
+
+      if (!isPortfoliosLoading && (!portfolios || portfolios.length === 0)) {
+        showSnackbar('Create portfolio first.', 'error')
+        return
+      }
+
+      resetTransferState()
+      setIsTransferOpen(true)
+    }
+
+    window.addEventListener('open-add-fund-modal', onOpenAddFund)
+    window.addEventListener('open-transfer-fund-modal', onOpenTransferFund)
+
+    return () => {
+      window.removeEventListener('open-add-fund-modal', onOpenAddFund)
+      window.removeEventListener('open-transfer-fund-modal', onOpenTransferFund)
+    }
+  }, [isPortfoliosLoading, portfolios, showSnackbar])
+
   const styles = {
     py: 2,
     px: 4,
@@ -277,6 +352,16 @@ const UserDropdown = () => {
             Transfer Fund to Portfolio
           </Box>
         </MenuItem>
+        <MenuItem sx={{ p: 0 }} onClick={handleToggleLayout}>
+          <Box sx={styles}>
+            {layoutMode === 'admin' ? (
+              <LanguageOutlinedIcon sx={{ marginRight: 2 }} />
+            ) : (
+              <DashboardCustomizeOutlinedIcon sx={{ marginRight: 2 }} />
+            )}
+            {layoutMode === 'admin' ? 'Switch to Website' : 'Switch to Admin Panel'}
+          </Box>
+        </MenuItem>
         <Divider />
         <MenuItem sx={{ py: 2 }} onClick={handleLogout}>
           <LogoutVariant sx={{ marginRight: 2, fontSize: '1.375rem', color: 'text.secondary' }} />
@@ -326,7 +411,7 @@ const UserDropdown = () => {
             onChange={e => setSelectedPortfolioId(e.target.value)}
           >
             {(portfolios || []).map(portfolio => (
-              <MenuItem key={portfolio._id} value={portfolio._id}>
+              <MenuItem key={portfolio.id} value={portfolio.id}>
                 {portfolio.name}
               </MenuItem>
             ))}

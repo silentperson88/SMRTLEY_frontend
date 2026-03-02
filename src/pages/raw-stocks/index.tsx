@@ -22,7 +22,7 @@ interface StockData {
   symbol: string
   token: string
   exch_seg: string
-  _id: string
+  id: string
   status: string
   name: string
 }
@@ -94,8 +94,8 @@ const MUITable = () => {
     setSearchValue(value)
   }
 
-  const handleStockCheck = async (_id: string, token: string, name: string, exch_seg: string) => {
-    setStockId(_id)
+  const handleStockCheck = async (id: string, token: string, name: string, exch_seg: string) => {
+    setStockId(id)
 
     try {
       const body: { mode: string; tokenIds: [string]; exchange: string } = {

@@ -18,7 +18,8 @@ import { useEffect, useState } from 'react'
 import { getErrorMessage } from 'src/api/axios/errorhandler'
 import { useMutationSWR } from 'src/hooks/swr/swrhooks'
 import { useSnackbar } from 'src/layouts/components/SnackbarContext'
-import { getRiskColor, PortfolioType } from 'src/pages/portfolio-stocks'
+import { getRiskColor } from 'src/pages/portfolio-stocks'
+import type { PortfolioType } from 'src/types/portfolio'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
 
 interface Props {
@@ -51,7 +52,7 @@ const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Pr
     try {
       const payload: portfolioPayload = {
         name: portfolioName,
-        portfolio_type_id: selectedType._id,
+        portfolio_type_id: selectedType.id,
         initial_fund: initialFund || 0
       }
 
@@ -78,19 +79,19 @@ const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Pr
   }
 
   const handleSelectType = (id: string) => {
-    const type = portfolioTypes.find(type => type._id === id)
+    const type = portfolioTypes.find(type => type.id === id)
     if (!type) return
 
     setSelectedType(type)
-    setInitialFund(type.initial_fund || 0)
+    setInitialFund(type.fund || 0)
   }
 
   useEffect(() => {
     if (selectedId) {
-      const type = portfolioTypes.find(type => type._id === selectedId)
+      const type = portfolioTypes.find(type => type.id === selectedId)
       if (!type) return
       setSelectedType(type)
-      setInitialFund(type.initial_fund || 0)
+      setInitialFund(type.fund || 0)
     }
   }, [selectedId, portfolioTypes])
 
@@ -115,11 +116,11 @@ const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Pr
           select
           label='Portfolio Type'
           margin='normal'
-          value={selectedType?._id || ''}
+          value={selectedType?.id || ''}
           onChange={e => handleSelectType(e.target.value)}
         >
           {portfolioTypes.map(type => (
-            <MenuItem key={type._id} value={type._id}>
+            <MenuItem key={type.id} value={type.id}>
               <Box display='flex' justifyContent='space-between' alignItems='center' mb={2} width='100%'>
                 <Typography variant='h6'>{type.display_name}</Typography>
                 <Chip label={type.risk_level} size='small' color={getRiskColor(type.risk_level)} />
