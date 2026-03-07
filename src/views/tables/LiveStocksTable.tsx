@@ -7,7 +7,7 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
-import { Button, Typography } from '@mui/material'
+import { Button, Chip, Tooltip, Typography } from '@mui/material'
 import Profit from '@mui/icons-material/TrendingUp'
 import Loss from '@mui/icons-material/TrendingDown'
 import NextLink from 'next/link'
@@ -48,6 +48,9 @@ interface Data {
   close: number
   percentChange: number
   status: string
+  hasHistoryData?: boolean
+  historyDataFromDate?: string | null
+  historyDataToDate?: string | null
 }
 
 interface RawFormat {
@@ -65,20 +68,42 @@ interface RawFormat {
 
 const TableStickyHeader = ({
   rawStocksData,
-  handleFetchfundamental
+  handleFetchHistory,
+  handleViewEod,
+  onReachEnd,
+  hasMore,
+  isLoadingMore
 }: {
   rawStocksData: Data[]
-  handleFetchfundamental: (id: string) => void
+  handleFetchHistory: (id: string, name: string) => void
+  handleViewEod: (id: string) => void
+  onReachEnd: () => void
+  hasMore: boolean
+  isLoadingMore: boolean
 }) => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const [formattedRows, setFormattedRows] = useState<RawFormat[]>([])
 
   useEffect(() => {
-    if (rawStocksData.length > 0) {
-      const temp: RawFormat[] = rawStocksData.map(
+    const temp: RawFormat[] = rawStocksData.map(
         (
-          { name, symbol, token, exchange, ltp, open, high, low, close, percentChange, master_id }: Data,
+          {
+            name,
+            symbol,
+            token,
+            exchange,
+            ltp,
+            open,
+            high,
+            low,
+            close,
+            percentChange,
+            master_id,
+            hasHistoryData,
+            historyDataFromDate,
+            historyDataToDate
+          }: Data,
           index: number
         ) => ({
           srNo: <Typography>{index + 1}</Typography>,
@@ -116,23 +141,52 @@ const TableStickyHeader = ({
           close: <Typography>{close}</Typography>,
           status: percentChange > 0 ? <Profit color='success' /> : <Loss color='error' />,
           action: (
-            <Button
-              variant='contained'
-              color='primary'
-              style={{ color: '#ffffff' }}
-              onClick={() => handleFetchfundamental(master_id)}
-            >
-              FF
-            </Button>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center' }}>
+              {hasHistoryData ? (
+                <Tooltip
+                  title={`History: ${historyDataFromDate || '-'} to ${historyDataToDate || '-'}`}
+                  arrow
+                  placement='top'
+                >
+                  <Chip label='History Ready' size='small' color='success' variant='outlined' />
+                </Tooltip>
+              ) : (
+                <Button
+                  variant='contained'
+                  color='primary'
+                  style={{ color: '#ffffff' }}
+                  onClick={() => master_id && handleFetchHistory(master_id, name)}
+                >
+                  Fetch EOD
+                </Button>
+              )}
+              <Button
+                variant='outlined'
+                size='small'
+                onClick={() => master_id && handleViewEod(master_id)}
+              >
+                View EOD
+              </Button>
+            </div>
           )
         })
       )
-      setFormattedRows(temp)
-    }
+    setFormattedRows(temp)
   }, [rawStocksData])
+
+  useEffect(() => {
+    const totalPages = Math.max(1, Math.ceil(rawStocksData.length / rowsPerPage))
+    if (page > totalPages - 1) {
+      setPage(0)
+    }
+  }, [page, rawStocksData.length, rowsPerPage])
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
+    const totalPages = Math.max(1, Math.ceil(rawStocksData.length / rowsPerPage))
+    if (newPage >= totalPages - 1 && hasMore && !isLoadingMore) {
+      onReachEnd()
+    }
   }
 
   const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {

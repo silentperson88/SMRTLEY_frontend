@@ -26,6 +26,9 @@ import WalletPlusOutline from 'mdi-material-ui/WalletPlusOutline'
 import CurrencyUsd from 'mdi-material-ui/CurrencyUsd'
 import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined'
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined'
+import MovieOpenOutline from 'mdi-material-ui/MovieOpenOutline'
+import TextToSpeech from 'mdi-material-ui/TextToSpeech'
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined'
 
 import { mutate } from 'swr'
 import { useMutationSWR, useSimpleSWR } from 'src/hooks/swr/swrhooks'
@@ -260,6 +263,21 @@ const UserDropdown = () => {
     handleDropdownClose()
   }
 
+  const handleOpenRemotionDemo = () => {
+    handleDropdownClose()
+    router.push('/remotion-demo')
+  }
+
+  const handleOpenTtsDemo = () => {
+    handleDropdownClose()
+    router.push('/tts-audio-demo')
+  }
+
+  const handleOpenContentCreator = () => {
+    handleDropdownClose()
+    router.push('/content-creator')
+  }
+
   useEffect(() => {
     if (typeof window === 'undefined') return
 
@@ -360,6 +378,24 @@ const UserDropdown = () => {
               <DashboardCustomizeOutlinedIcon sx={{ marginRight: 2 }} />
             )}
             {layoutMode === 'admin' ? 'Switch to Website' : 'Switch to Admin Panel'}
+          </Box>
+        </MenuItem>
+        <MenuItem sx={{ p: 0 }} onClick={handleOpenRemotionDemo}>
+          <Box sx={styles}>
+            <MovieOpenOutline sx={{ marginRight: 2 }} />
+            Remotion Demo
+          </Box>
+        </MenuItem>
+        <MenuItem sx={{ p: 0 }} onClick={handleOpenTtsDemo}>
+          <Box sx={styles}>
+            <TextToSpeech sx={{ marginRight: 2 }} />
+            TTS Audio Demo
+          </Box>
+        </MenuItem>
+        <MenuItem sx={{ p: 0 }} onClick={handleOpenContentCreator}>
+          <Box sx={styles}>
+            <EditNoteOutlinedIcon sx={{ marginRight: 2 }} />
+            Content Creator
           </Box>
         </MenuItem>
         <Divider />
