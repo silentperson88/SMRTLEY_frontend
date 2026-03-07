@@ -24,6 +24,10 @@ export const ENDURL = {
   // IPO GMP
   FETCH_IPO_GMP: 'ticker/ipo-gmp',
 
+  // EOD
+  FETCH_EOD_BY_RANGE_CHUNKED: 'ticker/eod/fetch-by-range-chunked',
+  GET_EOD_MASTER_RANGE: 'ticker/eod/master',
+
   // Master Stock
   GET_MASTER_STOCKS: 'ticker/master',
 
@@ -48,6 +52,9 @@ export const ENDURL = {
   GET_OVERVIEW: 'user/dashboard',
   GET_DASHBOARD: 'user/dashboard',
   LOAD_WALLET_FUND: 'user/wallet/load',
-  TRANSFER_WALLET_TO_PORTFOLIO: 'user/wallet/transfer-to-portfolio/:portfolioId'
+  TRANSFER_WALLET_TO_PORTFOLIO: 'user/wallet/transfer-to-portfolio/:portfolioId',
+
+  // TTS (Piper)
+  GENERATE_TTS_AUDIO: 'user/tts/generate'
 }
 

@@ -7,16 +7,15 @@ import CardHeader from '@mui/material/CardHeader'
 // ** Demo Components Imports
 import LiveStocksTable from 'src/views/tables/LiveStocksTable'
 import { useEffect, useState } from 'react'
-import { InputAdornment, LinearProgress, TextField } from '@mui/material'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, InputAdornment, LinearProgress, TextField } from '@mui/material'
 import { Magnify } from 'mdi-material-ui'
 import { useMutationSWR, usePaginatedSWR } from 'src/hooks/swr/swrhooks'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
 import { useSnackbar } from 'src/layouts/components/SnackbarContext'
 import { mutate } from 'swr'
-import { useDispatch, useSelector } from 'react-redux'
-import { requestSubscribe } from 'src/store/slices/subscribeMarket.slice'
 import { useRouter } from 'next/router'
 import MarketOverviewBanner from 'src/components/page/MarketOverviewBanner'
+import { useDebounce } from 'src/utils/useDebounce'
 
 interface StockData {
   master_id?: string
@@ -32,40 +31,73 @@ interface StockData {
   id: string
   status: string
   name: string
+  hasHistoryData?: boolean
+  historyDataFromDate?: string | null
+  historyDataToDate?: string | null
 }
 
-interface FetchFundaMentalResponse {
-  isSussess: boolean
+interface FetchEodResponse {
+  count: number
 }
 
 const LiveStocks = () => {
   const router = useRouter()
-  const page = 1
   const pageSize = 50
+  const [apiPage, setApiPage] = useState<number>(1)
+  const [allStocks, setAllStocks] = useState<StockData[]>([])
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false)
   const [searchValue, setSearchValue] = useState<string>('')
+  const debouncedSearchValue = useDebounce(searchValue, 400)
+  const [historyForm, setHistoryForm] = useState<{
+    open: boolean
+    masterId: string
+    stockName: string
+    fromDate: string
+    toDate: string
+  }>({
+    open: false,
+    masterId: '',
+    stockName: '',
+    fromDate: '2007-01-01',
+    toDate: new Date().toISOString().slice(0, 10)
+  })
   const { showSnackbar } = useSnackbar()
-  const dispatch = useDispatch()
 
   const { data: apiData, isLoading } = usePaginatedSWR<StockData[]>(ENDURL.GET_ALL_ACTIVE_STOCKS, {
-    page,
+    page: apiPage,
     pageSize,
-    searchValue
+    search: debouncedSearchValue,
+    debounceMs: 0
   })
 
   useEffect(() => {
-    if (!apiData?.length) return
+    if (!apiData) return
 
-    dispatch(requestSubscribe(apiData.map(stock => stock.symbol)))
-  }, [apiData])
+    setAllStocks(prev => {
+      if (apiPage === 1) return apiData
 
-  const { trigger } = useMutationSWR<FetchFundaMentalResponse, { master_id: string }>(ENDURL.Fetch_STOCK_FUNDAMENTAL)
+      const existing = new Set(prev.map(item => String(item.id)))
+      const next = [...prev]
+      for (const row of apiData) {
+        const key = String(row.id)
+        if (!existing.has(key)) {
+          next.push(row)
+          existing.add(key)
+        }
+      }
 
-  // Get live prices and merged data from websocket hook
-  const livePrices = useSelector((state: any) => state.market.prices)
+      return next
+    })
 
-  useEffect(() => {
-    console.log('Live Stocks Data Updated:', livePrices, apiData)
-  }, [livePrices, apiData])
+    setHasMore(apiData.length === pageSize)
+    setIsLoadingMore(false)
+  }, [apiData, apiPage, pageSize])
+
+  const { trigger: triggerEodFetch } = useMutationSWR<
+    FetchEodResponse,
+    { master_id: string; fromDate: string; toDate: string }
+  >(ENDURL.FETCH_EOD_BY_RANGE_CHUNKED)
 
   // const [portfolioStock, setPortfolioStock] = useState<{ open: boolean; data: any; error: any }>(initialPortFolio)
 
@@ -74,32 +106,60 @@ const LiveStocks = () => {
     setSearchValue(value)
   }
 
-  const handleFetchfundamental = async (id: string) => {
-    console.log(id)
-    if (id) {
-      const res = await trigger({ master_id: id })
-      console.log(res)
-      showSnackbar('Status updated', 'success')
-      mutate([ENDURL.GET_RAW_STOCKS, { page, pageSize, search: searchValue }])
-    }
+  useEffect(() => {
+    setApiPage(1)
+    setAllStocks([])
+    setHasMore(true)
+    setIsLoadingMore(false)
+  }, [debouncedSearchValue])
+
+  const handleFetchNextPage = () => {
+    if (isLoading || isLoadingMore || !hasMore) return
+    setIsLoadingMore(true)
+    setApiPage(prev => prev + 1)
   }
 
-  const mergedStocksData =
-    apiData?.map(stock => {
-      const live = livePrices[stock.symbol]
+  const handleOpenHistoryForm = (id: string, stockName: string) => {
+    setHistoryForm({
+      open: true,
+      masterId: id,
+      stockName,
+      fromDate: '2007-01-01',
+      toDate: new Date().toISOString().slice(0, 10)
+    })
+  }
 
-      if (!live) return stock
+  const handleViewEod = (id: string) => {
+    router.push(`/eod-graph?master_id=${id}`)
+  }
 
-      return {
-        ...stock,
-        ltp: live.ltp ?? stock.ltp,
-        open: live.open ?? stock.open,
-        high: live.high ?? stock.high,
-        low: live.low ?? stock.low,
-        close: live.close ?? stock.close,
-        percentChange: live.open ? ((live.ltp - live.open) / live.open) * 100 : stock.percentChange
-      }
-    }) ?? []
+  const handleCloseHistoryForm = () => {
+    setHistoryForm(prev => ({ ...prev, open: false }))
+  }
+
+  const handleHistoryDateChange = (field: 'fromDate' | 'toDate', value: string) => {
+    setHistoryForm(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleContinueHistoryFetch = async () => {
+    const { masterId, fromDate, toDate } = historyForm
+    if (!masterId) return
+    if (!fromDate || !toDate) {
+      showSnackbar('Please select both from and to dates', 'error')
+      return
+    }
+    if (fromDate > toDate) {
+      showSnackbar('From date must be before or equal to to date', 'error')
+      return
+    }
+
+    const res = await triggerEodFetch({ master_id: masterId, fromDate, toDate })
+    showSnackbar(`EOD fetched: ${res?.count || 0} candles`, 'success')
+    handleCloseHistoryForm()
+    mutate([ENDURL.GET_ALL_ACTIVE_STOCKS, { page: 1, pageSize, search: debouncedSearchValue }])
+  }
+
+  const mergedStocksData = allStocks ?? []
 
   return (
     <Grid container spacing={6}>
@@ -130,13 +190,62 @@ const LiveStocks = () => {
       <Grid item xs={12}>
         <Card>
           <CardHeader title='Live Stocks' titleTypographyProps={{ variant: 'h6' }} />
-          {isLoading ? (
+          {isLoading && !allStocks.length ? (
             <LinearProgress color='primary' />
           ) : (
-            <LiveStocksTable rawStocksData={mergedStocksData ?? []} handleFetchfundamental={handleFetchfundamental} />
+            <>
+              {(isLoading || isLoadingMore) && <LinearProgress color='primary' />}
+              <LiveStocksTable
+                rawStocksData={mergedStocksData ?? []}
+                handleFetchHistory={handleOpenHistoryForm}
+                handleViewEod={handleViewEod}
+                hasMore={hasMore}
+                isLoadingMore={isLoadingMore}
+                onReachEnd={handleFetchNextPage}
+              />
+            </>
           )}
         </Card>
       </Grid>
+
+      <Dialog open={historyForm.open} onClose={handleCloseHistoryForm} fullWidth maxWidth='xs'>
+        <DialogTitle>Fetch EOD History</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin='dense'
+            label='Stock'
+            fullWidth
+            value={historyForm.stockName}
+            InputProps={{ readOnly: true }}
+          />
+          <TextField
+            margin='dense'
+            label='From Date'
+            type='date'
+            fullWidth
+            value={historyForm.fromDate}
+            onChange={e => handleHistoryDateChange('fromDate', e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+          <TextField
+            margin='dense'
+            label='To Date'
+            type='date'
+            fullWidth
+            value={historyForm.toDate}
+            onChange={e => handleHistoryDateChange('toDate', e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseHistoryForm} color='inherit'>
+            Cancel
+          </Button>
+          <Button onClick={handleContinueHistoryFetch} variant='contained'>
+            Continue
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* {portfolioStock.open && (
         <AddStockToPortfolio
