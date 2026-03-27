@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 import LinearProgress from '@mui/material/LinearProgress'
+import { alpha } from '@mui/material/styles'
 
 // ** Icons Imports
 import MenuUp from 'mdi-material-ui/MenuUp'
@@ -100,7 +101,7 @@ const TotalEarning = () => {
                   mr: 3,
                   width: 40,
                   height: 40,
-                  backgroundColor: theme => `rgba(${theme.palette.customColors.main}, 0.04)`
+                  backgroundColor: theme => alpha(theme.palette.customColors.main, 0.04)
                 }}
               >
                 <img src={item.imgSrc} alt={item.title} height={item.imgHeight} />

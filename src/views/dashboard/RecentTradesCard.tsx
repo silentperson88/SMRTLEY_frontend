@@ -8,6 +8,7 @@ import CardContent from '@mui/material/CardContent'
 import LinearProgress from '@mui/material/LinearProgress'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import TrendingDownIcon from '@mui/icons-material/TrendingDown'
+import { alpha } from '@mui/material/styles'
 
 import { TC } from 'src/utils/constants/text.constants'
 import { ThemeColor } from 'src/@core/layouts/types'
@@ -87,7 +88,7 @@ const RecentTradesCard = ({ rows, emptyMessage }: { rows: TradeItem[]; emptyMess
                     mr: 3,
                     width: 40,
                     height: 40,
-                    backgroundColor: theme => `rgba(${theme.palette.customColors.main}, 0.04)`,
+                    backgroundColor: theme => alpha(theme.palette.customColors.main, 0.04),
                     color: item.isProfit ? 'success.main' : 'error.main'
                   }}
                 >

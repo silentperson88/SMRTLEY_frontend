@@ -24,6 +24,36 @@ const navigation = (): VerticalNavItemsType => {
       path: '/'
     },
     {
+      title: 'AI Chat',
+      icon: Table,
+      path: '/ollama-chat'
+    },
+    {
+      title: 'News Creator',
+      icon: Table,
+      path: '/news-creator'
+    },
+    {
+      title: 'News Content',
+      icon: Table,
+      path: '/news-content'
+    },
+    {
+      title: 'Render Jobs',
+      icon: Table,
+      path: '/news-content/render-jobs'
+    },
+    {
+      title: 'Audio Tools',
+      icon: Table,
+      path: '/news-content/audio-tools'
+    },
+    {
+      title: 'Voice Styles',
+      icon: Table,
+      path: '/news-content/audio-voice-styles'
+    },
+    {
       sectionTitle: 'Market'
     },
     {
@@ -85,6 +115,36 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Dashboard',
       icon: HomeOutline,
       path: '/'
+    },
+    {
+      title: 'AI Chat',
+      icon: Table,
+      path: '/ollama-chat'
+    },
+    {
+      title: 'News Creator',
+      icon: Table,
+      path: '/news-creator'
+    },
+    {
+      title: 'News Content',
+      icon: Table,
+      path: '/news-content'
+    },
+    {
+      title: 'Render Jobs',
+      icon: Table,
+      path: '/news-content/render-jobs'
+    },
+    {
+      title: 'Audio Tools',
+      icon: Table,
+      path: '/news-content/audio-tools'
+    },
+    {
+      title: 'Voice Styles',
+      icon: Table,
+      path: '/news-content/audio-voice-styles'
     },
     {
       sectionTitle: 'Market'

@@ -106,7 +106,9 @@ const TtsAudioDemoPage = () => {
         splitSentences
       }
 
-      const res = await axiosInstance.post<{ data: GenerateAudioResponse }>(ENDURL.GENERATE_TTS_AUDIO, payload)
+      const res = await axiosInstance.post<{ data: GenerateAudioResponse }>(ENDURL.GENERATE_TTS_AUDIO, payload, {
+        timeout: 8 * 60 * 1000
+      })
       const audioUrl = res.data?.data?.audioUrl
 
       if (!audioUrl) {

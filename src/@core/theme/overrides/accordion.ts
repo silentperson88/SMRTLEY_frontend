@@ -1,5 +1,5 @@
 // ** MUI Imports
-import { Theme } from '@mui/material/styles'
+import { alpha, Theme } from '@mui/material/styles'
 
 const Accordion = (theme: Theme) => {
   return {
@@ -7,7 +7,7 @@ const Accordion = (theme: Theme) => {
       styleOverrides: {
         root: {
           '&.Mui-disabled': {
-            backgroundColor: `rgba(${theme.palette.customColors.main}, 0.12)`
+            backgroundColor: alpha(theme.palette.customColors.main, 0.12)
           },
           '&.Mui-expanded': {
             boxShadow: theme.shadows[3]
