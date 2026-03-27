@@ -278,6 +278,11 @@ const UserDropdown = () => {
     router.push('/content-creator')
   }
 
+  const handleOpenNewsCreator = () => {
+    handleDropdownClose()
+    router.push('/news-creator')
+  }
+
   useEffect(() => {
     if (typeof window === 'undefined') return
 
@@ -396,6 +401,12 @@ const UserDropdown = () => {
           <Box sx={styles}>
             <EditNoteOutlinedIcon sx={{ marginRight: 2 }} />
             Content Creator
+          </Box>
+        </MenuItem>
+        <MenuItem sx={{ p: 0 }} onClick={handleOpenNewsCreator}>
+          <Box sx={styles}>
+            <EditNoteOutlinedIcon sx={{ marginRight: 2 }} />
+            News Creator
           </Box>
         </MenuItem>
         <Divider />

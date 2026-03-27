@@ -1,5 +1,5 @@
 // ** MUI Imports
-import { Theme } from '@mui/material/styles'
+import { alpha, Theme } from '@mui/material/styles'
 
 const Switch = (theme: Theme) => {
   return {
@@ -7,7 +7,7 @@ const Switch = (theme: Theme) => {
       styleOverrides: {
         root: {
           '& .MuiSwitch-track': {
-            backgroundColor: `rgb(${theme.palette.customColors.main})`
+            backgroundColor: alpha(theme.palette.customColors.main, 1)
           }
         }
       }
