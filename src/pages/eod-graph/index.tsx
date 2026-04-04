@@ -2075,39 +2075,44 @@ const EodGraphPage = () => {
               {isCandlesLoading ? (
                 <LinearProgress />
               ) : (
-                <Box
-                  ref={chartViewportRef}
-                  onWheel={handleWheelZoom}
-                  onPointerDown={handlePointerDown}
-                  onPointerMove={handlePointerMove}
-                  onPointerUp={handlePointerUp}
-                  onPointerLeave={handlePointerUp}
-                  sx={{ cursor: drawTool !== 'none' ? 'crosshair' : isDragging ? 'grabbing' : 'grab', touchAction: 'none', position: 'relative' }}
-                >
-                  <ReactApexcharts
-                    type={chartType === 'area' ? 'area' : chartType === 'ohlc' ? 'ohlc' : 'candlestick'}
-                    height={520}
-                    options={options}
-                    series={series}
-                  />
-                  {drawTool !== 'none' ? (
-                    <Box
-                      onPointerDown={handleChartClick}
-                      sx={{
-                        position: 'absolute',
-                        left: plotRect.left,
-                        top: plotRect.top,
-                        width: plotRect.width,
-                        height: plotRect.height,
-                        zIndex: 2
-                      }}
-                    />
-                  ) : null}
-                  <svg
-                    width={plotRect.width}
-                    height={plotRect.height}
-                    style={{ position: 'absolute', top: plotRect.top, left: plotRect.left, pointerEvents: 'none', zIndex: 3 }}
+                <>
+                  <Box
+                    ref={chartViewportRef}
+                    onWheel={handleWheelZoom}
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerLeave={handlePointerUp}
+                    sx={{
+                      cursor: drawTool !== 'none' ? 'crosshair' : isDragging ? 'grabbing' : 'grab',
+                      touchAction: 'none',
+                      position: 'relative'
+                    }}
                   >
+                    <ReactApexcharts
+                      type={chartType === 'area' ? 'area' : chartType === 'ohlc' ? 'ohlc' : 'candlestick'}
+                      height={520}
+                      options={options}
+                      series={series}
+                    />
+                    {drawTool !== 'none' ? (
+                      <Box
+                        onPointerDown={handleChartClick}
+                        sx={{
+                          position: 'absolute',
+                          left: plotRect.left,
+                          top: plotRect.top,
+                          width: plotRect.width,
+                          height: plotRect.height,
+                          zIndex: 2
+                        }}
+                      />
+                    ) : null}
+                    <svg
+                      width={plotRect.width}
+                      height={plotRect.height}
+                      style={{ position: 'absolute', top: plotRect.top, left: plotRect.left, pointerEvents: 'none', zIndex: 3 }}
+                    >
                     {trendLines.map(line => (
                       <line
                         key={line.id}
@@ -2515,8 +2520,9 @@ const EodGraphPage = () => {
                     {pendingPoints.map((p, idx) => (
                       <circle key={`pending-${idx}`} cx={toPixelX(p.ts)} cy={toPixelY(p.price)} r='4' fill='#d32f2f' />
                     ))}
-                  </svg>
-                </Box>
+                    </svg>
+                  </Box>
+                </>
               )}
             </CardContent>
           </Card>
@@ -2527,3 +2533,4 @@ const EodGraphPage = () => {
 }
 
 export default EodGraphPage
+

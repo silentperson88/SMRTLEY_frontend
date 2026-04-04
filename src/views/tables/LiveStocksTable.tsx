@@ -110,7 +110,7 @@ const TableStickyHeader = ({
           name: (
             <NextLink
               href={{
-                pathname: `/stock-fundamental/${name}`
+                pathname: `/stock-fundamental/${encodeURIComponent(symbol || name)}`
               }}
               passHref
 

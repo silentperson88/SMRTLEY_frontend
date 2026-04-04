@@ -25,7 +25,20 @@ import { useEffect, useState } from 'react'
 import CompanyStatisticsCard from 'src/views/stock-fundamentals/companyStatics'
 import ProsCons from 'src/views/stock-fundamentals/prosCons'
 import FundamentalTable, { TableData, TableDataRow } from 'src/views/stock-fundamentals/FundamentalTable'
-import { Box, Button, Card, CardHeader, Chip, Grid as MuiGrid, LinearProgress, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Chip,
+  Grid as MuiGrid,
+  LinearProgress,
+  Stack,
+  Tab,
+  Tabs,
+  Typography
+} from '@mui/material'
 import Link from '@mui/material/Link'
 import { useLivePrices } from 'src/hooks/socket/useLivePrice'
 import { Candles } from 'src/types/ws'
@@ -98,6 +111,28 @@ interface FundamentalApiPayload {
       dividend_yield?: number
     }
   }
+  technicals?: {
+    symbol?: string
+    exchange?: string
+    trade_date?: string
+    close?: number | string | null
+    high?: number | string | null
+    low?: number | string | null
+    rsi_14?: number | string | null
+    rsi_signal?: string | null
+    macd_line?: number | string | null
+    signal_line?: number | string | null
+    macd_histogram?: number | string | null
+    macd_signal?: string | null
+    roc_10d?: number | string | null
+    roc_20d?: number | string | null
+    roc_60d?: number | string | null
+    roc_1yr?: number | string | null
+    stoch_k?: number | string | null
+    stoch_d?: number | string | null
+    stoch_signal?: string | null
+    momentum_score?: string | null
+  } | null
   tables?: {
     quarters?: FundamentalApiTable
     profit_loss?: FundamentalApiTable
@@ -287,6 +322,8 @@ interface GrowthMetricCard {
   }>
 }
 
+type MomentumTab = 'summary' | 'rsi' | 'macd' | 'roc' | 'stochastic'
+
 const renameMetricTitle = (title: string): string => {
   const normalized = title.trim().toLowerCase()
   if (normalized === 'compounded sales growth') return 'Revenue CAGR'
@@ -295,6 +332,44 @@ const renameMetricTitle = (title: string): string => {
   if (normalized === 'return on equity') return 'Equity Return Trend'
 
   return title
+}
+
+const formatNumber = (value: unknown, digits = 2) => {
+  const parsed = Number(value)
+  if (value === null || value === undefined || !Number.isFinite(parsed)) return '-'
+  return parsed.toFixed(digits)
+}
+
+const formatSignedPct = (value: unknown, digits = 2) => {
+  const parsed = Number(value)
+  if (value === null || value === undefined || !Number.isFinite(parsed)) return '-'
+  return `${parsed >= 0 ? '+' : ''}${parsed.toFixed(digits)}%`
+}
+
+const getMomentumChipColor = (signal?: string | null) => {
+  const normalized = String(signal || '').toLowerCase()
+
+  if (normalized.includes('strong bullish') || normalized.includes('bullish crossover') || normalized === 'bullish') {
+    return 'success' as const
+  }
+
+  if (normalized.includes('strong bearish') || normalized.includes('bearish crossover') || normalized === 'bearish') {
+    return 'error' as const
+  }
+
+  if (normalized.includes('overbought')) {
+    return 'warning' as const
+  }
+
+  if (normalized.includes('oversold')) {
+    return 'success' as const
+  }
+
+  if (normalized.includes('neutral')) {
+    return 'primary' as const
+  }
+
+  return 'default' as const
 }
 
 const Dashboard = () => {
@@ -308,6 +383,7 @@ const Dashboard = () => {
   const [todaysMarket, setTodaysMarket] = useState<TodaysMarket | null>()
   const [ratios, setRatios] = useState<TableData | null>()
   const [shareholdingTable, setShareholdingTable] = useState<TableData | null>()
+  const [momentumTab, setMomentumTab] = useState<MomentumTab>('summary')
   const [showBuySellModal, setShowBuySellModal] = useState<BuySellModal>({ type: 'BUY', open: false })
   const [growthMetricCards, setGrowthMetricCards] = useState<GrowthMetricCard[]>([])
   const router = useRouter()
@@ -445,6 +521,7 @@ const Dashboard = () => {
   const annualReports = documents?.annual_reports?.items || []
   const creditRatings = documents?.credit_ratings?.items || []
   const concalls = documents?.concalls?.items || []
+  const momentumSnapshot = data?.technicals || null
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -684,6 +761,323 @@ const Dashboard = () => {
               </Card>
             </Grid>
           )}
+
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3 }}>
+              <CardHeader
+                title='Momentum Analysis'
+                subheader='RSI, MACD, ROC, and Stochastic signals from daily EOD data.'
+                titleTypographyProps={{ variant: 'h6', fontWeight: 600 }}
+              />
+              <CardContent sx={{ pt: 0 }}>
+                {momentumSnapshot ? (
+                  <Stack spacing={3}>
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                      <Tabs
+                        value={momentumTab}
+                        onChange={(_, value) => setMomentumTab(value as MomentumTab)}
+                        aria-label='momentum analysis tabs'
+                        variant='scrollable'
+                        scrollButtons='auto'
+                      >
+                        <Tab value='summary' label='Summary' />
+                        <Tab value='rsi' label='RSI' />
+                        <Tab value='macd' label='MACD' />
+                        <Tab value='roc' label='ROC' />
+                        <Tab value='stochastic' label='Stochastic' />
+                      </Tabs>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        p: 3,
+                        borderRadius: 2,
+                        bgcolor: theme => `${theme.palette.primary.main}08`,
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}
+                    >
+                      {momentumTab === 'summary' && (
+                        <Stack spacing={2}>
+                          <Box>
+                            <Typography variant='subtitle1' fontWeight={700}>
+                              Momentum Snapshot
+                            </Typography>
+                            <Typography variant='body2' color='text.secondary'>
+                              {momentumSnapshot.trade_date
+                                ? `Latest EOD date: ${momentumSnapshot.trade_date}`
+                                : 'Latest EOD data is available, but the date could not be resolved.'}
+                            </Typography>
+                          </Box>
+
+                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                            <Chip label={`Score: ${momentumSnapshot.momentum_score || 'Neutral'}`} color={getMomentumChipColor(momentumSnapshot.momentum_score)} />
+                            <Chip label={`RSI: ${formatNumber(momentumSnapshot.rsi_14)}`} variant='outlined' />
+                            <Chip label={`MACD: ${formatNumber(momentumSnapshot.macd_line)}`} variant='outlined' />
+                            <Chip label={`ROC 20D: ${formatSignedPct(momentumSnapshot.roc_20d)}`} variant='outlined' />
+                            <Chip label={`Stoch %K: ${formatNumber(momentumSnapshot.stoch_k)}`} variant='outlined' />
+                          </Stack>
+
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} md={6}>
+                              <Card variant='outlined' sx={{ height: '100%' }}>
+                                <CardContent>
+                                  <Typography variant='subtitle2' color='text.secondary'>
+                                    What this tab means
+                                  </Typography>
+                                  <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+                                    This combines trend speed, price acceleration, and short-term range position into one quick read.
+                                    Use it to see whether the stock is heating up, cooling down, or staying mixed.
+                                  </Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                              <Card variant='outlined' sx={{ height: '100%' }}>
+                                <CardContent>
+                                  <Typography variant='subtitle2' color='text.secondary'>
+                                    Quick interpretation
+                                  </Typography>
+                                  <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+                                    Bullish combinations usually mean RSI is firm, MACD is above signal, ROC is positive, and Stochastic is
+                                    not stuck near oversold levels. Bearish setups do the opposite.
+                                  </Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                          </Grid>
+                        </Stack>
+                      )}
+
+                      {momentumTab === 'rsi' && (
+                        <Stack spacing={2}>
+                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
+                            <Chip label={`RSI ${formatNumber(momentumSnapshot.rsi_14)}`} color={getMomentumChipColor(momentumSnapshot.rsi_signal)} />
+                            <Chip label={momentumSnapshot.rsi_signal || 'Neutral'} variant='outlined' />
+                            <Chip label={`Close ${formatNumber(momentumSnapshot.close)}`} variant='outlined' />
+                          </Stack>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} sm={4}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    Latest RSI
+                                  </Typography>
+                                  <Typography variant='h5'>{formatNumber(momentumSnapshot.rsi_14)}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    RSI Signal
+                                  </Typography>
+                                  <Typography variant='h5'>{momentumSnapshot.rsi_signal || '-'}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    Latest Close
+                                  </Typography>
+                                  <Typography variant='h5'>{formatNumber(momentumSnapshot.close)}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                          </Grid>
+                          <Box>
+                            <Typography variant='subtitle2' sx={{ mb: 1 }}>
+                              How to read RSI
+                            </Typography>
+                            <Typography variant='body2' color='text.secondary'>
+                              RSI tracks whether recent gains are outpacing recent losses. Above 70 usually means the stock is stretched to
+                              the upside. Below 30 usually means it is stretched to the downside. Around 50 is the middle zone.
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      )}
+
+                      {momentumTab === 'macd' && (
+                        <Stack spacing={2}>
+                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
+                            <Chip label={momentumSnapshot.macd_signal || 'Neutral'} color={getMomentumChipColor(momentumSnapshot.macd_signal)} />
+                            <Chip label={`MACD ${formatNumber(momentumSnapshot.macd_line)}`} variant='outlined' />
+                            <Chip label={`Signal ${formatNumber(momentumSnapshot.signal_line)}`} variant='outlined' />
+                            <Chip label={`Histogram ${formatNumber(momentumSnapshot.macd_histogram)}`} variant='outlined' />
+                          </Stack>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} sm={4}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    MACD Line
+                                  </Typography>
+                                  <Typography variant='h5'>{formatNumber(momentumSnapshot.macd_line)}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    Signal Line
+                                  </Typography>
+                                  <Typography variant='h5'>{formatNumber(momentumSnapshot.signal_line)}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    Histogram
+                                  </Typography>
+                                  <Typography variant='h5'>{formatNumber(momentumSnapshot.macd_histogram)}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                          </Grid>
+                          <Box>
+                            <Typography variant='subtitle2' sx={{ mb: 1 }}>
+                              How to read MACD
+                            </Typography>
+                            <Typography variant='body2' color='text.secondary'>
+                              MACD compares a faster moving average with a slower one to show momentum shifts. When MACD crosses above the
+                              signal line, momentum is improving. When it crosses below, momentum is fading.
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      )}
+
+                      {momentumTab === 'roc' && (
+                        <Stack spacing={2}>
+                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
+                            <Chip label={`10D ${formatSignedPct(momentumSnapshot.roc_10d)}`} variant='outlined' />
+                            <Chip label={`20D ${formatSignedPct(momentumSnapshot.roc_20d)}`} variant='outlined' />
+                            <Chip label={`60D ${formatSignedPct(momentumSnapshot.roc_60d)}`} variant='outlined' />
+                            <Chip label={`1Y ${formatSignedPct(momentumSnapshot.roc_1yr)}`} variant='outlined' />
+                          </Stack>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    10 Day ROC
+                                  </Typography>
+                                  <Typography variant='h5'>{formatSignedPct(momentumSnapshot.roc_10d)}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    20 Day ROC
+                                  </Typography>
+                                  <Typography variant='h5'>{formatSignedPct(momentumSnapshot.roc_20d)}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    60 Day ROC
+                                  </Typography>
+                                  <Typography variant='h5'>{formatSignedPct(momentumSnapshot.roc_60d)}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    1 Year ROC
+                                  </Typography>
+                                  <Typography variant='h5'>{formatSignedPct(momentumSnapshot.roc_1yr)}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                          </Grid>
+                          <Box>
+                            <Typography variant='subtitle2' sx={{ mb: 1 }}>
+                              How to read ROC
+                            </Typography>
+                            <Typography variant='body2' color='text.secondary'>
+                              Rate of Change shows how far price has moved over fixed windows. Positive ROC means the stock is above its
+                              earlier price. Negative ROC means it is trading below that earlier reference point.
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      )}
+
+                      {momentumTab === 'stochastic' && (
+                        <Stack spacing={2}>
+                          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
+                            <Chip label={`K ${formatNumber(momentumSnapshot.stoch_k)}`} color={getMomentumChipColor(momentumSnapshot.stoch_signal)} />
+                            <Chip label={`D ${formatNumber(momentumSnapshot.stoch_d)}`} variant='outlined' />
+                            <Chip label={momentumSnapshot.stoch_signal || 'Neutral'} variant='outlined' />
+                          </Stack>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} sm={4}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    %K
+                                  </Typography>
+                                  <Typography variant='h5'>{formatNumber(momentumSnapshot.stoch_k)}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    %D
+                                  </Typography>
+                                  <Typography variant='h5'>{formatNumber(momentumSnapshot.stoch_d)}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                              <Card variant='outlined'>
+                                <CardContent>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    Signal
+                                  </Typography>
+                                  <Typography variant='h5'>{momentumSnapshot.stoch_signal || '-'}</Typography>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                          </Grid>
+                          <Box>
+                            <Typography variant='subtitle2' sx={{ mb: 1 }}>
+                              How to read Stochastic
+                            </Typography>
+                            <Typography variant='body2' color='text.secondary'>
+                              The Stochastic Oscillator compares the latest close with the recent high-low range. Values near 80 or above
+                              suggest the stock is near the top of its range. Values near 20 or below suggest it is near the bottom of its
+                              range.
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      )}
+                    </Box>
+                  </Stack>
+                ) : (
+                  <Box sx={{ px: 1, pb: 1 }}>
+                    <Typography variant='body2' color='text.secondary'>
+                      Not enough EOD history is available yet to calculate the momentum indicators. Once daily candles are loaded, this
+                      tab will show RSI, MACD, ROC, and Stochastic signals automatically.
+                    </Typography>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
 
           {(announcements.length > 0 ||
             annualReports.length > 0 ||

@@ -62,6 +62,11 @@ const navigation = (): VerticalNavItemsType => {
       path: '/live-stocks'
     },
     {
+      title: 'EOD Trend',
+      icon: Table,
+      path: '/eod-trend'
+    },
+    {
       title: 'IPO',
       icon: Table,
       path: '/ipo'
@@ -70,6 +75,16 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Fundamentals',
       icon: Table,
       path: '/fundamentals'
+    },
+    {
+      title: 'Schema Audit',
+      icon: Table,
+      path: '/fundamentals-schema-audit'
+    },
+    {
+      title: 'Tax Planner',
+      icon: CurrencyUsd,
+      path: '/tax-planner'
     },
     {
       sectionTitle: 'Portfolio'
@@ -155,6 +170,11 @@ const navigation = (): VerticalNavItemsType => {
       path: '/live-stocks'
     },
     {
+      title: 'EOD Trend',
+      icon: Table,
+      path: '/eod-trend'
+    },
+    {
       title: 'IPO',
       icon: Table,
       path: '/ipo'
@@ -165,9 +185,24 @@ const navigation = (): VerticalNavItemsType => {
       path: '/fundamentals'
     },
     {
+      title: 'Schema Audit',
+      icon: Table,
+      path: '/fundamentals-schema-audit'
+    },
+    {
+      title: 'Tax Planner',
+      icon: CurrencyUsd,
+      path: '/tax-planner'
+    },
+    {
       title: 'Raw Stocks',
       icon: Table,
       path: '/raw-stocks'
+    },
+    {
+      title: 'Stock Universe',
+      icon: Table,
+      path: '/stock-universe-audit'
     },
     {
       sectionTitle: 'Portfolio'

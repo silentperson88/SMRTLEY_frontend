@@ -33,8 +33,8 @@ import { ENDURL } from 'src/utils/constants/endurl.utils'
 
 interface SearchList {
   id: string
-  company: string
   name: string
+  symbol: string
 }
 
 interface Props {
@@ -174,12 +174,12 @@ const WebsiteLayout = ({ children }: Props) => {
                           <ListItemButton
                             key={item.id}
                             onClick={() => {
-                              setSearchValue(item.company)
+                              setSearchValue(item.name || item.symbol || '')
                               setSearchOpen(false)
-                              router.push(`/stock-fundamental/${item.name}`)
+                              router.push(`/stock-fundamental/${encodeURIComponent(item.symbol || item.name || '')}`)
                             }}
                           >
-                            <ListItemText primary={item.company} secondary={item.name} />
+                            <ListItemText primary={item.name} secondary={item.symbol} />
                           </ListItemButton>
                         ))}
                       </List>

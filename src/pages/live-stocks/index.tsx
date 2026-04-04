@@ -6,7 +6,7 @@ import CardHeader from '@mui/material/CardHeader'
 
 // ** Demo Components Imports
 import LiveStocksTable from 'src/views/tables/LiveStocksTable'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, InputAdornment, LinearProgress, TextField } from '@mui/material'
 import { Magnify } from 'mdi-material-ui'
 import { useMutationSWR, usePaginatedSWR } from 'src/hooks/swr/swrhooks'
@@ -16,6 +16,8 @@ import { mutate } from 'swr'
 import { useRouter } from 'next/router'
 import MarketOverviewBanner from 'src/components/page/MarketOverviewBanner'
 import { useDebounce } from 'src/utils/useDebounce'
+import { useAppDispatch, useAppSelector } from 'src/store/hooks'
+import { setLiveStocksSnapshot } from 'src/store/slices/liveStocks.slice'
 
 interface StockData {
   master_id?: string
@@ -42,13 +44,19 @@ interface FetchEodResponse {
 
 const LiveStocks = () => {
   const router = useRouter()
+  const dispatch = useAppDispatch()
+  const liveStocksCache = useAppSelector(state => state.liveStocks)
   const pageSize = 50
-  const [apiPage, setApiPage] = useState<number>(1)
-  const [allStocks, setAllStocks] = useState<StockData[]>([])
-  const [hasMore, setHasMore] = useState<boolean>(true)
+  const getSafeNextPage = (stocksCount: number) => Math.max(1, Math.floor(stocksCount / pageSize) + 1)
+  const [apiPage, setApiPage] = useState<number>(getSafeNextPage(Array.isArray(liveStocksCache.stocks) ? liveStocksCache.stocks.length : 0))
+  const [allStocks, setAllStocks] = useState<StockData[]>(
+    liveStocksCache.searchKey === '' ? (liveStocksCache.stocks as StockData[]) : []
+  )
+  const [hasMore, setHasMore] = useState<boolean>(liveStocksCache.hasMore)
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false)
   const [searchValue, setSearchValue] = useState<string>('')
   const debouncedSearchValue = useDebounce(searchValue, 400)
+  const lastHydratedSearchRef = useRef<string | null>(null)
   const [historyForm, setHistoryForm] = useState<{
     open: boolean
     masterId: string
@@ -64,6 +72,11 @@ const LiveStocks = () => {
   })
   const { showSnackbar } = useSnackbar()
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.removeItem('run4dream-live-stocks-cache')
+  }, [])
+
   const { data: apiData, isLoading } = usePaginatedSWR<StockData[]>(ENDURL.GET_ALL_ACTIVE_STOCKS, {
     page: apiPage,
     pageSize,
@@ -74,25 +87,36 @@ const LiveStocks = () => {
   useEffect(() => {
     if (!apiData) return
 
-    setAllStocks(prev => {
-      if (apiPage === 1) return apiData
+    const currentStocks = allStocks
+    const nextStocks =
+      apiPage === 1
+        ? apiData
+        : (() => {
+            const existing = new Set(currentStocks.map(item => String(item.id)))
+            const next = [...currentStocks]
+            for (const row of apiData) {
+              const key = String(row.id)
+              if (!existing.has(key)) {
+                next.push(row)
+                existing.add(key)
+              }
+            }
+            return next
+          })()
 
-      const existing = new Set(prev.map(item => String(item.id)))
-      const next = [...prev]
-      for (const row of apiData) {
-        const key = String(row.id)
-        if (!existing.has(key)) {
-          next.push(row)
-          existing.add(key)
-        }
-      }
-
-      return next
-    })
+    setAllStocks(nextStocks)
 
     setHasMore(apiData.length === pageSize)
+    dispatch(
+      setLiveStocksSnapshot({
+        searchKey: debouncedSearchValue,
+        stocks: nextStocks,
+        nextPage: apiData.length === pageSize ? apiPage + 1 : apiPage,
+        hasMore: apiData.length === pageSize
+      })
+    )
     setIsLoadingMore(false)
-  }, [apiData, apiPage, pageSize])
+  }, [apiData, apiPage, pageSize, debouncedSearchValue, dispatch])
 
   const { trigger: triggerEodFetch } = useMutationSWR<
     FetchEodResponse,
@@ -107,9 +131,26 @@ const LiveStocks = () => {
   }
 
   useEffect(() => {
-    setApiPage(1)
-    setAllStocks([])
-    setHasMore(true)
+    if (lastHydratedSearchRef.current === debouncedSearchValue) {
+      return
+    }
+
+    lastHydratedSearchRef.current = debouncedSearchValue
+
+    const cacheMatchesSearch = liveStocksCache.searchKey === debouncedSearchValue
+    const cachedStocks = Array.isArray(liveStocksCache.stocks) ? (liveStocksCache.stocks as StockData[]) : []
+
+    if (cacheMatchesSearch) {
+      const safeNextPage = getSafeNextPage(cachedStocks.length)
+      setApiPage(safeNextPage)
+      setAllStocks(cachedStocks)
+      setHasMore(liveStocksCache.hasMore)
+    } else {
+      setApiPage(1)
+      setAllStocks([])
+      setHasMore(true)
+    }
+
     setIsLoadingMore(false)
   }, [debouncedSearchValue])
 

@@ -9,6 +9,11 @@ export const ENDURL = {
   GET_RAW_STOCKS: 'ticker/admin/raw-stocks',
   GET_RAW_STOCK_BY_ID: 'ticker/admin/raw-stock/:id',
   POST_RAW_STOCK: 'ticker/admin/raw-stock',
+  GET_STOCK_UNIVERSE_AUDIT: 'ticker/admin/stock-universe-audit',
+  MARK_STOCK_UNIVERSE_INACTIVE: 'ticker/admin/stock-universe-audit/mark-inactive',
+  MARK_STOCK_UNIVERSE_ROW_INACTIVE: 'ticker/admin/stock-universe-audit/mark-row-inactive',
+  ADD_STOCK_FROM_AUDIT: 'ticker/admin/stock-universe-audit/add-stock',
+  ADD_STOCKS_FROM_AUDIT: 'ticker/admin/stock-universe-audit/add-stocks',
   POST_RAW_STOCK_STATUS: 'ticker/master/create',
   POST_RAW_STOCK_PRICE: 'ticker/admin/raw-stock-price',
 
@@ -20,6 +25,8 @@ export const ENDURL = {
   // Stock Fundamental
   Fetch_STOCK_FUNDAMENTAL: 'ticker/fundamentals/fetch',
   GET_STOCK_FUNDAMENTAL_DETAILS: 'ticker/fundamentals',
+  FUNDAMENTAL_SCHEMA_AUDIT: 'ticker/fundamentals/schema-audit',
+  FUNDAMENTAL_SCHEMA_AUDIT_FINALIZE: 'ticker/fundamentals/schema-audit/finalize',
 
   // IPO GMP
   FETCH_IPO_GMP: 'ticker/ipo-gmp',
@@ -30,6 +37,8 @@ export const ENDURL = {
 
   // Master Stock
   GET_MASTER_STOCKS: 'ticker/master',
+  UPDATE_MASTER_TOKEN_EXCHANGE: 'ticker/master/:id/token-exchange',
+  MARK_MASTER_STOCK_INACTIVE: 'ticker/master/:id/inactive',
 
   // authentication
   REGISTER: 'user/auth/register',
@@ -53,6 +62,11 @@ export const ENDURL = {
   GET_DASHBOARD: 'user/dashboard',
   LOAD_WALLET_FUND: 'user/wallet/load',
   TRANSFER_WALLET_TO_PORTFOLIO: 'user/wallet/transfer-to-portfolio/:portfolioId',
+
+  // Tax Planner
+  USER_TAX_PLANNER_LIST: 'user/tax-planner',
+  USER_TAX_PLANNER_ACTIVE: 'user/tax-planner/active',
+  USER_TAX_PLANNER_ITEM: 'user/tax-planner/:planId',
 
   // TTS (Piper)
   GENERATE_TTS_AUDIO: 'user/tts/generate',
