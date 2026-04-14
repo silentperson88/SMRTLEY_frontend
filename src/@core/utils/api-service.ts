@@ -3,7 +3,7 @@ import { mutate } from 'swr'
 
 // Define a type for the axios instance
 export const axiosService = axios.create({
-  baseURL: 'http://localhost:8000/api/', // Replace with your actual base URL
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_API_URL || '',
   headers: {
     'Content-Type': 'application/json'
   }
