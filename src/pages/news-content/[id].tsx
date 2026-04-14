@@ -3671,7 +3671,7 @@ const NewsContentPage: NextPage = () => {
                       <Player
                         ref={previewPlayerRef}
                         key={`${customPreviewLayout}:${customAudioSrc}:${customPreviewDurationFrames}:${parsedSentences.length}:${activeClips.length}`}
-                        component={ShortScriptAudioPreviewComposition}
+                        component={ShortScriptAudioPreviewComposition as any}
                         durationInFrames={customPreviewDurationFrames}
                         fps={PREVIEW_FPS}
                         compositionWidth={customPreviewLayout === 'short' ? 1080 : 1920}
@@ -3704,7 +3704,6 @@ const NewsContentPage: NextPage = () => {
                           timeline: previewTimelineForRender
                         }}
                         controls
-                        acknowledgeRemotionLicense
                       />
                     </Box>
                   ) : null}
@@ -3761,7 +3760,7 @@ const NewsContentPage: NextPage = () => {
                       return (
                         <Box
                           key={`clip-s-${idx}`}
-                          ref={el => {
+                          ref={(el: HTMLDivElement | null) => {
                             clipSentenceItemRefs.current[idx] = el
                           }}
                         >
@@ -3820,7 +3819,7 @@ const NewsContentPage: NextPage = () => {
               >
                 {refineLoading ? 'Refining...' : 'Refine Phrase'}
               </Button>
-              <Button variant='contained' onClick={handleSearchImages} disabled={imageLoading || !imageQuery.trim()}>
+              <Button variant='contained' onClick={() => void handleSearchImages()} disabled={imageLoading || !imageQuery.trim()}>
                 {imageLoading ? 'Searching...' : 'Search'}
               </Button>
             </Stack>

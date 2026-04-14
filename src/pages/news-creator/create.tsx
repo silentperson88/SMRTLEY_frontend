@@ -691,7 +691,7 @@ const NewsCreatorBuildPage: NextPage = () => {
                 </Typography>
                 <Box sx={{ borderRadius: 2, overflow: 'hidden', bgcolor: 'black', p: 1 }}>
                   <RemotionPlayer
-                    component={ShortScriptAudioPreviewComposition}
+                    component={ShortScriptAudioPreviewComposition as any}
                     durationInFrames={Math.max(PREVIEW_FPS * 8, Math.min(PREVIEW_FPS * 240, Math.round(targetDurationSec * 0.45 * PREVIEW_FPS)))}
                     fps={PREVIEW_FPS}
                     compositionWidth={1080}
@@ -704,7 +704,6 @@ const NewsCreatorBuildPage: NextPage = () => {
                       stylePreset: videoStylePreset
                     }}
                     controls
-                    acknowledgeRemotionLicense
                   />
                 </Box>
               </Stack>
@@ -802,7 +801,7 @@ const NewsCreatorBuildPage: NextPage = () => {
                 </Typography>
                 <Box sx={{ borderRadius: 2, overflow: 'hidden', bgcolor: 'black', p: 1 }}>
                   <RemotionPlayer
-                    component={NewsScriptHighlightsComposition}
+                    component={NewsScriptHighlightsComposition as any}
                     durationInFrames={previewDurationInFrames}
                     fps={PREVIEW_FPS}
                     compositionWidth={1080}
@@ -815,7 +814,6 @@ const NewsCreatorBuildPage: NextPage = () => {
                     }}
                     controls
                     loop
-                    acknowledgeRemotionLicense
                   />
                 </Box>
               </Stack>

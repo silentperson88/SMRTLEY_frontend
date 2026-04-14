@@ -409,7 +409,7 @@ const FilteredNewsPage: NextPage = () => {
       mediumText: templateDescription,
       highlights: detailRow.template_one?.highlights || [],
       cta: detailRow.template_one?.cta || '',
-      image: toAbsoluteUrl(selectedImages[0] || detailRow.template_one?.image || detailRow.images?.[0] || ''),
+      image: toAbsoluteUrl(selectedImages[0] || detailRow.template_one?.image || detailRow?.images?.[0] || ''),
       audioUrl: toAbsoluteUrl(selectedMusic?.file_url),
       durationSec: templateOneDurationSec,
       imageMode: templateOneImageMode,
@@ -427,7 +427,7 @@ const FilteredNewsPage: NextPage = () => {
       return {
         ...detailRow.template_two,
         brand: 'Run4Dream',
-        image: toAbsoluteUrl(selectedImages[1] || selectedImages[0] || detailRow.template_two?.image || detailRow.images?.[0] || ''),
+        image: toAbsoluteUrl(selectedImages[1] || selectedImages[0] || detailRow.template_two?.image || detailRow?.images?.[0] || ''),
         audioUrl: toAbsoluteUrl(selectedMusicTwo?.file_url),
         imageMode: templateTwoImageMode,
       }
@@ -437,7 +437,7 @@ const FilteredNewsPage: NextPage = () => {
       return {
         ...detailRow.template_three,
         brand: 'Run4Dream',
-        image: toAbsoluteUrl(selectedImages[0] || detailRow.template_three?.image || detailRow.images?.[0] || ''),
+        image: toAbsoluteUrl(selectedImages[0] || detailRow.template_three?.image || detailRow?.images?.[0] || ''),
         audioUrl: toAbsoluteUrl(selectedMusicThree?.file_url),
         imageMode: templateThreeImageMode,
       }
@@ -1124,7 +1124,7 @@ const FilteredNewsPage: NextPage = () => {
         { timeout: LONG_TIMEOUT_MS }
       )
       const updatedRows = await load()
-      const row = updatedRows.find(item => item.link === link)
+      const row = updatedRows.find((item: RssRow) => item.link === link)
       if (row) {
         setDetailRow(row)
         setDetailOpen(true)
@@ -1656,7 +1656,7 @@ const FilteredNewsPage: NextPage = () => {
                     />
                   </Stack>
                   <Player
-                    component={SocialTemplateOneComposition}
+                    component={SocialTemplateOneComposition as any}
                     durationInFrames={Math.max(1, Math.round(templateOneDurationSec * 30))}
                     fps={30}
                     compositionWidth={1080}
@@ -1668,7 +1668,7 @@ const FilteredNewsPage: NextPage = () => {
                       subtitle: templateOneDescriptionDraft || detailRow.template_one.subtitle,
                       shortText: templateOneDescriptionDraft || detailRow.template_one.shortText,
                       mediumText: templateOneDescriptionDraft || detailRow.template_one.mediumText,
-                      image: selectedImages[0] || detailRow.template_one.image || detailRow.images?.[0] || null,
+                      image: selectedImages[0] || detailRow.template_one.image || detailRow?.images?.[0] || null,
                       audioUrl: toAbsoluteUrl(getSelectedMusicTrack('templateOne')?.file_url),
                       durationSec: templateOneDurationSec,
                       imageMode: templateOneImageMode,
@@ -1723,7 +1723,7 @@ const FilteredNewsPage: NextPage = () => {
                     Music: {getSelectedMusicTrack('templateTwo')?.title || 'Not linked'}
                   </Typography>
                   <Player
-                    component={SocialTemplateTwoOverlayComposition}
+                    component={SocialTemplateTwoOverlayComposition as any}
                     durationInFrames={180}
                     fps={30}
                     compositionWidth={1080}
@@ -1731,7 +1731,7 @@ const FilteredNewsPage: NextPage = () => {
                     inputProps={{
                       ...detailRow.template_two,
                       brand: 'Run4Dream',
-                      image: selectedImages[1] || selectedImages[0] || detailRow.template_two.image || detailRow.images?.[0] || null,
+                      image: selectedImages[1] || selectedImages[0] || detailRow.template_two.image || detailRow?.images?.[0] || null,
                       audioUrl: toAbsoluteUrl(getSelectedMusicTrack('templateTwo')?.file_url),
                       imageMode: templateTwoImageMode
                     }}
@@ -1785,7 +1785,7 @@ const FilteredNewsPage: NextPage = () => {
                     Music: {getSelectedMusicTrack('templateThree')?.title || 'Not linked'}
                   </Typography>
                   <Player
-                    component={SocialTemplateThreeHeaderComposition}
+                    component={SocialTemplateThreeHeaderComposition as any}
                     durationInFrames={180}
                     fps={30}
                     compositionWidth={1080}
@@ -1793,7 +1793,7 @@ const FilteredNewsPage: NextPage = () => {
                     inputProps={{
                       ...detailRow.template_three,
                       brand: 'Run4Dream',
-                      image: selectedImages[0] || detailRow.template_three.image || detailRow.images?.[0] || null,
+                      image: selectedImages[0] || detailRow.template_three.image || detailRow?.images?.[0] || null,
                       audioUrl: toAbsoluteUrl(getSelectedMusicTrack('templateThree')?.file_url),
                       imageMode: templateThreeImageMode
                     }}
@@ -1921,7 +1921,7 @@ const FilteredNewsPage: NextPage = () => {
                 >
                   {selectedImages[0] || detailRow?.images?.[0] ? (
                     <img
-                      src={selectedImages[0] || detailRow.images?.[0] || ''}
+                      src={selectedImages[0] || detailRow?.images?.[0] || ''}
                       alt='single-template'
                       style={{
                         width: '100%',
@@ -1975,7 +1975,7 @@ const FilteredNewsPage: NextPage = () => {
                 >
                   {selectedImages[0] || detailRow?.images?.[0] ? (
                     <img
-                      src={selectedImages[0] || detailRow.images?.[0] || ''}
+                      src={selectedImages[0] || detailRow?.images?.[0] || ''}
                       alt='single-variant-top'
                       style={{
                         width: '100%',
@@ -2045,7 +2045,7 @@ const FilteredNewsPage: NextPage = () => {
                     <>
                       {detailRow?.images?.[0] ? (
                         <img
-                          src={detailRow.images[0]}
+                          src={detailRow?.images?.[0] || ''}
                           alt='single-variant-heading'
                           style={{
                             width: '100%',
@@ -2146,7 +2146,7 @@ const FilteredNewsPage: NextPage = () => {
                   {(selectedImages.length || detailRow?.images?.length) ? (
                     <>
                       <img
-                        src={(selectedImages.length ? selectedImages : detailRow.images || [])[carouselIndex % (selectedImages.length || detailRow.images.length)]}
+                        src={(selectedImages.length ? selectedImages : detailRow?.images || [])[carouselIndex % (selectedImages.length || detailRow?.images?.length || 1)]}
                         alt='carousel'
                         style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }}
                       />
@@ -2155,7 +2155,7 @@ const FilteredNewsPage: NextPage = () => {
                           detailRow?.template_one?.highlights ||
                           detailRow?.template_two?.heading ||
                           []
-                        const totalImages = selectedImages.length || detailRow.images.length
+                        const totalImages = selectedImages.length || detailRow?.images?.length || 0
                         if (!points.length) return null
                         const perImage = Math.min(totalImages, points.length)
                         const start = (carouselIndex % totalImages) * perImage
@@ -2194,7 +2194,7 @@ const FilteredNewsPage: NextPage = () => {
                           borderRadius: 999
                         }}
                       >
-                        {carouselIndex + 1}/{selectedImages.length || detailRow.images.length}
+                        {carouselIndex + 1}/{selectedImages.length || detailRow?.images?.length || 0}
                       </div>
                     </>
                   ) : (
@@ -2418,7 +2418,7 @@ const FilteredNewsPage: NextPage = () => {
                   ))}
                 </Select>
               </FormControl>
-              <Button variant='outlined' onClick={loadMusicLibrary} disabled={musicLoading}>
+              <Button variant='outlined' onClick={() => void loadMusicLibrary()} disabled={musicLoading}>
                 {musicLoading ? 'Loading...' : 'Refresh'}
               </Button>
             </Stack>

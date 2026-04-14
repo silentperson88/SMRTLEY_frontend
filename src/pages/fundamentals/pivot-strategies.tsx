@@ -111,7 +111,7 @@ const formatCurrency = (value: any, digits = 2) => {
   return `Rs. ${n.toFixed(digits)}`
 }
 
-const valueText = (value: any) => {
+const valueText = (value: any): string => {
   if (value === null || value === undefined) return 'n/a'
   if (Array.isArray(value)) return value.map((item) => valueText(item)).join(', ')
   if (typeof value === 'number') return formatNumber(value)

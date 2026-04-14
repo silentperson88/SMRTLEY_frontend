@@ -358,9 +358,9 @@ const NewApproachPage: NextPage = () => {
         importantTerms.length > 0
           ? importantTerms
           : terms.filter(
-              term =>
-                !positiveTerms.some(p => p.toLowerCase() === term.toLowerCase()) &&
-                !negativeTerms.some(n => n.toLowerCase() === term.toLowerCase())
+              (term: string) =>
+                !positiveTerms.some((p: string) => p.toLowerCase() === term.toLowerCase()) &&
+                !negativeTerms.some((n: string) => n.toLowerCase() === term.toLowerCase())
             )
       setHighlightTerms(terms)
       setHighlightTermsImportant(derivedImportant)
@@ -541,7 +541,7 @@ const NewApproachPage: NextPage = () => {
               {customPreviewReady ? (
                 <Box sx={{ borderRadius: 2, overflow: 'hidden', bgcolor: 'black', p: 1 }}>
                   <Player
-                    component={ShortScriptAudioPreviewComposition}
+                    component={ShortScriptAudioPreviewComposition as any}
                     durationInFrames={previewDurationFrames}
                     fps={PREVIEW_FPS}
                     compositionWidth={customPreviewLayout === 'short' ? 1080 : 1920}
@@ -559,7 +559,6 @@ const NewApproachPage: NextPage = () => {
                       stylePreset: 'data'
                     }}
                     controls
-                    acknowledgeRemotionLicense
                   />
                 </Box>
               ) : null}
@@ -755,7 +754,7 @@ const NewApproachPage: NextPage = () => {
                 <Box sx={{ borderRadius: 2, overflow: 'hidden', bgcolor: 'black', p: 1 }}>
                   {previewMode === 'approach2' ? (
                     <Player
-                      component={ShortScriptAudioPreviewComposition}
+                      component={ShortScriptAudioPreviewComposition as any}
                       durationInFrames={previewDurationFrames}
                       fps={PREVIEW_FPS}
                       compositionWidth={previewLayout === 'short' ? 1080 : 1920}
@@ -776,11 +775,10 @@ const NewApproachPage: NextPage = () => {
                         negativeHighlightKeywords: highlightTermsNegative
                       }}
                       controls
-                      acknowledgeRemotionLicense
-                    />
+                  />
                   ) : (
                     <Player
-                      component={NewsApproachOneComposition}
+                      component={NewsApproachOneComposition as any}
                       durationInFrames={previewDurationFrames}
                       fps={PREVIEW_FPS}
                       compositionWidth={previewLayout === 'short' ? 1080 : 1920}
@@ -806,8 +804,7 @@ const NewApproachPage: NextPage = () => {
                         ]
                       }}
                       controls
-                      acknowledgeRemotionLicense
-                    />
+                  />
                   )}
                 </Box>
               ) : null}

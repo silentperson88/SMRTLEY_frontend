@@ -1579,7 +1579,7 @@ const EodGraphPage = () => {
 
   const options: ApexOptions = {
     chart: {
-      type: chartType === 'area' ? 'area' : chartType === 'ohlc' ? 'ohlc' : 'candlestick',
+      type: chartType === 'area' ? 'area' : 'candlestick',
       zoom: {
         enabled: false
       },

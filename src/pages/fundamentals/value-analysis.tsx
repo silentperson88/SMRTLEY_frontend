@@ -72,7 +72,9 @@ type ValueRow = {
     pe_ratio?: number | null
     price_to_book?: number | null
     ev_ebitda?: number | null
+    dividend_yield?: number | null
     interest_coverage?: number | null
+    debtor_days?: number | null
     promoters?: number | null
     fiis?: number | null
     diis?: number | null

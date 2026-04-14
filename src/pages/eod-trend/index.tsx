@@ -104,6 +104,8 @@ interface TrendAnalysisResult {
 
 type VolatilityState = 'Very Low Volatility' | 'Low Volatility' | 'Moderate Volatility' | 'High Volatility' | 'Very High Volatility'
 
+const isPresent = <T,>(value: T | null | undefined): value is T => value !== null && value !== undefined
+
 interface VolatilityPoint extends ParsedCandle {
   trueRange: number
   atr14: number | null
@@ -533,7 +535,7 @@ const toValidDate = (value: string | Date) => {
 }
 
 const computeTrendAnalysis = (candles: EodCandle[]): TrendAnalysisResult => {
-  const source = candles
+  const source = (candles
     .map(c => {
       const d = toValidDate(c.trade_date)
       const open = Number(c.open)
@@ -554,8 +556,7 @@ const computeTrendAnalysis = (candles: EodCandle[]): TrendAnalysisResult => {
         volume: Number.isFinite(volume) ? volume : 0
       }
     })
-    .filter(Boolean)
-    .sort((a, b) => a.ts - b.ts) as ParsedCandle[]
+    .filter(isPresent) as ParsedCandle[]).sort((a, b) => a.ts - b.ts)
 
   if (!source.length) {
     return {
@@ -620,7 +621,7 @@ const computeTrendAnalysis = (candles: EodCandle[]): TrendAnalysisResult => {
         trendStrengthPct
       }
     })
-    .filter(Boolean) as TrendPoint[]
+    .filter(isPresent) as TrendPoint[]
 
   const rows = baseRows.map((row, idx) => {
     const sma20Lag = idx >= 5 ? baseRows[idx - 5]?.sma20 ?? null : null
@@ -643,7 +644,7 @@ const computeTrendAnalysis = (candles: EodCandle[]): TrendAnalysisResult => {
         : null
     const volumeRatio =
       row.volumeAvg20 && row.volumeAvg20 > 0 ? row.volume / row.volumeAvg20 : null
-    const volumeConfirmation =
+    const volumeConfirmation: TrendPoint['volumeConfirmation'] =
       volumeRatio === null ? 'Neutral' : volumeRatio >= 1.1 ? 'Above Average' : volumeRatio <= 0.9 ? 'Below Average' : 'Neutral'
 
     const slopes = [sma20SlopePct, sma50SlopePct, sma200SlopePct].filter(
@@ -724,7 +725,7 @@ const computeTrendAnalysis = (candles: EodCandle[]): TrendAnalysisResult => {
 }
 
 const computeVolatilityAnalysis = (candles: EodCandle[]): VolatilityAnalysisResult => {
-  const source = candles
+  const source = (candles
     .map(c => {
       const d = toValidDate(c.trade_date)
       const open = Number(c.open)
@@ -743,8 +744,7 @@ const computeVolatilityAnalysis = (candles: EodCandle[]): VolatilityAnalysisResu
         close
       }
     })
-    .filter(Boolean)
-    .sort((a, b) => a.ts - b.ts) as ParsedCandle[]
+    .filter(isPresent) as ParsedCandle[]).sort((a, b) => a.ts - b.ts)
 
   if (!source.length) {
     return {
@@ -804,7 +804,7 @@ const computeVolatilityAnalysis = (candles: EodCandle[]): VolatilityAnalysisResu
         atrSlopePct
       }
     })
-    .filter(Boolean) as VolatilityPoint[]
+    .filter(isPresent) as VolatilityPoint[]
 
   const transitions: VolatilityPoint[] = []
   rows.forEach((row, idx) => {
@@ -860,7 +860,7 @@ const computeBollingerAnalysis = (candles: EodCandle[]): BollingerAnalysisResult
         close
       }
     })
-    .filter(Boolean)
+    .filter(isPresent)
     .sort((a, b) => a.ts - b.ts) as ParsedCandle[]
 
   if (!source.length) {
@@ -935,7 +935,7 @@ const computeBollingerAnalysis = (candles: EodCandle[]): BollingerAnalysisResult
         bbScore
       }
     })
-    .filter(Boolean) as BollingerPoint[]
+    .filter(isPresent) as BollingerPoint[]
 
   const transitions: BollingerPoint[] = []
   rows.forEach((row, idx) => {
@@ -991,7 +991,7 @@ const computeReturnVolatilityAnalysis = (candles: EodCandle[]): ReturnVolatility
         close
       }
     })
-    .filter(Boolean)
+    .filter(isPresent)
     .sort((a, b) => a.ts - b.ts) as ParsedCandle[]
 
   if (source.length < 2) {
@@ -1037,7 +1037,7 @@ const computeReturnVolatilityAnalysis = (candles: EodCandle[]): ReturnVolatility
         volatilityState1yr: classifyReturnVolatility(volatility1yr)
       }
     })
-    .filter(Boolean) as ReturnVolatilityPoint[]
+    .filter(isPresent) as ReturnVolatilityPoint[]
 
   return {
     rows,
@@ -1067,7 +1067,7 @@ const computeVolumeAnalysis = (candles: EodCandle[]): VolumeAnalysisResult => {
         volume: Number.isFinite(volume) ? volume : 0
       }
     })
-    .filter(Boolean)
+    .filter(isPresent)
     .sort((a, b) => a.ts - b.ts) as ParsedCandle[]
 
   if (!source.length) {
@@ -1209,7 +1209,7 @@ const computeMomentumAnalysis = (candles: EodCandle[]): MomentumAnalysisResult =
         close
       }
     })
-    .filter(Boolean)
+    .filter(isPresent)
     .sort((a, b) => a.ts - b.ts) as ParsedCandle[]
 
   if (!source.length) {
@@ -1266,7 +1266,7 @@ const computeMomentumAnalysis = (candles: EodCandle[]): MomentumAnalysisResult =
     const macdLine = ema12 === null || ema26 === null ? null : Number((ema12 - ema26).toFixed(2))
     macdHistory.push(macdLine)
     const signalCandidates = macdHistory.slice(-9).filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
-    const signalLine = signalCandidates.length === 9 ? Number(average(signalCandidates).toFixed(2)) : null
+    const signalLine = signalCandidates.length === 9 ? Number((average(signalCandidates) ?? 0).toFixed(2)) : null
     const macdHistogram = macdLine === null || signalLine === null ? null : Number((macdLine - signalLine).toFixed(2))
     const prevMacd = rows.length ? rows[rows.length - 1].macdLine : null
     const prevSignal = rows.length ? rows[rows.length - 1].signalLine : null
@@ -1295,7 +1295,7 @@ const computeMomentumAnalysis = (candles: EodCandle[]): MomentumAnalysisResult =
         : Number((((row.close - lowest14) / (highest14 - lowest14)) * 100).toFixed(2))
     stochHistory.push(stochK)
     const stochCandidates = stochHistory.slice(-3).filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
-    const stochD = stochCandidates.length === 3 ? Number(average(stochCandidates).toFixed(2)) : null
+    const stochD = stochCandidates.length === 3 ? Number((average(stochCandidates) ?? 0).toFixed(2)) : null
     const stochSignal: MomentumPoint['stochSignal'] =
       stochK === null ? 'Neutral' : stochK >= 80 ? 'Overbought' : stochK <= 20 ? 'Oversold' : 'Neutral'
 
@@ -1366,7 +1366,7 @@ const computeBreakoutAnalysis = (candles: EodCandle[]): BreakoutAnalysisResult =
         volume: Number.isFinite(volume) ? volume : 0
       }
     })
-    .filter(Boolean)
+    .filter(isPresent)
     .sort((a, b) => a.ts - b.ts) as ParsedCandle[]
 
   if (!source.length) {
@@ -1553,7 +1553,7 @@ const computeSeasonalityAnalysis = (candles: EodCandle[]): SeasonalityAnalysisRe
         close
       }
     })
-    .filter(Boolean)
+    .filter(isPresent)
     .sort((a, b) => a.ts - b.ts) as ParsedCandle[]
 
   if (!source.length) {
@@ -1960,7 +1960,7 @@ const EodTrendPage = () => {
 
     const trendScore = latestTrend.trendScore
     const breakoutReadiness = latestBreakout?.breakoutReadiness || 'Far From Breakout'
-    const volumeRatio = latestVolume?.latest?.volumeRatio ?? null
+    const volumeRatio = latestVolume?.volumeRatio ?? null
 
     const bullishSignals =
       (latestTrend.trend === 'Strong Uptrend' ? 2 : latestTrend.trend === 'Uptrend' ? 1 : 0) +
@@ -2638,10 +2638,10 @@ const EodTrendPage = () => {
                         {latestBreakout
                           ? renderSummaryChip(`Setup: ${latestBreakout.breakoutReadiness}`, getBreakoutReadinessColor(latestBreakout.breakoutReadiness))
                           : null}
-                        {latestVolume?.latest
+                        {latestVolume
                           ? renderSummaryChip(
-                              `Volume: ${latestVolume.latest.volumeSignal}`,
-                              getVolumeSpikeColor(latestVolume.latest.volumeSignal)
+                              `Volume: ${latestVolume.volumeSignal}`,
+                              getVolumeSpikeColor(latestVolume.volumeSignal)
                             )
                           : null}
                       </Box>
@@ -2688,16 +2688,16 @@ const EodTrendPage = () => {
                             Participation
                           </Typography>
                           <Typography variant='h6'>
-                            {latestVolume?.latest ? latestVolume.latest.volumeSignal : '-'}
+                            {latestVolume ? latestVolume.volumeSignal : '-'}
                           </Typography>
                           <Typography variant='body2' color='text.secondary'>
                             Ratio:{' '}
-                            {latestVolume?.latest?.volumeRatio !== null && latestVolume?.latest?.volumeRatio !== undefined
-                              ? `${latestVolume.latest.volumeRatio.toFixed(2)}x`
+                            {latestVolume?.volumeRatio !== null && latestVolume?.volumeRatio !== undefined
+                              ? `${latestVolume.volumeRatio.toFixed(2)}x`
                               : '-'}
                           </Typography>
                           <Typography variant='body2' color='text.secondary'>
-                            Flow: {latestVolume?.latest?.flowConsensus || '-'}
+                            Flow: {latestVolume?.flowConsensus || '-'}
                           </Typography>
                         </CardContent>
                       </Card>

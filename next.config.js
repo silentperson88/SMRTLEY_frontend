@@ -3,9 +3,14 @@ const path = require('path')
 module.exports = {
   trailingSlash: true,
   reactStrictMode: false,
+  eslint: {
+    ignoreDuringBuilds: true
+  },
   experimental: {
     esmExternals: false,
-    jsconfigPaths: true // enables it for both jsconfig.json and tsconfig.json
+    jsconfigPaths: true, // enables it for both jsconfig.json and tsconfig.json
+    cpus: 1,
+    workerThreads: true
   },
   webpack: config => {
     config.resolve.alias = {

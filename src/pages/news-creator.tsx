@@ -801,7 +801,7 @@ const NewsCreatorListPage: NextPage = () => {
               {marketPreviewReady ? (
                 <Box sx={{ borderRadius: 2, overflow: 'hidden', bgcolor: 'black', p: 1 }}>
                   <Player
-                    component={NewsApproachSequenceComposition}
+                    component={NewsApproachSequenceComposition as any}
                     durationInFrames={pageSequenceFrames}
                     fps={PREVIEW_FPS}
                     compositionWidth={1920}
@@ -815,7 +815,6 @@ const NewsCreatorListPage: NextPage = () => {
                       companyGroups: pageSequenceCompanyGroups
                     }}
                     controls
-                    acknowledgeRemotionLicense
                   />
                 </Box>
               ) : (
