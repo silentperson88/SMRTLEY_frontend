@@ -4,6 +4,7 @@ import HomeOutline from 'mdi-material-ui/HomeOutline'
 import LogoutVariant from 'mdi-material-ui/LogoutVariant'
 import WalletPlusOutline from 'mdi-material-ui/WalletPlusOutline'
 import CurrencyUsd from 'mdi-material-ui/CurrencyUsd'
+import LinkVariant from 'mdi-material-ui/LinkVariant'
 
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
@@ -37,6 +38,16 @@ const navigation = (): VerticalNavItemsType => {
       title: 'News Content',
       icon: Table,
       path: '/news-content'
+    },
+    {
+      title: 'Music Library',
+      icon: Table,
+      path: '/music-library'
+    },
+    {
+      title: 'Social Accounts',
+      icon: LinkVariant,
+      path: '/social-accounts'
     },
     {
       title: 'Render Jobs',
@@ -75,6 +86,46 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Fundamentals',
       icon: Table,
       path: '/fundamentals'
+    },
+    {
+      title: 'Dividend Screener',
+      icon: Table,
+      path: '/fundamentals/dividend-analysis'
+    },
+    {
+      title: 'Growth Screener',
+      icon: Table,
+      path: '/fundamentals/growth-analysis'
+    },
+    {
+      title: 'Value Screener',
+      icon: Table,
+      path: '/fundamentals/value-analysis'
+    },
+    {
+      title: 'Screener Search',
+      icon: Table,
+      path: '/fundamentals/screener-search'
+    },
+    {
+      title: 'Pivot Strategies',
+      icon: Table,
+      path: '/fundamentals/pivot-strategies'
+    },
+    {
+      title: 'GARP Screener',
+      icon: Table,
+      path: '/fundamentals/garp-analysis'
+    },
+    {
+      title: 'Screener Playbook',
+      icon: Table,
+      path: '/fundamentals/screener-playbook'
+    },
+    {
+      title: 'Warning Flags',
+      icon: Table,
+      path: '/fundamentals/warning-flags'
     },
     {
       title: 'Schema Audit',
@@ -147,6 +198,16 @@ const navigation = (): VerticalNavItemsType => {
       path: '/news-content'
     },
     {
+      title: 'Music Library',
+      icon: Table,
+      path: '/music-library'
+    },
+    {
+      title: 'Social Accounts',
+      icon: LinkVariant,
+      path: '/social-accounts'
+    },
+    {
       title: 'Render Jobs',
       icon: Table,
       path: '/news-content/render-jobs'
@@ -183,6 +244,46 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Fundamentals',
       icon: Table,
       path: '/fundamentals'
+    },
+    {
+      title: 'Dividend Screener',
+      icon: Table,
+      path: '/fundamentals/dividend-analysis'
+    },
+    {
+      title: 'Growth Screener',
+      icon: Table,
+      path: '/fundamentals/growth-analysis'
+    },
+    {
+      title: 'Value Screener',
+      icon: Table,
+      path: '/fundamentals/value-analysis'
+    },
+    {
+      title: 'Screener Search',
+      icon: Table,
+      path: '/fundamentals/screener-search'
+    },
+    {
+      title: 'Pivot Strategies',
+      icon: Table,
+      path: '/fundamentals/pivot-strategies'
+    },
+    {
+      title: 'GARP Screener',
+      icon: Table,
+      path: '/fundamentals/garp-analysis'
+    },
+    {
+      title: 'Screener Playbook',
+      icon: Table,
+      path: '/fundamentals/screener-playbook'
+    },
+    {
+      title: 'Warning Flags',
+      icon: Table,
+      path: '/fundamentals/warning-flags'
     },
     {
       title: 'Schema Audit',

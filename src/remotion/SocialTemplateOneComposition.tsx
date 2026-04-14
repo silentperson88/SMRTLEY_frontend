@@ -1,112 +1,207 @@
 import React from 'react'
-import { AbsoluteFill, Img, interpolate, useCurrentFrame } from 'remotion'
+import { AbsoluteFill, Audio, Img, interpolate, useCurrentFrame } from 'remotion'
 
 export type SocialTemplateOneProps = {
   brand?: string
   title: string
   subtitle?: string
+  shortText?: string
+  mediumText?: string
   highlights: string[]
-  cta: string
+  cta?: string
   image?: string | null
+  audioUrl?: string | null
+  imageMode?: 'custom' | 'original'
 }
 
 export const defaultSocialTemplateOneProps: SocialTemplateOneProps = {
-  brand: 'R4D News',
-  title: 'Top Story',
-  subtitle: 'Key developments you should know today.',
+  brand: 'Run4Dream',
+  title: 'Big Deal',
+  subtitle: 'A short social-ready line under 100 characters.',
+  shortText: 'A short social-ready line under 100 characters.',
+  mediumText: 'A slightly longer version for the same story.',
   highlights: ['Major update announced', 'Officials confirm next steps', 'Impact expected soon'],
-  cta: 'See more >>',
-  image: null
+  cta: '',
+  image: null,
+  audioUrl: null,
+  imageMode: 'custom',
 }
 
-const gradient =
-  'linear-gradient(135deg, rgba(12,19,33,0.82) 0%, rgba(15,23,42,0.9) 45%, rgba(8,12,20,0.95) 100%)'
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
 export const SocialTemplateOneComposition: React.FC<SocialTemplateOneProps> = ({
-  brand = 'R4D News',
+  brand = 'Run4Dream',
   title,
   subtitle,
+  shortText,
+  mediumText,
   highlights,
   cta,
-  image
+  image,
+  audioUrl,
+  imageMode = 'custom',
 }) => {
   const frame = useCurrentFrame()
-  const zoom = interpolate(frame, [0, 120], [1.06, 1], { extrapolateRight: 'clamp' })
-  const bannerSlide = 0
-  const bodyFade = 1
-  const accent = '#ffe600'
-  const accentText = '#d10000'
+  const isOriginal = imageMode === 'original'
+  const zoom = isOriginal ? 1 : interpolate(frame, [0, 120], [1.08, 1], { extrapolateRight: 'clamp' })
   const safeHighlights = Array.isArray(highlights) ? highlights.filter(Boolean) : []
-  const mainLine = safeHighlights[0] || subtitle || ''
-  const subLine = safeHighlights[1] || safeHighlights[2] || ''
+  const bodyLine = shortText || subtitle || mediumText || safeHighlights[0] || ''
+  const bottomAccent = safeHighlights[1] || safeHighlights[2] || ''
+  const titleWords = String(title || 'Top Story').trim().split(/\s+/).filter(Boolean).slice(0, 3).join(' ')
+  const titleLines = Math.max(1, Math.ceil(titleWords.length / 14))
+  const bodyLines = Math.max(1, Math.ceil(String(bodyLine || '').length / 32))
+  const accentLines = bottomAccent ? 1 : 0
+  const textBlockHeight = clamp(110 + titleLines * 28 + bodyLines * 20 + accentLines * 18, 150, 300)
+  const imageHeight = 1080 - textBlockHeight
 
   return (
     <AbsoluteFill
       style={{
-        background: '#0a0f1f',
+        background: '#000000',
         color: '#f8fafc',
-        fontFamily: 'Inter, Montserrat, Arial, sans-serif'
+        fontFamily: 'Inter, Montserrat, Arial, sans-serif',
       }}
     >
-      <AbsoluteFill style={{ background: '#0a0f1f' }}>
-        {image ? (
+      <AbsoluteFill style={{ background: '#000000' }} />
+
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: imageHeight,
+          overflow: 'hidden',
+          background: '#0b1220',
+        }}
+        >
+          {image ? (
           <AbsoluteFill style={{ transform: `scale(${zoom})` }}>
-            <Img src={image} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            <Img
+              src={image}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: isOriginal ? 'contain' : 'cover',
+                objectPosition: isOriginal ? 'center center' : 'center top',
+                background: '#000',
+              }}
+            />
           </AbsoluteFill>
         ) : (
           <AbsoluteFill style={{ background: 'linear-gradient(140deg, #0a0f1f, #1f2937)' }} />
         )}
-      </AbsoluteFill>
 
-      <AbsoluteFill style={{ display: 'flex', flexDirection: 'column' }}>
+        <AbsoluteFill
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.02) 64%, rgba(0,0,0,0.14) 100%)',
+          }}
+        />
+
         <div
           style={{
-            background: accent,
-            padding: '18px 46px',
-            transform: `translateY(${bannerSlide}px)`,
-            boxShadow: '0 12px 24px rgba(0,0,0,0.35)'
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            padding: '18px 34px',
+            color: '#facc15',
+            fontSize: 18,
+            fontWeight: 900,
+            letterSpacing: 1.7,
+            textTransform: 'uppercase',
+            textShadow: '0 2px 10px rgba(0,0,0,0.6)',
+            textAlign: 'right',
           }}
         >
-          <div style={{ fontSize: 38, fontWeight: 800, letterSpacing: 0.4, color: accentText }}>
-            {title}
-          </div>
-          <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: 2, color: '#111827' }}>{brand}</div>
+          {brand}
         </div>
+      </div>
 
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: textBlockHeight,
+          background: '#050505',
+          padding: '18px 32px 20px',
+          boxShadow: '0 -22px 42px rgba(0,0,0,0.75)',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+        }}
+      >
         <div
           style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'flex-end',
-            padding: '0 50px 52px',
-            opacity: bodyFade
+            position: 'absolute',
+            top: -20,
+            left: 0,
+            right: 0,
+            height: 20,
+            background: 'linear-gradient(180deg, rgba(5,5,5,0) 0%, rgba(5,5,5,0.88) 100%)',
           }}
-        >
+        />
+
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <div
             style={{
-              width: '100%',
-              background: 'rgba(5,8,15,0.85)',
-              borderRadius: 24,
-              padding: '26px 32px',
-              border: '1px solid rgba(255,255,255,0.12)',
-              boxShadow: '0 20px 50px rgba(0,0,0,0.45)'
+              fontSize: 27,
+              lineHeight: 1.02,
+              fontWeight: 900,
+              color: '#facc15',
+              textTransform: 'uppercase',
+              letterSpacing: 0.3,
+              maxWidth: 930,
             }}
           >
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#ffffff', lineHeight: 1.25 }}>
-              {mainLine || subtitle}
-            </div>
-            {subLine ? (
-              <div style={{ fontSize: 20, fontWeight: 600, color: accent, marginTop: 10 }}>{subLine}</div>
-            ) : null}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 18 }}>
-              <div style={{ fontSize: 16, fontWeight: 600, color: '#e5e7eb' }}>
-                {safeHighlights.slice(2, 4).join(' • ')}
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: accent }}>{cta}</div>
-            </div>
+            {titleWords}
           </div>
+
+          <div
+            style={{
+              marginTop: 8,
+              maxWidth: 980,
+              fontSize: 31,
+              lineHeight: 1.08,
+              fontWeight: 800,
+              color: '#ffffff',
+            }}
+          >
+            {bodyLine}
+          </div>
+
+          {bottomAccent ? (
+            <div
+              style={{
+                marginTop: 8,
+                maxWidth: 900,
+                fontSize: 17,
+                lineHeight: 1.22,
+                fontWeight: 600,
+                color: '#cbd5e1',
+              }}
+            >
+              {bottomAccent}
+            </div>
+          ) : null}
+
+          {cta ? (
+            <div
+              style={{
+                marginTop: 10,
+                fontSize: 16,
+                fontWeight: 700,
+                color: '#facc15',
+              }}
+            >
+              {cta}
+            </div>
+          ) : null}
         </div>
-      </AbsoluteFill>
+      </div>
+
+      {audioUrl ? <Audio src={audioUrl} volume={0.9} /> : null}
     </AbsoluteFill>
   )
 }
