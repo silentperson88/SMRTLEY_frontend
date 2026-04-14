@@ -441,7 +441,7 @@ const ContentCreatorPage: NextPage = () => {
           AI Content Creator
         </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-          Topic -> script -> refined scenes -> scene images + TTS -> Remotion final video.
+          Topic {'->'} script {'->'} refined scenes {'->'} scene images + TTS {'->'} Remotion final video.
         </Typography>
       </Grid>
 

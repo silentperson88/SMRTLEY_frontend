@@ -24,6 +24,7 @@ import { ShortScriptAudioPreviewComposition } from 'src/remotion/ShortScriptAudi
 
 const LONG_TIMEOUT_MS = 8 * 60 * 1000
 const PREVIEW_FPS = 30
+const NEWS_CREATOR_PREFILL_KEY = 'newsCreatorPrefill'
 type ExtraInfoType = 'GENERAL_CONTEXT' | 'SUBTOPIC_LIST' | 'CONTEXT_PLUS_SUBTOPICS'
 
 type SceneItem = {
@@ -165,6 +166,25 @@ const NewsCreatorBuildPage: NextPage = () => {
       .filter(Boolean)
       .slice(0, 30)
   }, [subtopicsText])
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(NEWS_CREATOR_PREFILL_KEY)
+      if (!raw) return
+      const payload = JSON.parse(raw || '{}')
+      if (payload?.platform) setPlatform(String(payload.platform))
+      if (payload?.title) setTopic(String(payload.title))
+      if (payload?.caption) setExtraInfo(String(payload.caption))
+      if (payload?.scriptLength === 'short' || payload?.scriptLength === 'long') setScriptLength(payload.scriptLength)
+      if (payload?.tone) setTone(String(payload.tone))
+      if (payload?.targetDurationSec) setTargetDurationSec(Number(payload.targetDurationSec))
+      if (payload?.language === 'hi' || payload?.language === 'en') setLanguage(payload.language)
+      if (payload?.subtopicsText) setSubtopicsText(String(payload.subtopicsText))
+      window.localStorage.removeItem(NEWS_CREATOR_PREFILL_KEY)
+    } catch (_) {
+      // ignore
+    }
+  }, [])
 
   useEffect(() => {
     const newsId = String(router.query?.newsId || '').trim()
@@ -545,6 +565,7 @@ const NewsCreatorBuildPage: NextPage = () => {
                   <TextField select label='Platform' value={platform} onChange={event => setPlatform(event.target.value)} fullWidth>
                     <MenuItem value='YouTube'>YouTube</MenuItem>
                     <MenuItem value='Instagram Reels'>Instagram Reels</MenuItem>
+                    <MenuItem value='Facebook'>Facebook</MenuItem>
                     <MenuItem value='Shorts'>Shorts</MenuItem>
                   </TextField>
                 </Grid>
@@ -670,7 +691,7 @@ const NewsCreatorBuildPage: NextPage = () => {
                 </Typography>
                 <Box sx={{ borderRadius: 2, overflow: 'hidden', bgcolor: 'black', p: 1 }}>
                   <RemotionPlayer
-                    component={ShortScriptAudioPreviewComposition}
+                    component={ShortScriptAudioPreviewComposition as any}
                     durationInFrames={Math.max(PREVIEW_FPS * 8, Math.min(PREVIEW_FPS * 240, Math.round(targetDurationSec * 0.45 * PREVIEW_FPS)))}
                     fps={PREVIEW_FPS}
                     compositionWidth={1080}
@@ -683,7 +704,6 @@ const NewsCreatorBuildPage: NextPage = () => {
                       stylePreset: videoStylePreset
                     }}
                     controls
-                    acknowledgeRemotionLicense
                   />
                 </Box>
               </Stack>
@@ -781,7 +801,7 @@ const NewsCreatorBuildPage: NextPage = () => {
                 </Typography>
                 <Box sx={{ borderRadius: 2, overflow: 'hidden', bgcolor: 'black', p: 1 }}>
                   <RemotionPlayer
-                    component={NewsScriptHighlightsComposition}
+                    component={NewsScriptHighlightsComposition as any}
                     durationInFrames={previewDurationInFrames}
                     fps={PREVIEW_FPS}
                     compositionWidth={1080}
@@ -794,7 +814,6 @@ const NewsCreatorBuildPage: NextPage = () => {
                     }}
                     controls
                     loop
-                    acknowledgeRemotionLicense
                   />
                 </Box>
               </Stack>

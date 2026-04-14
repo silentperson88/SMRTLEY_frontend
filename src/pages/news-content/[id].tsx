@@ -64,6 +64,7 @@ const NewsContentPage: NextPage = () => {
   const [customPreviewDurationFrames, setCustomPreviewDurationFrames] = useState(PREVIEW_FPS * 10)
   const [customPerSentenceSec, setCustomPerSentenceSec] = useState(5)
   const [filteredNewsImages, setFilteredNewsImages] = useState<string[]>([])
+  const [templateMusicSelection, setTemplateMusicSelection] = useState<any>(null)
   const [generatorFormatTab, setGeneratorFormatTab] = useState<'landscape' | 'short'>('landscape')
   const [generatorSectionTab, setGeneratorSectionTab] = useState<{ landscape: number; short: number }>({
     landscape: 0,
@@ -380,7 +381,8 @@ const NewsContentPage: NextPage = () => {
               title: payload?.title || '',
               content: payload?.rawText || '',
               script: payload?.script || '',
-              customScript: customScript || ''
+              customScript: customScript || '',
+              templateMusicSelection: payload?.templateMusicSelection || null
             })
           )
         } catch (_) {
@@ -389,6 +391,9 @@ const NewsContentPage: NextPage = () => {
       }
       if (Array.isArray(payload?.images)) {
         setFilteredNewsImages(payload.images.map((img: string) => String(img)))
+      }
+      if (payload?.templateMusicSelection) {
+        setTemplateMusicSelection(payload.templateMusicSelection)
       }
       if (Array.isArray(payload?.images)) {
         setClips(prev => {
@@ -489,7 +494,7 @@ const NewsContentPage: NextPage = () => {
     } catch (_) {
       // ignore
     }
-  }, [videoId, title, content, script, customScript, filteredNewsImages.length, sentenceKeywords, imageGallery.length])
+  }, [videoId, title, content, script, customScript, filteredNewsImages.length, sentenceKeywords, imageGallery.length, templateMusicSelection])
 
   useEffect(() => {
     if (!videoId) return
@@ -503,6 +508,7 @@ const NewsContentPage: NextPage = () => {
           script: script || '',
           customScript: customScript || '',
           images: filteredNewsImages || [],
+          templateMusicSelection: templateMusicSelection || null,
           sentenceKeywords: sentenceKeywords || {},
           imageGallery: imageGallery || [],
           clipApproach: clipApproach || 'multi_sentence',
@@ -3665,7 +3671,7 @@ const NewsContentPage: NextPage = () => {
                       <Player
                         ref={previewPlayerRef}
                         key={`${customPreviewLayout}:${customAudioSrc}:${customPreviewDurationFrames}:${parsedSentences.length}:${activeClips.length}`}
-                        component={ShortScriptAudioPreviewComposition}
+                        component={ShortScriptAudioPreviewComposition as any}
                         durationInFrames={customPreviewDurationFrames}
                         fps={PREVIEW_FPS}
                         compositionWidth={customPreviewLayout === 'short' ? 1080 : 1920}
@@ -3698,7 +3704,6 @@ const NewsContentPage: NextPage = () => {
                           timeline: previewTimelineForRender
                         }}
                         controls
-                        acknowledgeRemotionLicense
                       />
                     </Box>
                   ) : null}
@@ -3755,7 +3760,7 @@ const NewsContentPage: NextPage = () => {
                       return (
                         <Box
                           key={`clip-s-${idx}`}
-                          ref={el => {
+                          ref={(el: HTMLDivElement | null) => {
                             clipSentenceItemRefs.current[idx] = el
                           }}
                         >
@@ -3814,7 +3819,7 @@ const NewsContentPage: NextPage = () => {
               >
                 {refineLoading ? 'Refining...' : 'Refine Phrase'}
               </Button>
-              <Button variant='contained' onClick={handleSearchImages} disabled={imageLoading || !imageQuery.trim()}>
+              <Button variant='contained' onClick={() => void handleSearchImages()} disabled={imageLoading || !imageQuery.trim()}>
                 {imageLoading ? 'Searching...' : 'Search'}
               </Button>
             </Stack>

@@ -33,10 +33,33 @@ import StockGraph from './stockGraph'
 import { TC } from 'src/utils/constants/text.constants'
 
 export interface DataType {
-  stats: string | number
+  stats: string
   title: string
   color: ThemeColor
   icon: ReactElement
+}
+
+const formatStatValue = (title: string, value: number) => {
+  if (!Number.isFinite(value)) return '—'
+
+  switch (title) {
+    case 'Market Cap':
+      return `₹ ${Math.round(value).toLocaleString()} Cr.`
+    case 'Current Price':
+    case 'High':
+    case 'Low':
+    case 'Book Value':
+    case 'Face Value':
+      return `₹ ${value.toFixed(2)}`
+    case 'Dividend Yield':
+    case 'ROCE':
+    case 'ROE':
+      return `${value.toFixed(2)}%`
+    case 'PE Ratio':
+      return value.toFixed(2)
+    default:
+      return value.toLocaleString()
+  }
 }
 
 const renderStats = (stats: DataType[]) => {
@@ -67,6 +90,7 @@ const renderStats = (stats: DataType[]) => {
 
 const CompanyStatisticsCard = (props: {
   fundamentals: Fundamental
+  stockSymbol?: string
   todaysMarket?: TodaysMarket
   onBuy?: () => void
   onSell?: () => void
@@ -84,7 +108,7 @@ const CompanyStatisticsCard = (props: {
       const newStats: DataType[] = []
       if (marketSnapshot.marketCap) {
         newStats.push({
-          stats: marketSnapshot.marketCap,
+          stats: formatStatValue('Market Cap', marketSnapshot.marketCap),
           title: 'Market Cap',
           color: 'primary',
           icon: <ChartPie sx={{ fontSize: '1.75rem' }} />
@@ -93,7 +117,7 @@ const CompanyStatisticsCard = (props: {
 
       if (marketSnapshot.currentPrice) {
         newStats.push({
-          stats: marketSnapshot.currentPrice,
+          stats: formatStatValue('Current Price', marketSnapshot.currentPrice),
           title: 'Current Price',
           color: 'secondary',
           icon: <CurrencyUsd sx={{ fontSize: '1.75rem' }} />
@@ -102,7 +126,7 @@ const CompanyStatisticsCard = (props: {
 
       if (marketSnapshot.high) {
         newStats.push({
-          stats: marketSnapshot.high,
+          stats: formatStatValue('High', marketSnapshot.high),
           title: 'High',
           color: 'success',
           icon: <ArrowUpBoldCircleOutline sx={{ fontSize: '1.75rem' }} />
@@ -111,7 +135,7 @@ const CompanyStatisticsCard = (props: {
 
       if (marketSnapshot.low) {
         newStats.push({
-          stats: marketSnapshot.low,
+          stats: formatStatValue('Low', marketSnapshot.low),
           title: 'Low',
           color: 'error',
           icon: <ArrowDownBoldCircleOutline sx={{ fontSize: '1.75rem' }} />
@@ -120,7 +144,7 @@ const CompanyStatisticsCard = (props: {
 
       if (marketSnapshot.peRatio) {
         newStats.push({
-          stats: marketSnapshot.peRatio,
+          stats: formatStatValue('PE Ratio', marketSnapshot.peRatio),
           title: 'PE Ratio',
           color: 'info',
           icon: <ScaleBalance sx={{ fontSize: '1.75rem' }} />
@@ -129,7 +153,7 @@ const CompanyStatisticsCard = (props: {
 
       if (marketSnapshot.bookValue) {
         newStats.push({
-          stats: marketSnapshot.bookValue,
+          stats: formatStatValue('Book Value', marketSnapshot.bookValue),
           title: 'Book Value',
           color: 'info',
           icon: <BookOpenPageVariant sx={{ fontSize: '1.75rem' }} />
@@ -138,7 +162,7 @@ const CompanyStatisticsCard = (props: {
 
       if (marketSnapshot.dividendYield) {
         newStats.push({
-          stats: marketSnapshot.dividendYield,
+          stats: formatStatValue('Dividend Yield', marketSnapshot.dividendYield),
           title: 'Dividend Yield',
           color: 'info',
           icon: <CashMultiple sx={{ fontSize: '1.75rem' }} />
@@ -147,7 +171,7 @@ const CompanyStatisticsCard = (props: {
 
       if (marketSnapshot.roce) {
         newStats.push({
-          stats: marketSnapshot.roce,
+          stats: formatStatValue('ROCE', marketSnapshot.roce),
           title: 'ROCE',
           color: 'info',
           icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
@@ -156,7 +180,7 @@ const CompanyStatisticsCard = (props: {
 
       if (marketSnapshot.roe) {
         newStats.push({
-          stats: marketSnapshot.roe,
+          stats: formatStatValue('ROE', marketSnapshot.roe),
           title: 'ROE',
           color: 'info',
           icon: <Finance sx={{ fontSize: '1.75rem' }} />
@@ -165,7 +189,7 @@ const CompanyStatisticsCard = (props: {
 
       if (marketSnapshot.faceValue) {
         newStats.push({
-          stats: marketSnapshot.faceValue,
+          stats: formatStatValue('Face Value', marketSnapshot.faceValue),
           title: 'Face Value',
           color: 'info',
           icon: <CertificateOutline sx={{ fontSize: '1.75rem' }} />
@@ -187,7 +211,18 @@ const CompanyStatisticsCard = (props: {
   return (
     <Card>
       <CardHeader
-        title={companyName}
+        title={
+          <Box>
+            <Typography variant='h5' sx={{ fontWeight: 700, lineHeight: 1.15 }}>
+              {companyName}
+            </Typography>
+            {props.stockSymbol ? (
+              <Typography variant='caption' color='text.secondary'>
+                {String(props.stockSymbol).toUpperCase()}
+              </Typography>
+            ) : null}
+          </Box>
+        }
         action={
           <Box sx={{ display: 'flex', gap: 2 }}>
             <Button variant='contained' color='success' onClick={onBuy} disabled={!onBuy}>
@@ -218,11 +253,7 @@ const CompanyStatisticsCard = (props: {
           )
         }
         titleTypographyProps={{
-          sx: {
-            mb: 2.5,
-            lineHeight: '2rem !important',
-            letterSpacing: '0.15px !important'
-          }
+          sx: { mb: 2.5, letterSpacing: '0.15px !important' }
         }}
       />
 

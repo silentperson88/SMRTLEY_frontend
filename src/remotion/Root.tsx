@@ -128,7 +128,7 @@ export const RemotionRoot: React.FC = () => {
         width={1080}
         height={1080}
         fps={30}
-        durationInFrames={180}
+        durationInFrames={3600}
         defaultProps={defaultSocialTemplateOneProps}
       />
       <Composition
@@ -137,7 +137,7 @@ export const RemotionRoot: React.FC = () => {
         width={1080}
         height={1080}
         fps={30}
-        durationInFrames={180}
+        durationInFrames={3600}
         defaultProps={defaultSocialTemplateTwoProps}
       />
       <Composition
@@ -146,7 +146,7 @@ export const RemotionRoot: React.FC = () => {
         width={1080}
         height={1080}
         fps={30}
-        durationInFrames={180}
+        durationInFrames={3600}
         defaultProps={defaultSocialTemplateTwoOverlayProps}
       />
       <Composition
@@ -155,7 +155,7 @@ export const RemotionRoot: React.FC = () => {
         width={1080}
         height={1080}
         fps={30}
-        durationInFrames={180}
+        durationInFrames={3600}
         defaultProps={defaultSocialTemplateThreeHeaderProps}
       />
     </>

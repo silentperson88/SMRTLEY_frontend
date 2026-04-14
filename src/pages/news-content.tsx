@@ -130,6 +130,9 @@ const NewsContentListPage: NextPage = () => {
             <Button variant='outlined' onClick={() => router.push('/filtered-news')}>
               Filtered News
             </Button>
+            <Button variant='outlined' onClick={() => router.push('/music-library')}>
+              Music Library
+            </Button>
             <Button variant='contained' onClick={handleCreate}>
               Generate Video
             </Button>

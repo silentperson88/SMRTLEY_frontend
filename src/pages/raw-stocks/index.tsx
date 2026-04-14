@@ -2,9 +2,10 @@
 import Grid from '@mui/material/Grid'
 import Link from '@mui/material/Link'
 import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
-import { LinearProgress } from '@mui/material'
+import { LinearProgress, Divider, MenuItem, Button } from '@mui/material'
 
 // ** Demo Components Imports
 import RawStocksHeader from 'src/views/tables/RawStocks'
@@ -65,12 +66,31 @@ interface updateStatusBody {
   screenerUrl?: string
 }
 
+interface createRawStockBody {
+  token: string
+  symbol: string
+  name: string
+  exchange: string
+  instrumenttype: string
+  lotsize: number
+  tick_size?: number | null
+}
+
 const MUITable = () => {
   const page = 1
   const limit = 50
   const [openReviewModal, setOpenReviewModal] = useState<reviewModal>(intialliveStockData)
   const [stockId, setStockId] = useState<string>('')
   const [searchValue, setSearchValue] = useState<string>('')
+  const [newRawStock, setNewRawStock] = useState<createRawStockBody>({
+    token: '',
+    symbol: '',
+    name: '',
+    exchange: 'NSE',
+    instrumenttype: 'EQ',
+    lotsize: 1,
+    tick_size: null
+  })
   const { showSnackbar } = useSnackbar()
 
   const { data, isLoading } = usePaginatedSWR<StockData[]>(ENDURL.GET_RAW_STOCKS, {
@@ -85,6 +105,9 @@ const MUITable = () => {
 
   const { trigger: patch, isMutating } = usePatchSWR<{ message: string }, updateStatusBody>(
     ENDURL.POST_RAW_STOCK_STATUS
+  )
+  const { trigger: createRawStock, isMutating: isCreating } = useMutationSWR<{ message: string }, createRawStockBody>(
+    ENDURL.POST_RAW_STOCK
   )
 
   const handleClose = () => setOpenReviewModal(intialliveStockData)
@@ -138,6 +161,34 @@ const MUITable = () => {
     }
   }
 
+  const handleNewRawStockChange = (field: keyof createRawStockBody) => (event: any) => {
+    const value = field === 'lotsize' ? Number(event.target.value) : event.target.value
+
+    setNewRawStock(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleCreateRawStock = async () => {
+    try {
+      await createRawStock(newRawStock)
+      showSnackbar('Raw stock created successfully', 'success')
+      setNewRawStock({
+        token: '',
+        symbol: '',
+        name: '',
+        exchange: 'NSE',
+        instrumenttype: 'EQ',
+        lotsize: 1,
+        tick_size: null
+      })
+      mutate([ENDURL.GET_RAW_STOCKS, { page, limit, search: searchValue }])
+    } catch (err) {
+      showSnackbar(getErrorMessage(err), 'error')
+    }
+  }
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
@@ -163,6 +214,78 @@ const MUITable = () => {
       </Grid>
 
       <Grid item xs={12}>
+        <Card sx={{ mb: 4 }}>
+          <CardHeader title='Add Raw Stock' titleTypographyProps={{ variant: 'h6' }} />
+          <Divider />
+          <CardContent>
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={2}>
+                <TextField
+                  fullWidth
+                  label='Token'
+                  value={newRawStock.token}
+                  onChange={handleNewRawStockChange('token')}
+                />
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <TextField
+                  fullWidth
+                  label='Symbol'
+                  value={newRawStock.symbol}
+                  onChange={handleNewRawStockChange('symbol')}
+                />
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <TextField
+                  fullWidth
+                  label='Name'
+                  value={newRawStock.name}
+                  onChange={handleNewRawStockChange('name')}
+                />
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <TextField
+                  select
+                  fullWidth
+                  label='Exchange'
+                  value={newRawStock.exchange}
+                  onChange={handleNewRawStockChange('exchange')}
+                >
+                  <MenuItem value='NSE'>NSE</MenuItem>
+                  <MenuItem value='BSE'>BSE</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <TextField
+                  select
+                  fullWidth
+                  label='Instrument Type'
+                  value={newRawStock.instrumenttype}
+                  onChange={handleNewRawStockChange('instrumenttype')}
+                >
+                  <MenuItem value='EQ'>EQ</MenuItem>
+                  <MenuItem value='BE'>BE</MenuItem>
+                  <MenuItem value='SM'>SM</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <TextField
+                  fullWidth
+                  type='number'
+                  label='Lot'
+                  value={newRawStock.lotsize}
+                  onChange={handleNewRawStockChange('lotsize')}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button variant='contained' onClick={handleCreateRawStock} disabled={isCreating}>
+                  {isCreating ? 'Saving...' : 'Add Raw Stock'}
+                </Button>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader title='Raw Stocks' titleTypographyProps={{ variant: 'h6' }} />
           {isLoading ? (

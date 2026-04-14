@@ -312,7 +312,7 @@ const RemotionDemoPage: NextPage = () => {
           Remotion News Template Lab
         </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-          Each template has its own language dropdown. Hindi text -> Hindi audio, English text -> English audio.
+          Each template has its own language dropdown. Hindi text {'->'} Hindi audio, English text {'->'} English audio.
         </Typography>
       </Grid>
 
@@ -420,7 +420,7 @@ const RemotionDemoPage: NextPage = () => {
               {previewMode === 'single' && previewAudioSrc ? (
                 <Box sx={{ borderRadius: 2, overflow: 'hidden', bgcolor: 'black', p: 1 }}>
                   <Player
-                    component={ShortScriptAudioPreviewComposition}
+                    component={ShortScriptAudioPreviewComposition as any}
                     durationInFrames={previewDurationFrames}
                     fps={PREVIEW_FPS}
                     compositionWidth={1920}
@@ -433,7 +433,6 @@ const RemotionDemoPage: NextPage = () => {
                       stylePreset: previewStyle
                     }}
                     controls
-                    acknowledgeRemotionLicense
                   />
                 </Box>
               ) : null}
@@ -441,7 +440,7 @@ const RemotionDemoPage: NextPage = () => {
               {previewMode === 'multi' && previewScenes.length > 0 ? (
                 <Box sx={{ borderRadius: 2, overflow: 'hidden', bgcolor: 'black', p: 1 }}>
                   <Player
-                    component={NewsScriptHighlightsComposition}
+                    component={NewsScriptHighlightsComposition as any}
                     durationInFrames={previewDurationFrames}
                     fps={PREVIEW_FPS}
                     compositionWidth={1920}
@@ -453,7 +452,6 @@ const RemotionDemoPage: NextPage = () => {
                       stylePreset: previewStyle
                     }}
                     controls
-                    acknowledgeRemotionLicense
                   />
                 </Box>
               ) : null}

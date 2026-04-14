@@ -9,6 +9,11 @@ export const ENDURL = {
   GET_RAW_STOCKS: 'ticker/admin/raw-stocks',
   GET_RAW_STOCK_BY_ID: 'ticker/admin/raw-stock/:id',
   POST_RAW_STOCK: 'ticker/admin/raw-stock',
+  GET_STOCK_UNIVERSE_AUDIT: 'ticker/admin/stock-universe-audit',
+  MARK_STOCK_UNIVERSE_INACTIVE: 'ticker/admin/stock-universe-audit/mark-inactive',
+  MARK_STOCK_UNIVERSE_ROW_INACTIVE: 'ticker/admin/stock-universe-audit/mark-row-inactive',
+  ADD_STOCK_FROM_AUDIT: 'ticker/admin/stock-universe-audit/add-stock',
+  ADD_STOCKS_FROM_AUDIT: 'ticker/admin/stock-universe-audit/add-stocks',
   POST_RAW_STOCK_STATUS: 'ticker/master/create',
   POST_RAW_STOCK_PRICE: 'ticker/admin/raw-stock-price',
 
@@ -20,6 +25,25 @@ export const ENDURL = {
   // Stock Fundamental
   Fetch_STOCK_FUNDAMENTAL: 'ticker/fundamentals/fetch',
   GET_STOCK_FUNDAMENTAL_DETAILS: 'ticker/fundamentals',
+  GET_STOCK_FUNDAMENTAL_OVERVIEW_DETAILS: 'ticker/fundamentals/overview',
+  GET_STOCK_FUNDAMENTAL_QUARTERLY_DETAILS: 'ticker/fundamentals/quarterly',
+  GET_STOCK_FUNDAMENTAL_PROFIT_LOSS_DETAILS: 'ticker/fundamentals/profit-loss',
+  GET_STOCK_FUNDAMENTAL_BALANCE_SHEET_DETAILS: 'ticker/fundamentals/balance-sheet',
+  GET_STOCK_FUNDAMENTAL_CASH_FLOW_DETAILS: 'ticker/fundamentals/cash-flow',
+  GET_STOCK_FUNDAMENTAL_RATIOS_DETAILS: 'ticker/fundamentals/ratios',
+  GET_STOCK_FUNDAMENTAL_SHAREHOLDING_DETAILS: 'ticker/fundamentals/shareholding',
+  GET_STOCK_DIVIDEND_ANALYSIS: 'ticker/fundamentals/analysis/dividend',
+  GET_STOCK_DIVIDEND_ANALYSIS_BY_SYMBOL: 'ticker/fundamentals/analysis/dividend/:symbol',
+  GET_STOCK_GROWTH_ANALYSIS: 'ticker/fundamentals/analysis/growth',
+  GET_STOCK_GROWTH_ANALYSIS_BY_SYMBOL: 'ticker/fundamentals/analysis/growth/:symbol',
+  GET_STOCK_GARP_ANALYSIS: 'ticker/fundamentals/analysis/garp',
+  GET_STOCK_GARP_ANALYSIS_BY_SYMBOL: 'ticker/fundamentals/analysis/garp/:symbol',
+  GET_STOCK_VALUE_ANALYSIS: 'ticker/fundamentals/analysis/value',
+  GET_STOCK_VALUE_ANALYSIS_BY_SYMBOL: 'ticker/fundamentals/analysis/value/:symbol',
+  GET_STOCK_PIVOT_ANALYSIS: 'ticker/fundamentals/analysis/pivot',
+  GET_STOCK_PIVOT_ANALYSIS_BY_SYMBOL: 'ticker/fundamentals/analysis/pivot/:symbol',
+  FUNDAMENTAL_SCHEMA_AUDIT: 'ticker/fundamentals/schema-audit',
+  FUNDAMENTAL_SCHEMA_AUDIT_FINALIZE: 'ticker/fundamentals/schema-audit/finalize',
 
   // IPO GMP
   FETCH_IPO_GMP: 'ticker/ipo-gmp',
@@ -30,6 +54,8 @@ export const ENDURL = {
 
   // Master Stock
   GET_MASTER_STOCKS: 'ticker/master',
+  UPDATE_MASTER_TOKEN_EXCHANGE: 'ticker/master/:id/token-exchange',
+  MARK_MASTER_STOCK_INACTIVE: 'ticker/master/:id/inactive',
 
   // authentication
   REGISTER: 'user/auth/register',
@@ -53,6 +79,11 @@ export const ENDURL = {
   GET_DASHBOARD: 'user/dashboard',
   LOAD_WALLET_FUND: 'user/wallet/load',
   TRANSFER_WALLET_TO_PORTFOLIO: 'user/wallet/transfer-to-portfolio/:portfolioId',
+
+  // Tax Planner
+  USER_TAX_PLANNER_LIST: 'user/tax-planner',
+  USER_TAX_PLANNER_ACTIVE: 'user/tax-planner/active',
+  USER_TAX_PLANNER_ITEM: 'user/tax-planner/:planId',
 
   // TTS (Piper)
   GENERATE_TTS_AUDIO: 'user/tts/generate',
@@ -119,10 +150,24 @@ export const ENDURL = {
   NEWS_CONTENT_RSS: 'content/news-content/rss',
   NEWS_CONTENT_RSS_SAVE: 'content/news-content/rss/save',
   NEWS_CONTENT_RSS_ITEMS: 'content/news-content/rss/items',
+  NEWS_CONTENT_RSS_ITEM_DRAFT: 'content/news-content/rss/items/:id/draft',
   NEWS_CONTENT_RSS_PROGRESS: 'content/news-content/rss/progress',
   NEWS_CONTENT_RSS_PROCESS_ONE: 'content/news-content/rss/process-one',
   NEWS_CONTENT_RSS_ARTICLE_BODY: 'content/news-content/rss/article-body',
   NEWS_CONTENT_RSS_LINK_VIDEO: 'content/news-content/rss/link-video',
+  NEWS_CONTENT_RSS_IMPROVE_TEMPLATE: 'content/news-content/rss/improve-template',
+  NEWS_CONTENT_RSS_TEMPLATE_PROMPTS: 'content/news-content/rss/template-prompts',
+  NEWS_CONTENT_MUSIC_LIBRARY_CATEGORIES: 'content/news-content/music-library/categories',
+  NEWS_CONTENT_MUSIC_LIBRARY_TRACKS: 'content/news-content/music-library/tracks',
+  NEWS_CONTENT_MUSIC_LIBRARY_UPLOAD: 'content/news-content/music-library/tracks/upload',
+  NEWS_CONTENT_MUSIC_LIBRARY_TRACK_UPDATE: 'content/news-content/music-library/tracks/:id',
+  NEWS_CONTENT_MUSIC_LIBRARY_FILE: 'content/news-content/music-library/files/:fileName',
+  SOCIAL_ACCOUNTS_SCHEMA: 'content/news-content/social-accounts/schema',
+  SOCIAL_ACCOUNTS_LIST: 'content/news-content/social-accounts',
+  SOCIAL_ACCOUNTS_ITEM: 'content/news-content/social-accounts/:platform',
+  SOCIAL_ACCOUNTS_PUBLISH: 'content/news-content/social-accounts/:platform/publish',
+  GET_STOCK_SEARCH_ANALYSIS: 'ticker/fundamentals/analysis/search',
+  GET_STOCK_SEARCH_SUGGESTIONS: 'ticker/fundamentals/analysis/search/suggestions',
   NEWS_CONTENT_IMAGE_SEARCH: 'content/news-content/image-search'
 }
 

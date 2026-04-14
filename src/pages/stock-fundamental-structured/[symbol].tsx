@@ -111,6 +111,12 @@ interface FundamentalApiPayload {
       dividend_yield?: number
     }
   }
+  company_info?: {
+    company_name?: string
+    about?: string | null
+    key_points?: string | null
+    links?: Array<{ title?: string; url?: string }>
+  }
   technicals?: {
     symbol?: string
     exchange?: string
@@ -181,6 +187,26 @@ interface FundamentalApiPayload {
     }
   }
   active_stock_id?: string
+}
+
+interface QuarterlyFlatApiRow extends Record<string, string | number | null | undefined> {
+  id?: string | number | null
+  master_id?: string | number | null
+  active_stock_id?: string | number | null
+  snapshot_id?: string | number | null
+  period?: string | null
+  period_numeric?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+  last_updated_at?: string | null
+}
+
+interface QuarterlyFlatApiPayload {
+  symbol?: string
+  company_name?: string
+  master_id?: string
+  active_stock_id?: string
+  rows?: QuarterlyFlatApiRow[]
 }
 
 const toNumber = (value: unknown, fallback = 0): number => {
@@ -281,6 +307,271 @@ const mapPeersTableFromApi = (table?: FundamentalPeerTable): TableData | null =>
   }
 }
 
+const QUARTERLY_TABLE_COLUMNS = [
+  'id',
+  'master_id',
+  'active_stock_id',
+  'snapshot_id',
+  'period',
+  'period_numeric',
+  'sales',
+  'revenue',
+  'financing_profit',
+  'financing_margin_percent',
+  'expenses',
+  'interest',
+  'net_profit',
+  'opm_percent',
+  'tax_percent',
+  'depreciation',
+  'other_income',
+  'operating_profit',
+  'profit_before_tax',
+  'eps',
+  'raw_pdf',
+  'gross_npa_percent',
+  'net_npa_percent',
+  'sales_yoy_growth_percent',
+  'expenses_material_cost_percent',
+  'expenses_employee_cost_percent',
+  'other_income_normal',
+  'net_profit_profit_from_associates',
+  'net_profit_minority_share',
+  'net_profit_profit_excl_excep',
+  'net_profit_profit_for_pe',
+  'net_profit_profit_for_eps',
+  'net_profit_exceptional_items',
+  'net_profit_exceptional_items_at',
+  'net_profit_yoy_profit_growth_percent',
+  'last_updated_at',
+  'created_at',
+  'updated_at'
+]
+
+const QUARTERLY_ROW_DEFS: Array<{ key: string; label: string }> = [
+  { key: 'eps', label: 'EPS in Rs' },
+  { key: 'sales', label: 'Sales' },
+  { key: 'revenue', label: 'Revenue' },
+  { key: 'financing_profit', label: 'Financing Profit' },
+  { key: 'financing_margin_percent', label: 'Financing Margin %' },
+  { key: 'expenses', label: 'Expenses' },
+  { key: 'interest', label: 'Interest' },
+  { key: 'net_profit', label: 'Net Profit' },
+  { key: 'opm_percent', label: 'OPM %' },
+  { key: 'tax_percent', label: 'Tax %' },
+  { key: 'depreciation', label: 'Depreciation' },
+  { key: 'other_income', label: 'Other Income' },
+  { key: 'operating_profit', label: 'Operating Profit' },
+  { key: 'profit_before_tax', label: 'Profit before tax' },
+  { key: 'raw_pdf', label: 'Raw PDF' },
+  { key: 'gross_npa_percent', label: 'Gross NPA %' },
+  { key: 'net_npa_percent', label: 'Net NPA %' },
+  { key: 'sales_yoy_growth_percent', label: 'YOY Sales Growth %' },
+  { key: 'expenses_material_cost_percent', label: 'Material Cost %' },
+  { key: 'expenses_employee_cost_percent', label: 'Employee Cost %' },
+  { key: 'other_income_normal', label: 'Other income normal' },
+  { key: 'net_profit_profit_from_associates', label: 'Profit from Associates' },
+  { key: 'net_profit_minority_share', label: 'Minority share' },
+  { key: 'net_profit_profit_excl_excep', label: 'Profit excl Excep' },
+  { key: 'net_profit_profit_for_pe', label: 'Profit for PE' },
+  { key: 'net_profit_profit_for_eps', label: 'Profit for EPS' },
+  { key: 'net_profit_exceptional_items', label: 'Exceptional items' },
+  { key: 'net_profit_exceptional_items_at', label: 'Exceptional items AT' },
+  { key: 'net_profit_yoy_profit_growth_percent', label: 'YOY Profit Growth %' }
+]
+
+const PROFIT_LOSS_ROW_DEFS: Array<{ key: string; label: string }> = [
+  { key: 'sales', label: 'Sales' },
+  { key: 'revenue', label: 'Revenue' },
+  { key: 'financing_profit', label: 'Financing Profit' },
+  { key: 'financing_margin_percent', label: 'Financing Margin %' },
+  { key: 'expenses', label: 'Expenses' },
+  { key: 'operating_profit', label: 'Operating Profit' },
+  { key: 'opm_percent', label: 'OPM %' },
+  { key: 'other_income', label: 'Other Income' },
+  { key: 'interest', label: 'Interest' },
+  { key: 'depreciation', label: 'Depreciation' },
+  { key: 'profit_before_tax', label: 'Profit before tax' },
+  { key: 'tax_percent', label: 'Tax %' },
+  { key: 'net_profit', label: 'Net Profit' },
+  { key: 'eps', label: 'EPS in Rs' },
+  { key: 'dividend_payout_percent', label: 'Dividend Payout %' },
+  { key: 'sales_yoy_growth_percent', label: 'Sales Growth %' },
+  { key: 'expenses_manufacturing_cost_percent', label: 'Manufacturing Cost %' },
+  { key: 'expenses_material_cost_percent', label: 'Material Cost %' },
+  { key: 'expenses_employee_cost_percent', label: 'Employee Cost %' },
+  { key: 'expenses_other_cost_percent', label: 'Other Cost %' },
+  { key: 'other_income_normal', label: 'Other income normal' },
+  { key: 'net_profit_profit_from_associates', label: 'Profit from Associates' },
+  { key: 'net_profit_minority_share', label: 'Minority share' },
+  { key: 'net_profit_profit_excl_excep', label: 'Profit excl Excep' },
+  { key: 'net_profit_exceptional_items', label: 'Exceptional items' },
+  { key: 'net_profit_exceptional_items_at', label: 'Exceptional items AT' },
+  { key: 'net_profit_profit_for_eps', label: 'Profit for EPS' },
+  { key: 'net_profit_profit_for_pe', label: 'Profit for PE' },
+  { key: 'net_profit_yoy_profit_growth_percent', label: 'Profit Growth %' }
+]
+
+const BALANCE_SHEET_ROW_DEFS: Array<{ key: string; label: string }> = [
+  { key: 'equity_capital', label: 'Equity Capital' },
+  { key: 'reserves', label: 'Reserves' },
+  { key: 'borrowing', label: 'Borrowing' },
+  { key: 'deposits', label: 'Deposits' },
+  { key: 'borrowings', label: 'Borrowings' },
+  { key: 'long_term_borrowings', label: 'Long term Borrowings' },
+  { key: 'short_term_borrowings', label: 'Short term Borrowings' },
+  { key: 'other_borrowings', label: 'Other Borrowings' },
+  { key: 'other_liabilities', label: 'Other Liabilities' },
+  { key: 'advance_from_customers', label: 'Advance from Customers' },
+  { key: 'lease_liabilities', label: 'Lease Liabilities' },
+  { key: 'trade_payables', label: 'Trade Payables' },
+  { key: 'other_liability_items', label: 'Other liability items' },
+  { key: 'non_controlling_int', label: 'Non controlling int' },
+  { key: 'total_liabilities', label: 'Total Liabilities' },
+  { key: 'fixed_assets', label: 'Fixed Assets' },
+  { key: 'gross_block', label: 'Gross Block' },
+  { key: 'accumulated_depreciation', label: 'Accumulated Depreciation' },
+  { key: 'building', label: 'Building' },
+  { key: 'land', label: 'Land' },
+  { key: 'plant_machinery', label: 'Plant Machinery' },
+  { key: 'railway_sidings', label: 'Railway sidings' },
+  { key: 'vehicles', label: 'Vehicles' },
+  { key: 'computers', label: 'Computers' },
+  { key: 'furniture_n_fittings', label: 'Furniture n fittings' },
+  { key: 'equipments', label: 'Equipments' },
+  { key: 'other_fixed_assets', label: 'Other fixed assets' },
+  { key: 'intangible_assets', label: 'Intangible Assets' },
+  { key: 'cwip', label: 'CWIP' },
+  { key: 'investments', label: 'Investments' },
+  { key: 'other_assets', label: 'Other Assets' },
+  { key: 'inventories', label: 'Inventories' },
+  { key: 'trade_receivables', label: 'Trade receivables' },
+  { key: 'cash_equivalents', label: 'Cash Equivalents' },
+  { key: 'loans_n_advances', label: 'Loans n Advances' },
+  { key: 'other_asset_items', label: 'Other asset items' },
+  { key: 'total_assets', label: 'Total Assets' }
+]
+
+const CASH_FLOW_ROW_DEFS: Array<{ key: string; label: string }> = [
+  { key: 'cash_from_operating_activity', label: 'Cash from Operating Activity' },
+  { key: 'profit_from_operations', label: 'Profit from operations' },
+  { key: 'working_capital_changes', label: 'Working capital changes' },
+  { key: 'receivables', label: 'Receivables' },
+  { key: 'inventory', label: 'Inventory' },
+  { key: 'payables', label: 'Payables' },
+  { key: 'other_wc_items', label: 'Other WC items' },
+  { key: 'direct_taxes', label: 'Direct taxes' },
+  { key: 'interest_received', label: 'Interest received' },
+  { key: 'dividends_received', label: 'Dividends received' },
+  { key: 'exceptional_cf_items', label: 'Exceptional CF items' },
+  { key: 'operating_investments', label: 'Operating investments' },
+  { key: 'operating_borrowings', label: 'Operating borrowings' },
+  { key: 'operating_deposits', label: 'Operating deposits' },
+  { key: 'cash_from_investing_activity', label: 'Cash from Investing Activity' },
+  { key: 'investments_purchased', label: 'Investments purchased' },
+  { key: 'investments_sold', label: 'Investments sold' },
+  { key: 'fixed_assets_purchased', label: 'Fixed assets purchased' },
+  { key: 'fixed_assets_sold', label: 'Fixed assets sold' },
+  { key: 'acquisition_of_companies', label: 'Acquisition of companies' },
+  { key: 'invest_in_subsidiaries', label: 'Invest in subsidiaries' },
+  { key: 'investment_in_group_cos', label: 'Investment in group cos' },
+  { key: 'loans_advances', label: 'Loans Advances' },
+  { key: 'other_investing_items', label: 'Other investing items' },
+  { key: 'cash_from_financing_activity', label: 'Cash from Financing Activity' },
+  { key: 'proceeds_from_shares', label: 'Proceeds from shares' },
+  { key: 'proceeds_from_borrowings', label: 'Proceeds from borrowings' },
+  { key: 'repayment_of_borrowings', label: 'Repayment of borrowings' },
+  { key: 'interest_paid_fin', label: 'Interest paid fin' },
+  { key: 'dividends_paid', label: 'Dividends paid' },
+  { key: 'financial_liabilities', label: 'Financial liabilities' },
+  { key: 'share_application_money', label: 'Share application money' },
+  { key: 'other_financing_items', label: 'Other financing items' },
+  { key: 'net_cash_flow', label: 'Net Cash Flow' }
+]
+
+const RATIOS_ROW_DEFS: Array<{ key: string; label: string }> = [
+  { key: 'debtor_days', label: 'Debtor Days' },
+  { key: 'inventory_days', label: 'Inventory Days' },
+  { key: 'days_payable', label: 'Days Payable' },
+  { key: 'cash_conversion_cycle', label: 'Cash Conversion Cycle' },
+  { key: 'working_capital_days', label: 'Working Capital Days' },
+  { key: 'roce_percent', label: 'ROCE %' },
+  { key: 'roe_percent', label: 'ROE %' }
+]
+
+const SHAREHOLDING_ROW_DEFS: Array<{ key: string; label: string }> = [
+  { key: 'promoters', label: 'Promoters' },
+  { key: 'fiis', label: 'FIIs' },
+  { key: 'diis', label: 'DIIs' },
+  { key: 'public', label: 'Public' },
+  { key: 'government', label: 'Government' },
+  { key: 'others', label: 'Others' },
+  { key: 'no_of_shareholders', label: 'No. of Shareholders' }
+]
+
+const createPeriodSortKey = (period?: string | null, periodNumeric?: string | null) => {
+  const numeric = String(periodNumeric || '').trim()
+  const numericMatch = numeric.match(/^(\d{1,2})-(\d{4})$/)
+  if (numericMatch) return Number(numericMatch[2]) * 100 + Number(numericMatch[1])
+
+  const label = String(period || '').trim()
+  const monthOrder: Record<string, number> = {
+    jan: 1,
+    feb: 2,
+    mar: 3,
+    apr: 4,
+    may: 5,
+    jun: 6,
+    jul: 7,
+    aug: 8,
+    sep: 9,
+    oct: 10,
+    nov: 11,
+    dec: 12
+  }
+  const periodMatch = label.match(/^([A-Za-z]{3,9})\s+(\d{4})$/)
+  if (periodMatch) {
+    const monthKey = periodMatch[1].slice(0, 3).toLowerCase()
+    const month = monthOrder[monthKey]
+    if (month) return Number(periodMatch[2]) * 100 + month
+  }
+
+  return Number.MAX_SAFE_INTEGER
+}
+
+const mapSplitRowsFromApi = (
+  rows?: QuarterlyFlatApiRow[],
+  metricDefs: Array<{ key: string; label: string }> = QUARTERLY_ROW_DEFS
+): TableData | null => {
+  if (!Array.isArray(rows) || !rows.length) return null
+
+  const sortedRows = [...rows].sort((a, b) => {
+    const diff = createPeriodSortKey(a.period, a.period_numeric) - createPeriodSortKey(b.period, b.period_numeric)
+    if (diff !== 0) return diff
+    return String(a.period || a.period_numeric || '').localeCompare(String(b.period || b.period_numeric || ''), undefined, {
+      numeric: true,
+      sensitivity: 'base'
+    })
+  })
+  if (!sortedRows.length) return null
+  const columns = ['Metric', ...sortedRows.map((row, index) => String(row.period ?? row.period_numeric ?? `Period ${index + 1}`))]
+  const mappedRows: TableDataRow[] = metricDefs.map((metric, index) => ({
+    id: `quarter.metric.${index + 1}`,
+    label: metric.label,
+    cells: sortedRows.map(row => {
+      const value = row?.[metric.key as keyof QuarterlyFlatApiRow]
+      return value === null || value === undefined || value === '' ? '-' : (value as string | number)
+    }),
+    level: 0,
+    hasChildren: false
+  }))
+
+  return {
+    columns,
+    rows: mappedRows
+  }
+}
+
 export interface TodaysMarket {
   ltp: number
   open: number
@@ -378,6 +669,11 @@ const Dashboard = () => {
   const [peersTable, setPeersTable] = useState<TableData | null>()
   const [yearlyResult, setYearlyResult] = useState<TableData | null>()
   const [quarterlyResult, setQuarterlyResult] = useState<TableData | null>()
+  const [profitLossResult, setProfitLossResult] = useState<TableData | null>()
+  const [balanceSheetResult, setBalanceSheetResult] = useState<TableData | null>()
+  const [cashFlowResult, setCashFlowResult] = useState<TableData | null>()
+  const [ratiosResult, setRatiosResult] = useState<TableData | null>()
+  const [shareholdingResult, setShareholdingResult] = useState<TableData | null>()
   const [balanceSheet, setBalanceSheet] = useState<TableData | null>()
   const [cashFlows, setCashFlows] = useState<TableData | null>()
   const [todaysMarket, setTodaysMarket] = useState<TodaysMarket | null>()
@@ -390,7 +686,28 @@ const Dashboard = () => {
   const { symbol } = router.query
   const symbolCode = typeof symbol === 'string' ? symbol : ''
   const { data } = useSimpleSWR<FundamentalApiPayload>(
+    symbolCode ? `${ENDURL.GET_STOCK_FUNDAMENTAL_OVERVIEW_DETAILS}/${symbolCode}` : (null as any)
+  )
+  const { data: rawFundamentalsData } = useSimpleSWR<FundamentalApiPayload>(
     symbolCode ? `${ENDURL.GET_STOCK_FUNDAMENTAL_DETAILS}/${symbolCode}` : (null as any)
+  )
+  const { data: quarterlySplitData } = useSimpleSWR<QuarterlyFlatApiPayload>(
+    symbolCode ? `${ENDURL.GET_STOCK_FUNDAMENTAL_QUARTERLY_DETAILS}/${symbolCode}` : (null as any)
+  )
+  const { data: profitLossSplitData } = useSimpleSWR<QuarterlyFlatApiPayload>(
+    symbolCode ? `${ENDURL.GET_STOCK_FUNDAMENTAL_PROFIT_LOSS_DETAILS}/${symbolCode}` : (null as any)
+  )
+  const { data: balanceSheetSplitData } = useSimpleSWR<QuarterlyFlatApiPayload>(
+    symbolCode ? `${ENDURL.GET_STOCK_FUNDAMENTAL_BALANCE_SHEET_DETAILS}/${symbolCode}` : (null as any)
+  )
+  const { data: cashFlowSplitData } = useSimpleSWR<QuarterlyFlatApiPayload>(
+    symbolCode ? `${ENDURL.GET_STOCK_FUNDAMENTAL_CASH_FLOW_DETAILS}/${symbolCode}` : (null as any)
+  )
+  const { data: ratiosSplitData } = useSimpleSWR<QuarterlyFlatApiPayload>(
+    symbolCode ? `${ENDURL.GET_STOCK_FUNDAMENTAL_RATIOS_DETAILS}/${symbolCode}` : (null as any)
+  )
+  const { data: shareholdingSplitData } = useSimpleSWR<QuarterlyFlatApiPayload>(
+    symbolCode ? `${ENDURL.GET_STOCK_FUNDAMENTAL_SHAREHOLDING_DETAILS}/${symbolCode}` : (null as any)
   )
   const dispatch = useDispatch()
   const { mutate } = useSWRConfig()
@@ -494,7 +811,12 @@ const Dashboard = () => {
       cons: data.summary?.cons || []
     })
 
-    setQuarterlyResult(mapTableFromApi(data.tables?.quarters))
+    setQuarterlyResult(mapSplitRowsFromApi(quarterlySplitData?.rows, QUARTERLY_ROW_DEFS))
+    setProfitLossResult(mapSplitRowsFromApi(profitLossSplitData?.rows, PROFIT_LOSS_ROW_DEFS))
+    setBalanceSheetResult(mapSplitRowsFromApi(balanceSheetSplitData?.rows, BALANCE_SHEET_ROW_DEFS))
+    setCashFlowResult(mapSplitRowsFromApi(cashFlowSplitData?.rows, CASH_FLOW_ROW_DEFS))
+    setRatiosResult(mapSplitRowsFromApi(ratiosSplitData?.rows, RATIOS_ROW_DEFS))
+    setShareholdingResult(mapSplitRowsFromApi(shareholdingSplitData?.rows, SHAREHOLDING_ROW_DEFS))
     setYearlyResult(mapTableFromApi(data.tables?.profit_loss))
     setBalanceSheet(mapTableFromApi(data.tables?.balance_sheet))
     setCashFlows(mapTableFromApi(data.tables?.cash_flow))
@@ -502,7 +824,7 @@ const Dashboard = () => {
     setPeersTable(mapPeersTableFromApi(data.peers?.main_table))
     setShareholdingTable(mapTableFromApi(data.tables?.shareholdings))
     setGrowthMetricCards(
-      Object.values(data.other_details?.profit_loss || {})
+      Object.values(rawFundamentalsData?.other_details?.profit_loss || {})
         .filter(item => item?.title && item?.entries?.length)
         .map(item => ({
           title: renameMetricTitle(item.title || ''),
@@ -512,7 +834,18 @@ const Dashboard = () => {
           }))
         }))
     )
-  }, [data, symbolCode, todaysMarket])
+  }, [
+    data,
+    rawFundamentalsData,
+    quarterlySplitData,
+    profitLossSplitData,
+    balanceSheetSplitData,
+    cashFlowSplitData,
+    ratiosSplitData,
+    shareholdingSplitData,
+    symbolCode,
+    todaysMarket
+  ])
   const holdings = holdingsData || []
   const totalHoldingQty = holdings.reduce((sum, item) => sum + (item.holding?.quantity || 0), 0)
   const totalHoldingValue = holdings.reduce((sum, item) => sum + (item.holding?.invested_value || 0), 0)
@@ -522,6 +855,7 @@ const Dashboard = () => {
   const creditRatings = documents?.credit_ratings?.items || []
   const concalls = documents?.concalls?.items || []
   const momentumSnapshot = data?.technicals || null
+  const companyInfo = data?.company_info || null
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -539,14 +873,12 @@ const Dashboard = () => {
   return (
     <ApexChartWrapper>
       {symbolCode && (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 4 }}>
-          <Button
-            component={Link}
-            href={`/stock-fundamental-structured/${symbolCode}`}
-            variant='outlined'
-            size='small'
-          >
-            Open Structured View
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+          <Typography variant='h6' sx={{ fontWeight: 700 }}>
+            Structured Overview View
+          </Typography>
+          <Button component={Link} href={`/stock-fundamental/${symbolCode}`} variant='outlined' size='small'>
+            Open Raw View
           </Button>
         </Box>
       )}
@@ -566,6 +898,60 @@ const Dashboard = () => {
               totalHoldingValue={totalHoldingValue}
             />
           </Grid>
+
+          {companyInfo && (
+            <Grid item xs={12}>
+              <Card>
+                <CardHeader title='Company Overview' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <CardContent>
+                  {companyInfo.about && (
+                    <Box sx={{ mb: companyInfo.key_points ? 3 : 0 }}>
+                      <Typography variant='subtitle2' sx={{ fontWeight: 700, mb: 1 }}>
+                        About
+                      </Typography>
+                      <Typography variant='body2' color='text.secondary' sx={{ whiteSpace: 'pre-wrap' }}>
+                        {companyInfo.about}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {companyInfo.key_points && (
+                    <Box sx={{ mb: companyInfo.links?.length ? 3 : 0 }}>
+                      <Typography variant='subtitle2' sx={{ fontWeight: 700, mb: 1 }}>
+                        Key Points
+                      </Typography>
+                      <Typography variant='body2' color='text.secondary' sx={{ whiteSpace: 'pre-wrap' }}>
+                        {companyInfo.key_points}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {companyInfo.links?.length ? (
+                    <Box>
+                      <Typography variant='subtitle2' sx={{ fontWeight: 700, mb: 1 }}>
+                        Links
+                      </Typography>
+                      <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap'>
+                        {companyInfo.links.map((linkItem, index) => (
+                          <Button
+                            key={`${linkItem.title || 'link'}-${index}`}
+                            component={Link}
+                            href={linkItem.url || '#'}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            variant='outlined'
+                            size='small'
+                          >
+                            {linkItem.title || 'Link'}
+                          </Button>
+                        ))}
+                      </Stack>
+                    </Box>
+                  ) : null}
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
 
           <Grid item xs={12}>
             <Card sx={{ borderRadius: 3 }}>
@@ -692,8 +1078,53 @@ const Dashboard = () => {
           {quarterlyResult && (
             <Grid item xs={12}>
               <Card>
-                <CardHeader title='Quarterly Performance' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <CardHeader title='Quarterly Performance (Split Table)' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
                 <FundamentalTable data={quarterlyResult} />
+              </Card>
+            </Grid>
+          )}
+
+          {profitLossResult && (
+            <Grid item xs={12}>
+              <Card>
+                <CardHeader title='Income Statement (Split Table)' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <FundamentalTable data={profitLossResult} />
+              </Card>
+            </Grid>
+          )}
+
+          {balanceSheetResult && (
+            <Grid item xs={12}>
+              <Card>
+                <CardHeader title='Financial Position (Split Table)' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <FundamentalTable data={balanceSheetResult} />
+              </Card>
+            </Grid>
+          )}
+
+          {cashFlowResult && (
+            <Grid item xs={12}>
+              <Card>
+                <CardHeader title='Cash Movement (Split Table)' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <FundamentalTable data={cashFlowResult} />
+              </Card>
+            </Grid>
+          )}
+
+          {ratiosResult && (
+            <Grid item xs={12}>
+              <Card>
+                <CardHeader title='Key Ratios (Split Table)' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <FundamentalTable data={ratiosResult} />
+              </Card>
+            </Grid>
+          )}
+
+          {shareholdingResult && (
+            <Grid item xs={12}>
+              <Card>
+                <CardHeader title='Ownership Structure (Split Table)' titleTypographyProps={{ variant: 'h6', color: 'primary' }} />
+                <FundamentalTable data={shareholdingResult} />
               </Card>
             </Grid>
           )}
