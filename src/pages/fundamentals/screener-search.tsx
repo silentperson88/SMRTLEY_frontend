@@ -1,4 +1,4 @@
-import { Fragment, FormEvent, useEffect, useMemo, useState } from 'react'
+import { Fragment, FormEvent, KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react'
 import type { NextPage } from 'next'
 import axiosInstance from 'src/api/axios/axiosBaseQuery'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
@@ -19,16 +19,13 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import Collapse from '@mui/material/Collapse'
-import Divider from '@mui/material/Divider'
 import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import IconButton from '@mui/material/IconButton'
 import Alert from '@mui/material/Alert'
-import MenuItem from '@mui/material/MenuItem'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SearchIcon from '@mui/icons-material/Search'
-import RefreshIcon from '@mui/icons-material/Refresh'
 import LightbulbIcon from '@mui/icons-material/Lightbulb'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
@@ -39,6 +36,7 @@ type SearchSuggestion = {
   example?: string
   type?: string
   unit?: string | null
+  operators?: string[]
 }
 
 type SearchMatch = {
@@ -57,6 +55,8 @@ type SearchRow = {
   symbol?: string | null
   name?: string | null
   company_name?: string | null
+  market_cap?: number | null
+  current_price?: number | null
   analysis?: {
     score?: number
     grade?: string
@@ -73,6 +73,7 @@ type SearchRow = {
     promoters?: number | null
     fiis?: number | null
     diis?: number | null
+    public?: number | null
     roe?: number | null
     roce?: number | null
     debt_to_equity?: number | null
@@ -104,6 +105,25 @@ type SearchResponse = {
   }
 }
 
+type ActiveLineContext = {
+  lineStart: number
+  lineEnd: number
+  lineRaw: string
+  prefix: string
+  fieldText: string
+  operator: string | null
+  valueText: string
+  hasTrailingAnd: boolean
+}
+
+type CursorPosition = {
+  top: number
+  left: number
+  lineHeight: number
+}
+
+const FIELD_PATTERN = /^(.+?)\s*(>=|<=|!=|==|=|>|<|contains|starts with|ends with)\s*(.*)$/i
+
 const formatNumber = (value: unknown, digits = 2) => {
   const numeric = Number(value)
   if (!Number.isFinite(numeric)) return '?'
@@ -116,12 +136,6 @@ const formatPercent = (value: unknown) => {
   return `${numeric.toFixed(2)}%`
 }
 
-const formatRatio = (value: unknown) => {
-  const numeric = Number(value)
-  if (!Number.isFinite(numeric)) return '?'
-  return numeric.toFixed(2)
-}
-
 const gradeColor = (grade?: string) => {
   const text = String(grade || '').toUpperCase()
   if (text.includes('DEEP')) return 'success'
@@ -129,6 +143,107 @@ const gradeColor = (grade?: string) => {
   if (text.includes('WATCH')) return 'warning'
   if (text.includes('REJECT')) return 'error'
   return 'default'
+}
+
+const getActiveLineContext = (query: string, cursorIndex: number): ActiveLineContext => {
+  const position = Math.max(0, Math.min(cursorIndex, query.length))
+  const lineStart = query.lastIndexOf('\n', Math.max(0, position - 1)) + 1
+  const nextLineBreak = query.indexOf('\n', position)
+  const lineEnd = nextLineBreak === -1 ? query.length : nextLineBreak
+  const lineRaw = query.slice(lineStart, lineEnd)
+  const prefix = (lineRaw.match(/^\s*(?:AND\s+)?/i) || [''])[0]
+  const body = lineRaw.slice(prefix.length)
+  const hasTrailingAnd = /\s+(?:AND|&&)\s*$/i.test(body)
+  const bodyWithoutTrailingAnd = body.replace(/\s+(?:AND|&&)\s*$/i, '').trim()
+  const parsed = bodyWithoutTrailingAnd.match(FIELD_PATTERN)
+
+  return {
+    lineStart,
+    lineEnd,
+    lineRaw,
+    prefix,
+    fieldText: parsed ? parsed[1].trim() : bodyWithoutTrailingAnd,
+    operator: parsed ? parsed[2].trim() : null,
+    valueText: parsed ? parsed[3].trim() : '',
+    hasTrailingAnd,
+  }
+}
+
+const replaceLineField = (query: string, context: ActiveLineContext, suggestion: SearchSuggestion) => {
+  const label = suggestion.label || suggestion.example || ''
+  const comparisonPart = context.operator ? ` ${context.operator} ${context.valueText}`.trimEnd() : ''
+  const trailingAnd = context.hasTrailingAnd ? ' AND' : ''
+  const rebuiltLine = `${context.prefix}${label}${comparisonPart ? ` ${comparisonPart}` : ''}${trailingAnd}`
+
+  return {
+    nextQuery: `${query.slice(0, context.lineStart)}${rebuiltLine}${query.slice(context.lineEnd)}`,
+    nextCursor: context.lineStart + rebuiltLine.length,
+  }
+}
+
+const getCaretCoordinates = (textarea: HTMLTextAreaElement, caretPosition: number): CursorPosition => {
+  const styles = window.getComputedStyle(textarea)
+  const div = document.createElement('div')
+  const span = document.createElement('span')
+  const properties = [
+    'boxSizing',
+    'width',
+    'height',
+    'overflowX',
+    'overflowY',
+    'borderTopWidth',
+    'borderRightWidth',
+    'borderBottomWidth',
+    'borderLeftWidth',
+    'paddingTop',
+    'paddingRight',
+    'paddingBottom',
+    'paddingLeft',
+    'fontStyle',
+    'fontVariant',
+    'fontWeight',
+    'fontStretch',
+    'fontSize',
+    'fontSizeAdjust',
+    'lineHeight',
+    'fontFamily',
+    'textAlign',
+    'textTransform',
+    'textIndent',
+    'textDecoration',
+    'letterSpacing',
+    'wordSpacing',
+    'tabSize',
+    'MozTabSize',
+  ] as const
+
+  div.style.position = 'absolute'
+  div.style.visibility = 'hidden'
+  div.style.whiteSpace = 'pre-wrap'
+  div.style.wordWrap = 'break-word'
+  div.style.top = '0'
+  div.style.left = '-9999px'
+
+  properties.forEach((property) => {
+    div.style.setProperty(property, styles.getPropertyValue(property))
+  })
+
+  div.textContent = textarea.value.slice(0, caretPosition)
+  if (div.textContent.endsWith('\n')) div.textContent += ' '
+
+  span.textContent = textarea.value.slice(caretPosition) || ' '
+  div.appendChild(span)
+  document.body.appendChild(div)
+
+  const top = span.offsetTop - textarea.scrollTop
+  const left = span.offsetLeft - textarea.scrollLeft
+  document.body.removeChild(div)
+
+  return {
+    top,
+    left,
+    lineHeight: Number.parseFloat(styles.lineHeight || '24') || 24,
+  }
 }
 
 const ScreenerSearchPage: NextPage = () => {
@@ -140,12 +255,28 @@ const ScreenerSearchPage: NextPage = () => {
   const [suggestionLoading, setSuggestionLoading] = useState(false)
   const [error, setError] = useState('')
   const [expandedSymbol, setExpandedSymbol] = useState<string | null>(null)
+  const [editorFocused, setEditorFocused] = useState(false)
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0)
+  const [cursorIndex, setCursorIndex] = useState(0)
+  const [cursorPosition, setCursorPosition] = useState<CursorPosition | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  const activeLineContext = useMemo(() => getActiveLineContext(query, cursorIndex), [query, cursorIndex])
+
+  const updateCaretState = () => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+    const nextCursor = textarea.selectionStart || 0
+    setCursorIndex(nextCursor)
+    setCursorPosition(getCaretCoordinates(textarea, nextCursor))
+  }
 
   const loadSuggestions = async (value: string) => {
     if (!value.trim()) {
       setSuggestions([])
       return
     }
+
     try {
       setSuggestionLoading(true)
       const res = await axiosInstance.get(ENDURL.GET_STOCK_SEARCH_SUGGESTIONS, {
@@ -161,11 +292,22 @@ const ScreenerSearchPage: NextPage = () => {
   }
 
   useEffect(() => {
+    const searchTerm = activeLineContext.fieldText.trim()
+    if (!editorFocused || !searchTerm) {
+      setSuggestions([])
+      return
+    }
+
     const handle = setTimeout(() => {
-      void loadSuggestions(query)
-    }, 250)
+      void loadSuggestions(searchTerm)
+    }, 160)
+
     return () => clearTimeout(handle)
-  }, [query])
+  }, [activeLineContext.fieldText, editorFocused])
+
+  useEffect(() => {
+    setActiveSuggestionIndex(0)
+  }, [suggestions])
 
   const runSearch = async (value = query) => {
     const q = value.trim()
@@ -187,7 +329,6 @@ const ScreenerSearchPage: NextPage = () => {
       const payload = (res?.data?.data || {}) as SearchResponse
       setRows(Array.isArray(payload.rows) ? payload.rows : [])
       setSubmittedQuery(payload.query || q)
-      setSuggestions(Array.isArray(payload.suggestions) ? payload.suggestions : [])
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'Failed to search stocks')
       setRows([])
@@ -196,12 +337,50 @@ const ScreenerSearchPage: NextPage = () => {
     }
   }
 
-  const suggestionChips = useMemo(() => suggestions.slice(0, 8), [suggestions])
+  const applySuggestion = (suggestion: SearchSuggestion) => {
+    const { nextQuery, nextCursor } = replaceLineField(query, activeLineContext, suggestion)
+    setQuery(nextQuery)
+    setEditorFocused(true)
+    requestAnimationFrame(() => {
+      if (!textareaRef.current) return
+      textareaRef.current.focus()
+      textareaRef.current.setSelectionRange(nextCursor, nextCursor)
+      updateCaretState()
+    })
+  }
 
   const onQuerySubmit = (event: FormEvent) => {
     event.preventDefault()
     void runSearch(query)
   }
+
+  const onEditorKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!suggestions.length) return
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      setActiveSuggestionIndex((current) => (current + 1) % suggestions.length)
+      return
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      setActiveSuggestionIndex((current) => (current - 1 + suggestions.length) % suggestions.length)
+      return
+    }
+
+    if (event.key === 'Tab') {
+      event.preventDefault()
+      applySuggestion(suggestions[activeSuggestionIndex])
+    }
+  }
+
+  const suggestionOpen = Boolean(editorFocused && suggestions.length && cursorPosition && activeLineContext.fieldText.trim())
+  const examplePresets = [
+    'Sales growth > 12\nAND Profit growth > 15\nAND Return on capital employed > 15\nAND Debt to equity < 0.5',
+    'Price to earning < 30\nAND PEG Ratio < 1.5\nAND Market Capitalization > 500\nAND Current price < 50',
+    'Promoter holding > 50\nAND Return on equity > 15\nAND Dividend yield > 2',
+  ]
 
   return (
     <Grid container spacing={6}>
@@ -211,7 +390,7 @@ const ScreenerSearchPage: NextPage = () => {
             borderRadius: 3,
             overflow: 'hidden',
             background:
-              'radial-gradient(circle at 85% 15%, rgba(59, 130, 246, 0.24) 0%, transparent 30%), radial-gradient(circle at 15% 10%, rgba(245, 158, 11, 0.18) 0%, transparent 28%), linear-gradient(125deg, #08111f 0%, #0f172a 52%, #111827 100%)',
+              'radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.22) 0%, transparent 28%), radial-gradient(circle at 18% 15%, rgba(59, 130, 246, 0.22) 0%, transparent 26%), linear-gradient(130deg, #08111f 0%, #0f172a 52%, #111827 100%)',
           }}
         >
           <CardContent sx={{ p: { xs: 5, md: 7 } }}>
@@ -219,24 +398,22 @@ const ScreenerSearchPage: NextPage = () => {
               <Grid item xs={12} md={8}>
                 <Chip label='Screener Search' color='primary' size='small' sx={{ mb: 2 }} />
                 <Typography variant='h3' sx={{ color: 'common.white', fontWeight: 700, mb: 1.5 }}>
-                  Search Stocks Like a Screener
+                  Query Stocks Like Screener
                 </Typography>
-                <Typography variant='body1' sx={{ color: 'rgba(255,255,255,0.76)', maxWidth: 860 }}>
-                  Type natural screener queries like <b>promoter &gt; 70</b>, <b>roe &gt; 15</b>, or <b>debt &lt; 1</b>.
-                  The backend will search the active VALID universe and return matching companies.
+                <Typography variant='body1' sx={{ color: 'rgba(255,255,255,0.76)', maxWidth: 900 }}>
+                  Write one clause per line, use <b>AND</b> between rules, and the backend will evaluate it on the active
+                  VALID universe. Suggestions now follow the active line while you type.
                 </Typography>
               </Grid>
               <Grid item xs={12} md={4}>
                 <Card sx={{ bgcolor: 'rgba(8, 14, 26, 0.75)', border: '1px solid rgba(255,255,255,0.13)' }}>
                   <CardContent>
                     <Typography variant='caption' sx={{ color: 'rgba(255,255,255,0.65)' }}>
-                      Try examples
+                      Example block
                     </Typography>
-                    <Stack spacing={1.25} sx={{ mt: 1 }}>
-                      <Chip label='promoter > 70' color='success' size='small' />
-                      <Chip label='roe > 15 and roce > 15' color='primary' size='small' />
-                      <Chip label='debt to equity < 1' color='warning' size='small' />
-                    </Stack>
+                    <Typography component='pre' variant='body2' sx={{ mt: 1.5, color: 'rgba(255,255,255,0.84)', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
+                      {`Sales growth > 12\nAND Profit growth > 15\nAND Return on capital employed > 15\nAND Debt to equity < 0.5`}
+                    </Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -250,47 +427,119 @@ const ScreenerSearchPage: NextPage = () => {
           <CardContent>
             <form onSubmit={onQuerySubmit}>
               <Stack spacing={2}>
-                <TextField
-                  fullWidth
-                  label='Search Query'
-                  placeholder='Type something like promoter > 70 or roe > 15 and debt < 1'
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  InputProps={{
-                    endAdornment: (
-                      <Button type='submit' variant='contained' startIcon={<SearchIcon />} disabled={loading}>
-                        Search
-                      </Button>
-                    ),
-                  }}
-                  helperText='Use field names, operators, and values. Suggestions appear as you type.'
-                />
-                <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                <Box sx={{ position: 'relative' }}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    minRows={6}
+                    label='Search Query'
+                    placeholder='Sales growth > 12&#10;AND Profit growth > 15&#10;AND Return on capital employed > 15'
+                    value={query}
+                    onChange={(event) => {
+                      setQuery(event.target.value)
+                      requestAnimationFrame(updateCaretState)
+                    }}
+                    onKeyDown={onEditorKeyDown}
+                    onFocus={() => {
+                      setEditorFocused(true)
+                      requestAnimationFrame(updateCaretState)
+                    }}
+                    onBlur={() => {
+                      window.setTimeout(() => setEditorFocused(false), 120)
+                    }}
+                    onClick={() => requestAnimationFrame(updateCaretState)}
+                    onKeyUp={() => requestAnimationFrame(updateCaretState)}
+                    inputRef={textareaRef}
+                    helperText='Use one rule per line. Press Tab to insert the highlighted suggestion.'
+                  />
+
+                  {suggestionOpen ? (
+                    <Paper
+                      elevation={8}
+                      sx={{
+                        position: 'absolute',
+                        top: (cursorPosition?.top || 0) + (cursorPosition?.lineHeight || 24) + 36,
+                        left: Math.min((cursorPosition?.left || 0) + 16, 520),
+                        width: { xs: 'calc(100% - 24px)', sm: 420 },
+                        maxWidth: 'calc(100% - 24px)',
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        zIndex: 20,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Box sx={{ px: 2, py: 1.25, bgcolor: 'action.hover', borderBottom: '1px solid', borderColor: 'divider' }}>
+                        <Typography variant='caption' color='text.secondary'>
+                          Suggestions for {activeLineContext.fieldText || 'current line'}
+                        </Typography>
+                      </Box>
+                      <Stack spacing={0}>
+                        {suggestions.slice(0, 8).map((item, index) => (
+                          <Box
+                            key={item.key || item.label || index}
+                            onMouseDown={(event) => {
+                              event.preventDefault()
+                              applySuggestion(item)
+                            }}
+                            sx={{
+                              px: 2,
+                              py: 1.5,
+                              cursor: 'pointer',
+                              bgcolor: index === activeSuggestionIndex ? 'action.selected' : 'background.paper',
+                              borderBottom: index === Math.min(suggestions.length, 8) - 1 ? 'none' : '1px solid',
+                              borderColor: 'divider',
+                              '&:hover': {
+                                bgcolor: 'action.hover',
+                              },
+                            }}
+                          >
+                            <Stack direction='row' justifyContent='space-between' spacing={2}>
+                              <Box>
+                                <Typography variant='subtitle2'>{item.label}</Typography>
+                                <Typography variant='caption' color='text.secondary'>
+                                  {item.example || item.aliases?.slice(0, 3).join(', ') || 'No example'}
+                                </Typography>
+                              </Box>
+                              {item.unit ? <Chip size='small' label={item.unit} variant='outlined' /> : null}
+                            </Stack>
+                          </Box>
+                        ))}
+                      </Stack>
+                    </Paper>
+                  ) : null}
+                </Box>
+
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', sm: 'center' }}>
+                  <Button type='submit' variant='contained' startIcon={<SearchIcon />} disabled={loading}>
+                    {loading ? 'Searching...' : 'Search'}
+                  </Button>
                   <Chip label='Active + VALID stocks only' size='small' variant='outlined' />
-                  <Chip label={suggestionLoading ? 'Loading suggestions...' : 'Suggestions update live'} size='small' variant='outlined' />
-                  <Chip label='Backend parsed' size='small' variant='outlined' />
+                  <Chip label={suggestionLoading ? 'Updating suggestions...' : 'Suggestions follow cursor'} size='small' variant='outlined' />
+                  <Chip label='Parsed on backend' size='small' variant='outlined' />
                 </Stack>
               </Stack>
             </form>
 
-            {suggestionChips.length ? (
-              <Box sx={{ mt: 2 }}>
-                <Typography variant='caption' color='text.secondary'>
-                  Field suggestions
-                </Typography>
-                <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mt: 1 }}>
-                  {suggestionChips.map((item) => (
-                    <Chip
-                      key={item.key}
-                      label={`${item.label}${item.unit ? ` (${item.unit})` : ''}`}
-                      onClick={() => setQuery(item.example || item.label || '')}
-                      color='primary'
-                      variant='outlined'
-                    />
-                  ))}
-                </Stack>
-              </Box>
-            ) : null}
+            <Box sx={{ mt: 2.5 }}>
+              <Typography variant='caption' color='text.secondary'>
+                Quick examples
+              </Typography>
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mt: 1 }}>
+                {examplePresets.map((preset) => (
+                  <Chip
+                    key={preset}
+                    label={preset.split('\n')[0]}
+                    onClick={() => {
+                      setQuery(preset)
+                      requestAnimationFrame(updateCaretState)
+                    }}
+                    color='primary'
+                    variant='outlined'
+                  />
+                ))}
+              </Stack>
+            </Box>
 
             {error ? (
               <Alert severity='error' sx={{ mt: 2 }}>
@@ -306,7 +555,7 @@ const ScreenerSearchPage: NextPage = () => {
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
               <LightbulbIcon fontSize='small' />
-              <Typography variant='h6'>How to Search</Typography>
+              <Typography variant='h6'>How to Write Queries</Typography>
             </Stack>
           </AccordionSummary>
           <AccordionDetails>
@@ -315,10 +564,11 @@ const ScreenerSearchPage: NextPage = () => {
                 <Card variant='outlined' sx={{ borderRadius: 2 }}>
                   <CardContent>
                     <Typography variant='subtitle2' sx={{ mb: 1 }}>
-                      Numeric queries
+                      Supported operators
                     </Typography>
                     <Typography variant='body2' color='text.secondary'>
-                      Use comparisons like <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;</b>, <b>&lt;=</b>, or <b>=</b>.
+                      Use <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;</b>, <b>&lt;=</b>, <b>=</b>, <b>!=</b>. Text fields also support
+                      <b> contains</b>, <b> starts with</b>, and <b> ends with</b>.
                     </Typography>
                   </CardContent>
                 </Card>
@@ -327,10 +577,11 @@ const ScreenerSearchPage: NextPage = () => {
                 <Card variant='outlined' sx={{ borderRadius: 2 }}>
                   <CardContent>
                     <Typography variant='subtitle2' sx={{ mb: 1 }}>
-                      Available examples
+                      Available screener-style fields
                     </Typography>
                     <Typography variant='body2' color='text.secondary'>
-                      promoter, roe, roce, debt to equity, dividend yield, pe vs industry, price to book, ev / ebitda, debtor days.
+                      Sales growth, Profit growth, Return on capital employed, Debt to equity, Price to earning, PEG Ratio,
+                      Market Capitalization, Current price, Dividend yield, Promoter holding, and more.
                     </Typography>
                   </CardContent>
                 </Card>
@@ -344,9 +595,9 @@ const ScreenerSearchPage: NextPage = () => {
         <Card sx={{ borderRadius: 3 }}>
           <CardContent>
             <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
-              <Chip label={`Query: ${submittedQuery || '—'}`} color='primary' variant='outlined' />
+              <Chip label={`Query: ${submittedQuery || '-'}`} color='primary' variant='outlined' />
               <Chip label={`Results: ${rows.length}`} color='success' />
-              <Chip label='Top 50' variant='outlined' />
+              <Chip label='Top 50 matches' variant='outlined' />
             </Stack>
 
             <TableContainer component={Paper} variant='outlined' sx={{ borderRadius: 2 }}>
@@ -360,7 +611,7 @@ const ScreenerSearchPage: NextPage = () => {
                     <TableCell>Matched</TableCell>
                     <TableCell>ROE</TableCell>
                     <TableCell>ROCE</TableCell>
-                    <TableCell>Promoter %</TableCell>
+                    <TableCell>Current Price</TableCell>
                     <TableCell align='right'>Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -381,7 +632,7 @@ const ScreenerSearchPage: NextPage = () => {
                           </TableCell>
                           <TableCell>{formatPercent(row?.value_metrics?.roe)}</TableCell>
                           <TableCell>{formatPercent(row?.value_metrics?.roce)}</TableCell>
-                          <TableCell>{formatPercent(row?.value_metrics?.promoters)}</TableCell>
+                          <TableCell>{row?.current_price !== null && row?.current_price !== undefined ? `Rs. ${formatNumber(row.current_price)}` : '?'}</TableCell>
                           <TableCell align='right'>
                             <Stack direction='row' spacing={0.5} justifyContent='flex-end'>
                               <IconButton size='small' onClick={() => window.open(`/stock-fundamental/${encodeURIComponent(String(row.symbol || ''))}`, '_blank')}>
@@ -419,7 +670,7 @@ const ScreenerSearchPage: NextPage = () => {
                                             <Chip
                                               label={match.status || '?'}
                                               size='small'
-                                              color={match.status === 'pass' ? 'success' : 'error'}
+                                              color={match.status === 'pass' ? 'success' : match.status === 'unmatched' ? 'warning' : 'error'}
                                             />
                                           </TableCell>
                                         </TableRow>
@@ -438,7 +689,7 @@ const ScreenerSearchPage: NextPage = () => {
                     <TableRow>
                       <TableCell colSpan={9}>
                         <Typography variant='body2' color='text.secondary' sx={{ py: 3, textAlign: 'center' }}>
-                          Type a query and hit Search to see matching stocks.
+                          Build a query and hit Search to see matching stocks.
                         </Typography>
                       </TableCell>
                     </TableRow>
