@@ -48,6 +48,7 @@ import '../../styles/globals.css'
 import { SnackbarProvider } from 'src/layouts/components/SnackbarContext'
 import MarketConnectionManager from './MarketConnectionManager'
 import { useTheme } from '@mui/material/styles'
+import { AsOfDateProvider, useAsOfDate } from 'src/contexts/AsOfDateContext'
 
 // ** Extend App Props with Emotion
 type ExtendedAppProps = AppProps & {
@@ -297,7 +298,13 @@ const App = (props: ExtendedAppProps) => {
           <SettingsProvider>
             <SettingsConsumer>
               {({ settings }) => {
-                return <ThemeComponent settings={settings}>{getLayout(<Component {...pageProps} />)}</ThemeComponent>
+                return (
+                  <ThemeComponent settings={settings}>
+                    <AsOfDateProvider>
+                      <AppContent Component={Component} pageProps={pageProps} getLayout={getLayout} />
+                    </AsOfDateProvider>
+                  </ThemeComponent>
+                )
               }}
             </SettingsConsumer>
           </SettingsProvider>
@@ -305,6 +312,12 @@ const App = (props: ExtendedAppProps) => {
       </Provider>
     </SnackbarProvider>
   )
+}
+
+const AppContent = ({ Component, pageProps, getLayout }: { Component: NextPage; pageProps: any; getLayout: any }) => {
+  const { asOfDate } = useAsOfDate()
+
+  return getLayout(<Component key={asOfDate || 'today'} {...pageProps} />)
 }
 
 export default App

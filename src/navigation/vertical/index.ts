@@ -78,6 +78,11 @@ const navigation = (): VerticalNavItemsType => {
       path: '/eod-trend'
     },
     {
+      title: 'Stock Analysis',
+      icon: Table,
+      path: '/stock-analysis'
+    },
+    {
       title: 'IPO',
       icon: Table,
       path: '/ipo'
@@ -234,6 +239,11 @@ const navigation = (): VerticalNavItemsType => {
       title: 'EOD Trend',
       icon: Table,
       path: '/eod-trend'
+    },
+    {
+      title: 'Stock Analysis',
+      icon: Table,
+      path: '/stock-analysis'
     },
     {
       title: 'IPO',
