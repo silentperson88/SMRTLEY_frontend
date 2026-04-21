@@ -18,6 +18,7 @@ import MarketOverviewBanner from 'src/components/page/MarketOverviewBanner'
 import { useDebounce } from 'src/utils/useDebounce'
 import { useAppDispatch, useAppSelector } from 'src/store/hooks'
 import { setLiveStocksSnapshot } from 'src/store/slices/liveStocks.slice'
+import { useAsOfDate } from 'src/contexts/AsOfDateContext'
 
 interface StockData {
   master_id?: string
@@ -36,6 +37,21 @@ interface StockData {
   hasHistoryData?: boolean
   historyDataFromDate?: string | null
   historyDataToDate?: string | null
+}
+
+const toDateOnly = (value?: string | null) => {
+  const text = String(value || '').trim()
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return null
+
+  return text
+}
+
+const addDaysToIsoDate = (value: string, days: number) => {
+  const base = new Date(`${value}T00:00:00`)
+  if (Number.isNaN(base.getTime())) return value
+  base.setDate(base.getDate() + days)
+
+  return base.toISOString().slice(0, 10)
 }
 
 interface FetchEodResponse {
@@ -71,6 +87,7 @@ const LiveStocks = () => {
     toDate: new Date().toISOString().slice(0, 10)
   })
   const { showSnackbar } = useSnackbar()
+  const { asOfDate } = useAsOfDate()
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -160,13 +177,18 @@ const LiveStocks = () => {
     setApiPage(prev => prev + 1)
   }
 
-  const handleOpenHistoryForm = (id: string, stockName: string) => {
+  const handleOpenHistoryForm = (stock: StockData) => {
+    const normalizedAsOfDate = toDateOnly(asOfDate) || new Date().toISOString().slice(0, 10)
+    const latestHistoryDate = toDateOnly(stock.historyDataToDate)
+    const defaultFromDate = latestHistoryDate ? addDaysToIsoDate(latestHistoryDate, 1) : '2007-01-01'
+    const fromDate = defaultFromDate > normalizedAsOfDate ? normalizedAsOfDate : defaultFromDate
+
     setHistoryForm({
       open: true,
-      masterId: id,
-      stockName,
-      fromDate: '2007-01-01',
-      toDate: new Date().toISOString().slice(0, 10)
+      masterId: stock.master_id || stock.id,
+      stockName: stock.name,
+      fromDate,
+      toDate: normalizedAsOfDate
     })
   }
 
@@ -243,6 +265,7 @@ const LiveStocks = () => {
                 hasMore={hasMore}
                 isLoadingMore={isLoadingMore}
                 onReachEnd={handleFetchNextPage}
+                asOfDate={asOfDate}
               />
             </>
           )}

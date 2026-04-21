@@ -83,6 +83,16 @@ const navigation = (): VerticalNavItemsType => {
       path: '/stock-analysis'
     },
     {
+      title: 'Historical Universe',
+      icon: Table,
+      path: '/historical-universe'
+    },
+    {
+      title: 'Historical Screener',
+      icon: Table,
+      path: '/historical-screener'
+    },
+    {
       title: 'IPO',
       icon: Table,
       path: '/ipo'
@@ -244,6 +254,11 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Stock Analysis',
       icon: Table,
       path: '/stock-analysis'
+    },
+    {
+      title: 'Historical Universe',
+      icon: Table,
+      path: '/historical-universe'
     },
     {
       title: 'IPO',

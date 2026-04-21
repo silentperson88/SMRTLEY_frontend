@@ -58,7 +58,9 @@ interface StatusObj {
 const statusObj: StatusObj = {
   pending: { color: 'primary' },
   approved: { color: 'success' },
-  rejected: { color: 'error' }
+  rejected: { color: 'error' },
+  missing_token: { color: 'warning' },
+  skipped_tokenless: { color: 'warning' }
 }
 
 const TableStickyHeader = ({
@@ -73,7 +75,13 @@ const TableStickyHeader = ({
   const [formattedRows, setFormattedRows] = useState<RawFormat[]>([])
 
   useEffect(() => {
-    // if (rawStocksData.length > 0) {
+    const getStatusConfig = (status?: string) => statusObj[status || ''] || statusObj.pending
+    const formatStatusLabel = (status?: string) =>
+      (status || 'pending')
+        .split('_')
+        .filter(Boolean)
+        .join(' ')
+
     const temp: RawFormat[] = rawStocksData.map(
       ({ name, symbol, token, exch_seg, id, status }: Data, index: number) => ({
         srNo: <Typography>{index + 1}</Typography>,
@@ -84,8 +92,8 @@ const TableStickyHeader = ({
 
         status: (
           <Chip
-            label={status ?? 'pending'}
-            color={statusObj[status ? status : 'pending'].color}
+            label={formatStatusLabel(status)}
+            color={getStatusConfig(status).color}
             sx={{
               height: 24,
               fontSize: '0.75rem',

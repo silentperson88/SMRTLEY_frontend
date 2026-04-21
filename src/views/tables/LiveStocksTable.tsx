@@ -53,6 +53,13 @@ interface Data {
   historyDataToDate?: string | null
 }
 
+const toDateOnly = (value?: string | null) => {
+  const text = String(value || '').trim()
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return null
+
+  return text
+}
+
 interface RawFormat {
   srNo: JSX.Element
   name: JSX.Element
@@ -72,14 +79,16 @@ const TableStickyHeader = ({
   handleViewEod,
   onReachEnd,
   hasMore,
-  isLoadingMore
+  isLoadingMore,
+  asOfDate
 }: {
   rawStocksData: Data[]
-  handleFetchHistory: (id: string, name: string) => void
+  handleFetchHistory: (stock: Data) => void
   handleViewEod: (id: string) => void
   onReachEnd: () => void
   hasMore: boolean
   isLoadingMore: boolean
+  asOfDate: string
 }) => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
@@ -87,25 +96,34 @@ const TableStickyHeader = ({
 
   useEffect(() => {
     const temp: RawFormat[] = rawStocksData.map(
-        (
-          {
-            name,
-            symbol,
-            token,
-            exchange,
-            ltp,
-            open,
-            high,
-            low,
-            close,
-            percentChange,
-            master_id,
-            hasHistoryData,
-            historyDataFromDate,
-            historyDataToDate
-          }: Data,
-          index: number
-        ) => ({
+      (
+        {
+          name,
+          symbol,
+          token,
+          exchange,
+          ltp,
+          open,
+          high,
+          low,
+          close,
+          percentChange,
+          master_id,
+          hasHistoryData,
+          historyDataFromDate,
+          historyDataToDate
+        }: Data,
+        index: number
+      ) => {
+        const normalizedAsOfDate = toDateOnly(asOfDate)
+        const normalizedHistoryToDate = toDateOnly(historyDataToDate)
+        const isHistoryUpToAsOf =
+          Boolean(hasHistoryData) &&
+          Boolean(normalizedHistoryToDate) &&
+          Boolean(normalizedAsOfDate) &&
+          normalizedHistoryToDate! >= normalizedAsOfDate!
+
+        return {
           srNo: <Typography>{index + 1}</Typography>,
           name: (
             <NextLink
@@ -142,23 +160,58 @@ const TableStickyHeader = ({
           status: percentChange > 0 ? <Profit color='success' /> : <Loss color='error' />,
           action: (
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center' }}>
-              {hasHistoryData ? (
+              {isHistoryUpToAsOf ? (
                 <Tooltip
-                  title={`History: ${historyDataFromDate || '-'} to ${historyDataToDate || '-'}`}
+                  title={`History: ${historyDataFromDate || '-'} to ${historyDataToDate || '-'} (As Of ${asOfDate})`}
                   arrow
                   placement='top'
                 >
                   <Chip label='History Ready' size='small' color='success' variant='outlined' />
                 </Tooltip>
               ) : (
-                <Button
-                  variant='contained'
-                  color='primary'
-                  style={{ color: '#ffffff' }}
-                  onClick={() => master_id && handleFetchHistory(master_id, name)}
-                >
-                  Fetch EOD
-                </Button>
+                <>
+                  {hasHistoryData && (
+                    <Tooltip
+                      title={`History available till ${historyDataToDate || '-'} but missing till As Of ${asOfDate}`}
+                      arrow
+                      placement='top'
+                    >
+                      <Chip
+                        label={`Till ${historyDataToDate || 'No data'}`}
+                        size='small'
+                        color='warning'
+                        variant='outlined'
+                      />
+                    </Tooltip>
+                  )}
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    style={{ color: '#ffffff' }}
+                    onClick={() =>
+                      handleFetchHistory({
+                        master_id,
+                        id: master_id || '',
+                        name,
+                        symbol,
+                        token,
+                        exchange,
+                        ltp,
+                        open,
+                        high,
+                        low,
+                        close,
+                        percentChange,
+                        status: '',
+                        hasHistoryData,
+                        historyDataFromDate,
+                        historyDataToDate
+                      })
+                    }
+                  >
+                    {hasHistoryData ? 'Fetch Missing EOD' : 'Fetch EOD'}
+                  </Button>
+                </>
               )}
               <Button
                 variant='outlined'
@@ -169,10 +222,11 @@ const TableStickyHeader = ({
               </Button>
             </div>
           )
-        })
-      )
+        }
+      }
+    )
     setFormattedRows(temp)
-  }, [rawStocksData])
+  }, [asOfDate, rawStocksData])
 
   useEffect(() => {
     const totalPages = Math.max(1, Math.ceil(rawStocksData.length / rowsPerPage))
