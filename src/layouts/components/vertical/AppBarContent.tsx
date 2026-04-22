@@ -26,6 +26,7 @@ import { useMutationSWR, usePaginatedSWR, useSimpleSWR } from 'src/hooks/swr/swr
 import { getErrorMessage } from 'src/api/axios/errorhandler'
 import { useSnackbar } from '../SnackbarContext'
 import { useRouter } from 'next/router'
+import AsOfDateField from 'src/components/market/AsOfDateField'
 
 interface Props {
   hidden: boolean
@@ -195,6 +196,9 @@ const AppBarContent = (props: Props) => {
         </Popper>
       </Box>
       <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ mr: 3 }}>
+          <AsOfDateField compact />
+        </Box>
         {/* {hiddenSm ? null : (
           <Box
             component='a'

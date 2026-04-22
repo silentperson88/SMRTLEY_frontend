@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import type { BaseQueryFn } from '@reduxjs/toolkit/query'
+import { getStoredAsOfDate, shouldAttachAsOfDate } from 'src/utils/asOfDate'
 
 export interface ApiResponse<T> {
   data: T
@@ -18,6 +19,13 @@ axiosInstance.interceptors.request.use(
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+    }
+
+    if (shouldAttachAsOfDate(config.url, config.method)) {
+      config.params = {
+        ...(config.params || {}),
+        as_of_date: getStoredAsOfDate()
+      }
     }
 
     return config

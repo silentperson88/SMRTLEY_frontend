@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios'
 import { mutate } from 'swr'
+import { getStoredAsOfDate, shouldAttachAsOfDate } from 'src/utils/asOfDate'
 
 // Define a type for the axios instance
 export const axiosService = axios.create({
@@ -7,6 +8,17 @@ export const axiosService = axios.create({
   headers: {
     'Content-Type': 'application/json'
   }
+})
+
+axiosService.interceptors.request.use(config => {
+  if (shouldAttachAsOfDate(config.url, config.method)) {
+    config.params = {
+      ...(config.params || {}),
+      as_of_date: getStoredAsOfDate()
+    }
+  }
+
+  return config
 })
 
 // Define a generic type for the response data

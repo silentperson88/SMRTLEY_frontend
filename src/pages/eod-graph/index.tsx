@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
+  Autocomplete,
   Alert,
   Box,
   Button,
@@ -10,6 +11,14 @@ import {
   Grid,
   LinearProgress,
   MenuItem,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tabs,
   TextField,
   Typography
 } from '@mui/material'
@@ -19,6 +28,7 @@ import ReactApexcharts from 'src/@core/components/react-apexcharts'
 import axiosInstance from 'src/api/axios/axiosBaseQuery'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
 import { useRouter } from 'next/router'
+import { useDebounce } from 'src/utils/useDebounce'
 
 type RangeKey = '1M' | '1Y' | '5Y' | 'ALL' | 'CUSTOM'
 
@@ -37,6 +47,7 @@ interface EodCandle {
   high: number | string
   low: number | string
   close: number | string
+  volume?: number | string
 }
 
 interface ParsedCandle {
@@ -259,10 +270,13 @@ const PREDICTION_LABEL: Record<PredictionType, string> = {
 
 const EodGraphPage = () => {
   const router = useRouter()
+  const queryMasterId = String(router.query?.master_id || '').trim()
+  const querySymbol = String(router.query?.symbol || '').trim().toUpperCase()
   const [stocks, setStocks] = useState<ActiveStock[]>([])
   const [isStocksLoading, setIsStocksLoading] = useState(false)
   const [isCandlesLoading, setIsCandlesLoading] = useState(false)
   const [selectedMasterId, setSelectedMasterId] = useState<string>('')
+  const [searchInput, setSearchInput] = useState('')
   const [range, setRange] = useState<RangeKey>('5Y')
   const [showCustomRangeForm, setShowCustomRangeForm] = useState(false)
   const [customFromDate, setCustomFromDate] = useState('')
@@ -276,6 +290,7 @@ const EodGraphPage = () => {
   const [predictionType, setPredictionType] = useState<PredictionType>('none')
   const [allCandles, setAllCandles] = useState<EodCandle[]>([])
   const [error, setError] = useState<string>('')
+  const [viewTab, setViewTab] = useState<'chart' | 'table'>('chart')
   const [viewport, setViewport] = useState<{ min: number; max: number } | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [drawTool, setDrawTool] = useState<DrawTool>('none')
@@ -308,39 +323,72 @@ const EodGraphPage = () => {
   })
   const chartViewportRef = useRef<HTMLDivElement | null>(null)
   const dragRef = useRef<{ active: boolean; startX: number; min: number; max: number } | null>(null)
-
-  useEffect(() => {
-    const loadStocks = async () => {
-      try {
-        setIsStocksLoading(true)
-        const res = await axiosInstance.get(ENDURL.GET_ALL_ACTIVE_STOCKS, {
-          params: { page: 1, pageSize: 500, searchValue: '' }
-        })
-        const rows: ActiveStock[] = Array.isArray(res?.data?.data) ? res.data.data : []
-        const historyReady = rows.filter(item => item.hasHistoryData && item.historyDataFromDate && item.historyDataToDate)
-        setStocks(historyReady)
-
-        const queryMasterId = String(router.query.master_id || '')
-        const matched = historyReady.find(item => String(item.master_id) === queryMasterId)
-        if (matched?.master_id) {
-          setSelectedMasterId(String(matched.master_id))
-        } else if (historyReady.length && historyReady[0]?.master_id) {
-          setSelectedMasterId(String(historyReady[0].master_id))
-        }
-      } catch (e: any) {
-        setError(e?.response?.data?.message || 'Failed to load active stocks')
-      } finally {
-        setIsStocksLoading(false)
-      }
-    }
-
-    loadStocks()
-  }, [router.query.master_id])
-
+  const debouncedSearchInput = useDebounce(searchInput, 350)
   const selectedStock = useMemo(
     () => stocks.find(stock => String(stock.master_id) === String(selectedMasterId)) || null,
     [stocks, selectedMasterId]
   )
+
+  useEffect(() => {
+    let active = true
+
+    const loadStocks = async () => {
+      try {
+        setIsStocksLoading(true)
+        setError('')
+        const res = await axiosInstance.get(ENDURL.GET_ALL_ACTIVE_STOCKS, {
+          params: { page: 1, pageSize: 20, search: debouncedSearchInput || querySymbol || '' }
+        })
+        if (!active) return
+        const rows: ActiveStock[] = Array.isArray(res?.data?.data) ? res.data.data : []
+        const historyReady = rows.filter(item => item.hasHistoryData && item.historyDataFromDate && item.historyDataToDate)
+        const merged = [...historyReady]
+        if (
+          selectedStock?.master_id &&
+          !merged.some(item => String(item.master_id) === String(selectedStock.master_id))
+        ) {
+          merged.push(selectedStock)
+        }
+        setStocks(merged)
+
+        setSelectedMasterId(prev => {
+          const matched =
+            merged.find(item => String(item.master_id) === queryMasterId) ||
+            merged.find(item => String(item.symbol || '').toUpperCase() === querySymbol)
+
+          if (matched?.master_id) return String(matched.master_id)
+          if (prev && merged.some(item => String(item.master_id) === String(prev))) return prev
+          return merged[0]?.master_id ? String(merged[0].master_id) : ''
+        })
+      } catch (e: any) {
+        if (!active) return
+        setError(e?.response?.data?.message || 'Failed to load active stocks')
+      } finally {
+        if (active) setIsStocksLoading(false)
+      }
+    }
+
+    loadStocks()
+
+    return () => {
+      active = false
+    }
+  }, [debouncedSearchInput, queryMasterId, querySymbol, selectedStock?.master_id, selectedStock?.name, selectedStock?.symbol, selectedStock?.historyDataFromDate, selectedStock?.historyDataToDate])
+
+  useEffect(() => {
+    if (!selectedStock?.master_id) return
+
+    const nextQuery = {
+      master_id: String(selectedStock.master_id),
+      symbol: String(selectedStock.symbol || '')
+    }
+
+    if (String(router.query.master_id || '') === nextQuery.master_id && String(router.query.symbol || '').toUpperCase() === nextQuery.symbol.toUpperCase()) {
+      return
+    }
+
+    router.replace({ pathname: '/eod-graph', query: nextQuery }, undefined, { shallow: true })
+  }, [router, selectedStock?.master_id, selectedStock?.symbol])
 
   useEffect(() => {
     if (!selectedStock?.historyDataFromDate || !selectedStock?.historyDataToDate) return
@@ -1642,20 +1690,30 @@ const EodGraphPage = () => {
                 <Typography variant='body2'>No stock with history data found yet.</Typography>
               ) : (
                 <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', alignItems: 'center', mb: 3 }}>
-                  <TextField
-                    select
-                    size='small'
-                    label='Stock'
-                    value={selectedMasterId}
-                    onChange={e => setSelectedMasterId(e.target.value)}
-                    sx={{ minWidth: 320 }}
-                  >
-                    {stocks.map(stock => (
-                      <MenuItem key={String(stock.master_id)} value={String(stock.master_id)}>
-                        {stock.name} ({stock.symbol})
-                      </MenuItem>
-                    ))}
-                  </TextField>
+                  <Autocomplete
+                    sx={{ minWidth: 360, flex: '1 1 360px', maxWidth: 520 }}
+                    loading={isStocksLoading}
+                    options={stocks}
+                    value={selectedStock}
+                    inputValue={searchInput}
+                    onInputChange={(_, value, reason) => {
+                      if (reason !== 'reset') setSearchInput(value)
+                    }}
+                    onChange={(_, value) => {
+                      setSelectedMasterId(value?.master_id ? String(value.master_id) : '')
+                    }}
+                    getOptionLabel={option => `${option.symbol} - ${option.name}`}
+                    isOptionEqualToValue={(option, value) => String(option.master_id) === String(value.master_id)}
+                    filterOptions={options => options}
+                    renderInput={params => (
+                      <TextField
+                        {...params}
+                        size='small'
+                        label='Search stock'
+                        placeholder='Type symbol or company name'
+                      />
+                    )}
+                  />
 
                   <ButtonGroup size='small' variant='outlined'>
                     {(['1M', '1Y', '5Y', 'ALL', 'CUSTOM'] as RangeKey[]).map(btn => (
@@ -2045,6 +2103,11 @@ const EodGraphPage = () => {
                 </Box>
               ) : null}
 
+              <Tabs value={viewTab} onChange={(_, value) => setViewTab(value)} sx={{ mb: 3 }}>
+                <Tab value='chart' label='Chart' />
+                <Tab value='table' label='Data Table' />
+              </Tabs>
+
               {predictionType !== 'none' ? (
                 <Box sx={{ mb: 3, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
                   {latestPrediction ? (
@@ -2074,6 +2137,43 @@ const EodGraphPage = () => {
 
               {isCandlesLoading ? (
                 <LinearProgress />
+              ) : viewTab === 'table' ? (
+                <TableContainer sx={{ maxHeight: 720 }}>
+                  <Table stickyHeader size='small'>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Date</TableCell>
+                        <TableCell align='right'>Open</TableCell>
+                        <TableCell align='right'>High</TableCell>
+                        <TableCell align='right'>Low</TableCell>
+                        <TableCell align='right'>Close</TableCell>
+                        <TableCell align='right'>Volume</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {filteredCandles.length ? (
+                        [...filteredCandles].reverse().map((row, index) => (
+                          <TableRow key={`${row.trade_date}-${index}`} hover>
+                            <TableCell>{candleDateToIso(row.trade_date) || '-'}</TableCell>
+                            <TableCell align='right'>{Number(row.open).toFixed(2)}</TableCell>
+                            <TableCell align='right'>{Number(row.high).toFixed(2)}</TableCell>
+                            <TableCell align='right'>{Number(row.low).toFixed(2)}</TableCell>
+                            <TableCell align='right'>{Number(row.close).toFixed(2)}</TableCell>
+                            <TableCell align='right'>{Number(row.volume || 0).toLocaleString('en-IN')}</TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={6}>
+                            <Typography variant='body2' color='text.secondary'>
+                              No EOD rows available for the selected range.
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               ) : (
                 <>
                   <Box

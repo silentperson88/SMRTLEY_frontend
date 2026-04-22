@@ -22,6 +22,10 @@ export const ENDURL = {
   GET_STOCK_BY_SYMBOL: 'ticker/stocks/symbol/:symbol',
   GET_STOCK_BY_ID: 'ticker/stocks/:id',
 
+  // Historical Universe / Backtesting Phase 1
+  GET_HISTORICAL_UNIVERSE_RULES: 'ticker/historical-universe/rules',
+  POST_HISTORICAL_UNIVERSE_FILTER: 'ticker/historical-universe/filter',
+
   // Stock Fundamental
   Fetch_STOCK_FUNDAMENTAL: 'ticker/fundamentals/fetch',
   GET_STOCK_FUNDAMENTAL_DETAILS: 'ticker/fundamentals',
@@ -114,8 +118,7 @@ export const ENDURL = {
   NEWS_BSE_CATEGORIES: 'content/news-content/bse/categories',
   NEWS_BSE_ITEM: 'content/news-content/bse/news/:id',
   NEWS_BSE_VIDEOS_CREATE: 'content/news-content/bse/videos',
-  NEWS_BSE_VIDEOS_LIST: 'content/news-content/bse/videos'
-  ,
+  NEWS_BSE_VIDEOS_LIST: 'content/news-content/bse/videos',
   NEWS_NEW_APPROACH_SUMMARIZE: 'content/news-content/new-approach/summarize-by-news-id',
   NEWS_NEW_APPROACH_IMPORTANT: 'content/news-content/new-approach/important-points',
   NEWS_NEW_APPROACH_SCRIPT: 'content/news-content/new-approach/generate-script',
@@ -168,6 +171,7 @@ export const ENDURL = {
   SOCIAL_ACCOUNTS_PUBLISH: 'content/news-content/social-accounts/:platform/publish',
   GET_STOCK_SEARCH_ANALYSIS: 'ticker/fundamentals/analysis/search',
   GET_STOCK_SEARCH_SUGGESTIONS: 'ticker/fundamentals/analysis/search/suggestions',
+  POST_HISTORICAL_UNIVERSE_SEARCH: 'ticker/historical-universe/search',
+  POST_HISTORICAL_UNIVERSE_SEARCH_SPLIT: 'ticker/historical-universe/search-split',
   NEWS_CONTENT_IMAGE_SEARCH: 'content/news-content/image-search'
 }
-

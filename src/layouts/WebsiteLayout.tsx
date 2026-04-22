@@ -30,6 +30,7 @@ import { NavLink } from 'src/@core/layouts/types'
 import themeConfig from 'src/configs/themeConfig'
 import { usePaginatedSWR } from 'src/hooks/swr/swrhooks'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
+import AsOfDateField from 'src/components/market/AsOfDateField'
 
 interface SearchList {
   id: string
@@ -130,6 +131,9 @@ const WebsiteLayout = ({ children }: Props) => {
             </Stack>
 
             <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', color: 'rgba(255,255,255,0.9)' }}>
+              <Box sx={{ mr: 1.2 }}>
+                <AsOfDateField compact dark />
+              </Box>
               <Box ref={inputWrapperRef} sx={{ position: 'relative', minWidth: { xs: 150, sm: 230 }, mr: 1.2 }}>
                 <TextField
                   size='small'
