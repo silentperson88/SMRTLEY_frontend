@@ -41,7 +41,8 @@ const HIGHLIGHT_REGEX =
 const isHighlightedFragment = (value: string) => {
   const fragment = String(value || "").trim()
   if (!fragment) return false
-  return /^(\d+(?:\.\d+)?\s*%|(?:₹|rs\.?|inr)\s*\d[\d,]*(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s*(?:₹|rs\.?|inr)|\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}|\d{4}-\d{2}-\d{2}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december)\s+\d{1,2}(?:,)?\s+\d{4})$/i.test(
+  
+return /^(\d+(?:\.\d+)?\s*%|(?:₹|rs\.?|inr)\s*\d[\d,]*(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s*(?:₹|rs\.?|inr)|\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}|\d{4}-\d{2}-\d{2}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december)\s+\d{1,2}(?:,)?\s+\d{4})$/i.test(
     fragment
   )
 }
@@ -49,7 +50,8 @@ const isHighlightedFragment = (value: string) => {
 const renderHighlightedText = (text: string) => {
   const src = String(text || "")
   const parts = src.split(HIGHLIGHT_REGEX)
-  return parts.map((part, idx) => {
+  
+return parts.map((part, idx) => {
     if (!part) return null
     if (isHighlightedFragment(part)) {
       return (
@@ -67,7 +69,8 @@ const renderHighlightedText = (text: string) => {
         </span>
       )
     }
-    return <span key={`tx-${idx}`}>{part}</span>
+    
+return <span key={`tx-${idx}`}>{part}</span>
   })
 }
 
@@ -235,7 +238,8 @@ export const NewsApproachSequenceComposition: React.FC<NewsApproachSequenceProps
     const durationInFrames = Math.max(1, Math.round(sec * fps))
     const out = { item, startFrame: cursor, durationInFrames }
     cursor += durationInFrames
-    return out
+    
+return out
   })
 
   return (

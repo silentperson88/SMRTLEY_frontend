@@ -62,7 +62,8 @@ const FastRenderJobsPage: NextPage = () => {
     const timer = setInterval(() => {
       loadJobs(true)
     }, POLL_MS)
-    return () => clearInterval(timer)
+    
+return () => clearInterval(timer)
   }, [])
 
   const inProgressJobs = useMemo(
@@ -78,7 +79,8 @@ const FastRenderJobsPage: NextPage = () => {
     if (status === 'completed') return 'success'
     if (status === 'failed') return 'error'
     if (status === 'queued') return 'warning'
-    return 'primary'
+    
+return 'primary'
   }
 
   const openVideo = (fileName?: string) => {

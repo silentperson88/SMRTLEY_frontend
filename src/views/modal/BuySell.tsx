@@ -32,6 +32,7 @@ interface BuySellOrderModalProps {
   stockOptions?: { id: string; symbol: string }[]
   onSelectStock?: (stock: { id: string; symbol: string }) => void
   ltp?: number
+  simulatedTradeDate?: string
   onSuccess?: () => void
 }
 
@@ -70,6 +71,7 @@ export default function BuySellOrderModal({
   stockOptions = [],
   onSelectStock,
   ltp = 1067.5,
+  simulatedTradeDate,
   onSuccess
 }: BuySellOrderModalProps) {
   const isBuy = mode === 'BUY'
@@ -108,7 +110,8 @@ export default function BuySellOrderModal({
       order_type: orderType,
       stock_symbol: stockSymbol,
       quantity,
-      price: effectivePrice
+      price: effectivePrice,
+      simulated_trade_date: simulatedTradeDate
     }
 
     try {

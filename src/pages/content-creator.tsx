@@ -147,7 +147,8 @@ const ContentCreatorPage: NextPage = () => {
   const totalDuration = useMemo(() => scenes.reduce((sum, scene) => sum + Number(scene.durationSec || 0), 0), [scenes])
   const localEstimatedRenderSeconds = useMemo(() => {
     const factor = qualityMode === 'draft' ? 1.2 : qualityMode === 'high' ? 3.4 : 2.2
-    return Math.max(30, Math.round(totalDuration * factor))
+    
+return Math.max(30, Math.round(totalDuration * factor))
   }, [totalDuration, qualityMode])
 
   const apiBase = useMemo(
@@ -167,7 +168,8 @@ const ContentCreatorPage: NextPage = () => {
   const finalSubtopics = useMemo(() => {
     if (extraInfoType === 'GENERAL_CONTEXT') return []
     if (extraInfoType === 'SUBTOPIC_LIST') return extractSubtopicsFromText(subtopicsText || extraInfo)
-    return extractSubtopicsFromText(subtopicsText)
+    
+return extractSubtopicsFromText(subtopicsText)
   }, [extraInfoType, subtopicsText, extraInfo])
 
   const handleGenerateScript = async () => {
@@ -371,7 +373,8 @@ const ContentCreatorPage: NextPage = () => {
       if (eta > 0) setEstimatedRenderSeconds(eta)
       if (status === 'completed') {
         setRenderVideoUrl(getAbsoluteSrc(videoUrl))
-        return
+        
+return
       }
       if (status === 'failed') {
         throw new Error(errorMsg || 'Video render failed')
@@ -388,11 +391,13 @@ const ContentCreatorPage: NextPage = () => {
     const missingAudio = scenes.some(scene => !scene.audioUrl && !scene.audioSrc)
     if (missingImage) {
       setError('Please upload image for each scene before rendering video.')
-      return
+      
+return
     }
     if (missingAudio) {
       setError('Please generate audio for all scenes before rendering video.')
-      return
+      
+return
     }
 
     try {

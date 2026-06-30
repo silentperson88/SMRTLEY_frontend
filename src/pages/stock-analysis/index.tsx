@@ -71,7 +71,8 @@ const formatDate = (d: Date) => d.toISOString().slice(0, 10)
 const toValidDate = (value: string | Date | undefined | null) => {
   if (!value) return null
   const parsed = new Date(value)
-  return Number.isNaN(parsed.getTime()) ? null : parsed
+  
+return Number.isNaN(parsed.getTime()) ? null : parsed
 }
 
 const shiftFromDate = (toDate: string, { weeks = 0, months = 0, years = 0 }) => {
@@ -88,12 +89,14 @@ const shiftFromDate = (toDate: string, { weeks = 0, months = 0, years = 0 }) => 
 
 const toNumber = (value: unknown, fallback = 0) => {
   const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : fallback
+  
+return Number.isFinite(parsed) ? parsed : fallback
 }
 
 const formatPrice = (value: number) => {
   if (!Number.isFinite(value)) return '-'
-  return new Intl.NumberFormat('en-IN', {
+  
+return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
     maximumFractionDigits: 2
@@ -102,7 +105,8 @@ const formatPrice = (value: number) => {
 
 const formatCompactNumber = (value: number) => {
   if (!Number.isFinite(value)) return '-'
-  return new Intl.NumberFormat('en-IN', {
+  
+return new Intl.NumberFormat('en-IN', {
     notation: 'compact',
     maximumFractionDigits: 2
   }).format(value)
@@ -208,7 +212,8 @@ const StockAnalysisPage: NextPage = () => {
     const loadCandles = async () => {
       if (!selectedStock?.master_id || !requestedRange?.fromDate || !requestedRange?.toDate) {
         setCandles([])
-        return
+        
+return
       }
 
       try {
@@ -497,7 +502,7 @@ const StockAnalysisPage: NextPage = () => {
                 >
                   <Box>
                     <Typography variant='h6' sx={{ fontWeight: 700 }}>
-                      {selectedStock ? `${selectedStock.symbol} · ${selectedStock.exchange || 'NSE'}` : 'Select a stock'}
+                      {selectedStock ? `${selectedStock.symbol} ï¿½ ${selectedStock.exchange || 'NSE'}` : 'Select a stock'}
                     </Typography>
                     <Typography variant='body2' color='text.secondary'>
                       {selectedStock?.name || 'Choose a stock to load EOD candles.'}

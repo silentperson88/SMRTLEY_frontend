@@ -297,7 +297,8 @@ const NewsContentPage: NextPage = () => {
       raw = raw.replace(/^\/?tts\/audio\//, 'content/tts/audio/')
     }
     const normalized = raw.startsWith('/') ? raw : `/${raw}`
-    return `${apiBase}${normalized}`
+    
+return `${apiBase}${normalized}`
   }
   const getAudioDuration = (src: string): Promise<number> =>
     new Promise(resolve => {
@@ -398,7 +399,8 @@ const NewsContentPage: NextPage = () => {
       if (Array.isArray(payload?.images)) {
         setClips(prev => {
           if (!prev.length) return prev
-          return prev.map(clip => ({
+          
+return prev.map(clip => ({
             ...clip,
             images: (clip.images || []).length
               ? clip.images
@@ -619,17 +621,21 @@ const NewsContentPage: NextPage = () => {
             setVideoStatus('ready_for_download')
             setSuccess('Video ready for download.')
           }
-          return true
+          
+return true
         }
         if (state === 'failed') {
           if (!cancelled) setError(job?.error || 'Render failed')
-          return true
+          
+return true
         }
       } catch (err: any) {
         if (!cancelled) setError(err?.response?.data?.message || err?.message || 'Failed to fetch render status')
-        return true
+        
+return true
       }
-      return false
+      
+return false
     }
 
     const interval = setInterval(async () => {
@@ -637,7 +643,8 @@ const NewsContentPage: NextPage = () => {
       if (done) clearInterval(interval)
     }, 2000)
     poll()
-    return () => {
+    
+return () => {
       cancelled = true
       clearInterval(interval)
     }
@@ -646,7 +653,8 @@ const NewsContentPage: NextPage = () => {
   const parsedSentences = useMemo(() => {
     const src = String(customScript || '').trim()
     if (!src) return []
-    return src
+    
+return src
       .split(/[.!?\u0964|]+/)
       .map(s => s.trim())
       .filter(Boolean)
@@ -667,7 +675,8 @@ const NewsContentPage: NextPage = () => {
     const totalWords = wordCounts.reduce((sum, count) => sum + count, 0)
     if (!totalWords) {
       const fallback = Math.max(6, Math.floor(safeTotalFrames / lineCount))
-      return new Array(lineCount).fill(fallback)
+      
+return new Array(lineCount).fill(fallback)
     }
     const baseFrames = wordCounts.map(count => Math.max(1, Math.round((count / totalWords) * safeTotalFrames)))
     const sumFrames = baseFrames.reduce((sum, count) => sum + count, 0)
@@ -679,7 +688,8 @@ const NewsContentPage: NextPage = () => {
       const idx = i % next.length
       next[idx] = Math.max(1, next[idx] + step)
     }
-    return next
+    
+return next
   }
 
   const buildSentenceBoundaries = (frames: number[]) => {
@@ -689,7 +699,8 @@ const NewsContentPage: NextPage = () => {
       acc += Number(count || 0)
       boundaries.push(acc)
     })
-    return boundaries
+    
+return boundaries
   }
   const previewSentenceFrames = useMemo(
     () => buildSentenceFrames(parsedSentences, Math.max(1, Number(customPreviewDurationFrames || 1))),
@@ -701,7 +712,8 @@ const NewsContentPage: NextPage = () => {
     for (let i = 0; i < seedKey.length; i += 1) {
       seed = (seed * 31 + seedKey.charCodeAt(i)) % 100000
     }
-    return seed
+    
+return seed
   }
 
   const transitionOptions: Array<{ value: TransitionKey; label: string }> = [
@@ -719,13 +731,15 @@ const NewsContentPage: NextPage = () => {
 
   const normalizeTransitionSet = (list: TransitionKey[]) => {
     const seen = new Set<string>()
-    return (Array.isArray(list) ? list : [])
+    
+return (Array.isArray(list) ? list : [])
       .map(val => String(val) as TransitionKey)
       .filter(val => transitionOptions.some(opt => opt.value === val))
       .filter(val => {
         if (seen.has(val)) return false
         seen.add(val)
-        return true
+        
+return true
       })
   }
 
@@ -747,7 +761,8 @@ const NewsContentPage: NextPage = () => {
     const transitions = list.length ? list : (['fade'] as TransitionKey[])
     if (transitionMode === 'single') {
       const singleTransition = transitions[0] || 'fade'
-      return baseSegments.map(seg => ({
+      
+return baseSegments.map(seg => ({
         ...seg,
         transition: singleTransition
       }))
@@ -892,7 +907,8 @@ const NewsContentPage: NextPage = () => {
         normalizedStarts.push(Number(startSec.toFixed(3)))
       }
       normalizedStarts.sort((a, b) => a - b)
-      return normalizedStarts.map(startSec => ({
+      
+return normalizedStarts.map(startSec => ({
         ...overlay,
         startSec,
         endSec: Math.min(totalDurationSec, startSec + duration),
@@ -911,7 +927,8 @@ const NewsContentPage: NextPage = () => {
           repeat: false
         })
       }
-      return expanded
+      
+return expanded
     }
 
     return [
@@ -1002,7 +1019,8 @@ const NewsContentPage: NextPage = () => {
       const indices = Array.isArray(clip?.sentenceIdx) ? [...clip.sentenceIdx].sort((a, b) => a - b) : []
       const startIdx = indices.length ? indices[0] : 0
       const endIdx = indices.length ? indices[indices.length - 1] : startIdx
-      return {
+      
+return {
         startIdx,
         endIdx,
         images: Array.isArray(clip?.images) ? clip.images : [],
@@ -1023,7 +1041,8 @@ const NewsContentPage: NextPage = () => {
         const idx = (seed + i * 17 + range.startIdx * 13) % allClipImages.length
         out.push(allClipImages[idx])
       }
-      return out
+      
+return out
     }
 
     const rawSegments: Array<{
@@ -1073,7 +1092,8 @@ const NewsContentPage: NextPage = () => {
     const overlays = sentences.map((sentence, sentenceIdx) => {
       const startFrame = sentenceIdx === 0 ? 0 : sentenceBoundaries[sentenceIdx - 1] || 0
       const endFrame = sentenceBoundaries[sentenceIdx] || totalFrames
-      return {
+      
+return {
         startSec: startFrame / fps,
         endSec: endFrame / fps,
         text: sentence,
@@ -1090,7 +1110,8 @@ const NewsContentPage: NextPage = () => {
   )
   const previewTimelineForRender = useMemo(() => {
     const durationSec = Math.max(0.01, Number(customPreviewDurationFrames || 1) / PREVIEW_FPS)
-    return buildPreviewTimeline({
+    
+return buildPreviewTimeline({
       scriptSource: customScript.trim() ? customScript.trim() : script.trim(),
       sentences: parsedSentences,
       durationSec,
@@ -1104,7 +1125,8 @@ const NewsContentPage: NextPage = () => {
     () =>
       parsedSentences.map((sentence, idx) => {
         const clip = clips.find(item => Array.isArray(item.sentenceIdx) && item.sentenceIdx.includes(idx))
-        return {
+        
+return {
           idx,
           sentence,
           images: Array.isArray(clip?.images) ? clip.images : []
@@ -1123,7 +1145,8 @@ const NewsContentPage: NextPage = () => {
         uniq.set(item.url, { name: item.name || 'image', url: item.url })
       }
     })
-    return Array.from(uniq.values())
+    
+return Array.from(uniq.values())
   }, [imageGallery, filteredNewsImages, clips])
 
   const galleryUseCounts = useMemo(() => {
@@ -1135,18 +1158,21 @@ const NewsContentPage: NextPage = () => {
         counts.set(url, (counts.get(url) || 0) + 1)
       })
     })
-    return counts
+    
+return counts
   }, [clips])
   const usedSentenceIdx = useMemo(() => new Set(activeClips.flatMap(clip => clip.sentenceIdx)), [activeClips])
   const nextClipNeedingImagesId = useMemo(() => {
     const nextClip = activeClips.find(clip => !Array.isArray(clip.images) || clip.images.length === 0)
-    return nextClip ? nextClip.id : null
+    
+return nextClip ? nextClip.id : null
   }, [activeClips])
   const nextRequiredIdx = useMemo(() => {
     for (let i = 0; i < parsedSentences.length; i += 1) {
       if (!usedSentenceIdx.has(i)) return i
     }
-    return -1
+    
+return -1
   }, [parsedSentences, usedSentenceIdx])
   const canOpenClipModal = parsedSentences.length > 0
   const usedSentenceIdxForModal = useMemo(() => {
@@ -1155,7 +1181,8 @@ const NewsContentPage: NextPage = () => {
       if (editingClipId !== null && clip.id === editingClipId) return
       clip.sentenceIdx.forEach(idx => used.add(idx))
     })
-    return used
+    
+return used
   }, [activeClips, editingClipId])
   const handleOpenClipModal = () => {
     setClipSelectedIdx([])
@@ -1174,7 +1201,8 @@ const NewsContentPage: NextPage = () => {
     const existing = activeClips.find(clip => Array.isArray(clip.sentenceIdx) && clip.sentenceIdx.includes(idx))
     if (existing) {
       handleEditClip(existing.id)
-      return
+      
+return
     }
     setClipSelectedIdx([idx])
     setClipImages([])
@@ -1194,25 +1222,29 @@ const NewsContentPage: NextPage = () => {
     setClipSelectedIdx(prev => {
       if (clipApproach === 'single_sentence') {
         if (idx !== nextRequiredIdx) return prev
-        return prev.includes(idx) ? [] : [idx]
+        
+return prev.includes(idx) ? [] : [idx]
       }
       if (!prev.length) {
         if (idx !== nextRequiredIdx) return prev
-        return [idx]
+        
+return [idx]
       }
       if (prev.includes(idx)) {
         if (prev.length === 1) return []
         const min = Math.min(...prev)
         const max = Math.max(...prev)
         if (idx !== min && idx !== max) return prev
-        return prev.filter(item => item !== idx)
+        
+return prev.filter(item => item !== idx)
       }
       const min = Math.min(...prev)
       const max = Math.max(...prev)
       if (idx === min - 1 || idx === max + 1) {
         return [...prev, idx].sort((a, b) => a - b)
       }
-      return prev
+      
+return prev
     })
   }
 
@@ -1229,7 +1261,8 @@ const NewsContentPage: NextPage = () => {
       const target = clipSentenceItemRefs.current[nextRequiredIdx]
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        return
+        
+return
       }
 
       if (attempts < 12) {
@@ -1257,7 +1290,8 @@ const NewsContentPage: NextPage = () => {
       const target = clipCardRefs.current[nextClipNeedingImagesId]
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        return
+        
+return
       }
 
       if (attempts < 12) {
@@ -1295,7 +1329,8 @@ const NewsContentPage: NextPage = () => {
     if (!files || !files.length) return
     if (!videoId) {
       setError('Video id missing. Please reload.')
-      return
+      
+return
     }
     const toDataUrl = (file: File) =>
       new Promise<string>((resolve, reject) => {
@@ -1313,7 +1348,8 @@ const NewsContentPage: NextPage = () => {
         { timeout: LONG_TIMEOUT_MS }
       )
       const savedUrl = String(res?.data?.data?.url || '').trim()
-      return { name: file.name, url: toAbsoluteSrc(savedUrl || '') }
+      
+return { name: file.name, url: toAbsoluteSrc(savedUrl || '') }
     }
     Promise.all(Array.from(files).map(file => upload(file)))
       .then(nextImages => {
@@ -1322,14 +1358,16 @@ const NewsContentPage: NextPage = () => {
           nextImages.forEach(img => {
             if (!merged.some(item => item.url === img.url)) merged.push(img)
           })
-          return merged
+          
+return merged
         })
         setClipImages(prev => {
           const merged = [...prev]
           nextImages.forEach(img => {
             if (!merged.some(item => item.url === img.url)) merged.push(img)
           })
-          return merged
+          
+return merged
         })
       })
       .catch(err => setError(err?.message || 'Failed to upload images'))
@@ -1338,7 +1376,8 @@ const NewsContentPage: NextPage = () => {
     if (!files || !files.length) return
     if (!videoId) {
       setError('Video id missing. Please reload.')
-      return
+      
+return
     }
     const toDataUrl = (file: File) =>
       new Promise<string>((resolve, reject) => {
@@ -1356,7 +1395,8 @@ const NewsContentPage: NextPage = () => {
         { timeout: LONG_TIMEOUT_MS }
       )
       const savedUrl = String(res?.data?.data?.url || '').trim()
-      return { name: file.name, url: toAbsoluteSrc(savedUrl || '') }
+      
+return { name: file.name, url: toAbsoluteSrc(savedUrl || '') }
     }
 
     Promise.all(Array.from(files).map(file => upload(file)))
@@ -1368,7 +1408,8 @@ const NewsContentPage: NextPage = () => {
           nextImages.forEach(img => {
             if (!merged.some(item => item.url === img.url)) merged.push(img)
           })
-          return merged
+          
+return merged
         })
         updateOverlayItem(overlayId, { url: first.url, type: 'image' })
       })
@@ -1612,7 +1653,8 @@ const NewsContentPage: NextPage = () => {
     if (raw.startsWith(apiBase)) {
       return raw.replace(apiBase, '').replace(/^\/+/, '')
     }
-    return raw.replace(/^\/+/, '')
+    
+return raw.replace(/^\/+/, '')
   }
 
   const persistClips = async (nextClips: typeof clips) => {
@@ -1637,12 +1679,15 @@ const NewsContentPage: NextPage = () => {
                   { timeout: LONG_TIMEOUT_MS }
                 )
                 const savedUrl = String(res?.data?.data?.url || '').trim()
-                return { ...img, url: savedUrl ? toAbsoluteSrc(savedUrl) : raw }
+                
+return { ...img, url: savedUrl ? toAbsoluteSrc(savedUrl) : raw }
               }
-              return img
+              
+return img
             })
           )
-          return { ...clip, images }
+          
+return { ...clip, images }
         })
       )
 
@@ -1663,10 +1708,12 @@ const NewsContentPage: NextPage = () => {
       await axiosInstance.put(url, payload, { timeout: LONG_TIMEOUT_MS })
       setClips(uploadedClips)
       setSuccess('Clip saved.')
-      return uploadedClips
+      
+return uploadedClips
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'Failed to save clip')
-      return nextClips
+      
+return nextClips
     } finally {
       setClipSaving(false)
     }
@@ -1715,12 +1762,15 @@ const NewsContentPage: NextPage = () => {
                   { timeout: LONG_TIMEOUT_MS }
                 )
                 const savedUrl = String(res?.data?.data?.url || '').trim()
-                return { name: img.name, url: savedUrl ? toAbsoluteSrc(savedUrl) : url }
+                
+return { name: img.name, url: savedUrl ? toAbsoluteSrc(savedUrl) : url }
               }
-              return img
+              
+return img
             })
           )
-          return { ...clip, images }
+          
+return { ...clip, images }
         })
       )
 
@@ -1942,7 +1992,8 @@ const NewsContentPage: NextPage = () => {
                   endSec: Math.max(0, Math.min(limitSec, Number(overlay.endSec || 0)))
                 }))
                 .filter(overlay => overlay.endSec > overlay.startSec)
-              return {
+              
+return {
                 ...timeline,
                 segments: limitedSegments,
                 overlays: limitedOverlays,
@@ -2276,7 +2327,8 @@ const NewsContentPage: NextPage = () => {
   const handleStartQuickRecord = async () => {
     if (!customPreviewReady) {
       setError('Prepare preview first.')
-      return
+      
+return
     }
     try {
       setError('')
@@ -2320,7 +2372,8 @@ const NewsContentPage: NextPage = () => {
           await new Promise(resolve => window.setTimeout(resolve, 120))
           stream = getCaptureStream()
         }
-        return stream
+        
+return stream
       }
 
       let videoStream = await waitForCaptureStream()
@@ -2333,6 +2386,7 @@ const NewsContentPage: NextPage = () => {
           audio: true
         })
         const displayVideoTrack = displayStream.getVideoTracks()[0]
+
         // Region Capture (Chrome): crop tab capture to preview container only.
         const cropTargetApi = (window as any).CropTarget
         const canCropTo = displayVideoTrack && typeof (displayVideoTrack as any).cropTo === 'function'
@@ -2457,7 +2511,8 @@ const NewsContentPage: NextPage = () => {
     setImageGallery(prev => {
       const exists = prev.some(item => item.url === image.fullUrl)
       if (exists) return prev
-      return [...prev, { name: `${image.provider}-${image.id}`, url: image.fullUrl }]
+      
+return [...prev, { name: `${image.provider}-${image.id}`, url: image.fullUrl }]
     })
   }
 
@@ -2466,11 +2521,13 @@ const NewsContentPage: NextPage = () => {
     setImageGallery(prev => {
       const exists = prev.some(item => item.url === image.fullUrl)
       if (exists) return prev
-      return [...prev, { name: `${image.provider}-${image.id}`, url: image.fullUrl }]
+      
+return [...prev, { name: `${image.provider}-${image.id}`, url: image.fullUrl }]
     })
     setClipImages(prev => {
       if (prev.some(item => item.url === image.fullUrl)) return prev
-      return [...prev, { name: `${image.provider}-${image.id}`, url: image.fullUrl }]
+      
+return [...prev, { name: `${image.provider}-${image.id}`, url: image.fullUrl }]
     })
   }
 
@@ -2501,7 +2558,8 @@ const NewsContentPage: NextPage = () => {
     if (!image?.url) return
     setClipImages(prev => {
       if (prev.some(item => item.url === image.url)) return prev
-      return [...prev, image]
+      
+return [...prev, image]
     })
   }
 
@@ -2511,7 +2569,8 @@ const NewsContentPage: NextPage = () => {
       const next = prev.slice()
       const [moved] = next.splice(from, 1)
       next.splice(to, 0, moved)
-      return next
+      
+return next
     })
   }
 
@@ -2550,7 +2609,8 @@ const NewsContentPage: NextPage = () => {
       targets.forEach(idx => {
         next[idx] = true
       })
-      return next
+      
+return next
     })
     await Promise.all(
       targets.map(async idx => {
@@ -2581,7 +2641,8 @@ const NewsContentPage: NextPage = () => {
     const targets = activeClips.filter(clip => !String(clip.keyword || '').trim() && String(clip.text || '').trim())
     if (!targets.length) {
       setSuccess('All multi-sentence clips already have keywords.')
-      return
+      
+return
     }
 
     try {
@@ -2610,7 +2671,8 @@ const NewsContentPage: NextPage = () => {
       const nextClips = clips.map(clip => {
         if ((clip.approach || 'multi_sentence') !== 'multi_sentence') return clip
         const keyword = keywordByClipId[clip.id]
-        return keyword ? { ...clip, keyword } : clip
+        
+return keyword ? { ...clip, keyword } : clip
       })
 
       const persisted = await persistClips(nextClips)
@@ -2649,7 +2711,8 @@ const NewsContentPage: NextPage = () => {
       setCustomPerSentenceSec(perSentenceSec)
       setCustomPreviewDurationFrames(durationFrames)
     }
-    return { durationFrames, perSentenceSec }
+    
+return { durationFrames, perSentenceSec }
   }
 
   return (
@@ -3010,7 +3073,8 @@ const NewsContentPage: NextPage = () => {
                                 ? `${clip.sentenceIdx[0] + 1}-${clip.sentenceIdx[clip.sentenceIdx.length - 1] + 1}`
                                 : `Clip ${clip.id}`
                             const hasImages = Array.isArray(clip.images) && clip.images.length > 0
-                            return (
+                            
+return (
                               <Card
                                 key={`clip-${clip.id}`}
                                 ref={el => {
@@ -3072,7 +3136,8 @@ const NewsContentPage: NextPage = () => {
                     >
                       {parsedSentences.map((sentence, idx) => {
                         const used = usedSentenceIdxForModal.has(idx)
-                        return (
+                        
+return (
                           <Box
                             key={`sentence-row-${idx}`}
                             sx={{
@@ -3205,7 +3270,8 @@ const NewsContentPage: NextPage = () => {
                         const selected = sentenceImageRows.flatMap(row => row.images.map(img => img.url))
                         const all = [...filteredNewsImages, ...selected]
                         const uniq = Array.from(new Set(all))
-                        return uniq.length ? (
+                        
+return uniq.length ? (
                           uniq.map((img, idx) => (
                             <Box
                               key={`gallery-${idx}`}
@@ -3474,7 +3540,8 @@ const NewsContentPage: NextPage = () => {
                                 }}
                                 renderValue={selected => {
                                   const selectedItem = galleryItems.find(item => item.url === selected)
-                                  return selectedItem ? selectedItem.name : 'Choose image'
+                                  
+return selectedItem ? selectedItem.name : 'Choose image'
                                 }}
                               >
                                 <MenuItem value=''>
@@ -3757,7 +3824,8 @@ const NewsContentPage: NextPage = () => {
                         (idx === Math.min(...clipSelectedIdx) - 1 || idx === Math.max(...clipSelectedIdx) + 1)
                       const selectionDisabled =
                         used || (!checked && !canStart && !canExtend)
-                      return (
+                      
+return (
                         <Box
                           key={`clip-s-${idx}`}
                           ref={(el: HTMLDivElement | null) => {

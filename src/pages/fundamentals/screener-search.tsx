@@ -28,6 +28,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SearchIcon from '@mui/icons-material/Search'
 import LightbulbIcon from '@mui/icons-material/Lightbulb'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import { useAsOfDate } from 'src/contexts/AsOfDateContext'
 
 type SearchSuggestion = {
   key?: string
@@ -95,6 +96,7 @@ type SearchRow = {
 
 type SearchResponse = {
   query?: string
+  engine?: string
   rows?: SearchRow[]
   total?: number
   parsed?: Array<Record<string, unknown>>
@@ -127,22 +129,26 @@ const FIELD_PATTERN = /^(.+?)\s*(>=|<=|!=|==|=|>|<|contains|starts with|ends wit
 const formatNumber = (value: unknown, digits = 2) => {
   const numeric = Number(value)
   if (!Number.isFinite(numeric)) return '?'
-  return numeric.toFixed(digits)
+  
+return numeric.toFixed(digits)
 }
 
 const formatPercent = (value: unknown) => {
   const numeric = Number(value)
   if (!Number.isFinite(numeric)) return '?'
-  return `${numeric.toFixed(2)}%`
+  
+return `${numeric.toFixed(2)}%`
 }
 
 const gradeColor = (grade?: string) => {
   const text = String(grade || '').toUpperCase()
+  if (text.includes('MATCH') || text === 'A') return 'success'
   if (text.includes('DEEP')) return 'success'
   if (text.includes('VALUE')) return 'primary'
   if (text.includes('WATCH')) return 'warning'
   if (text.includes('REJECT')) return 'error'
-  return 'default'
+  
+return 'default'
 }
 
 const getActiveLineContext = (query: string, cursorIndex: number): ActiveLineContext => {
@@ -247,8 +253,10 @@ const getCaretCoordinates = (textarea: HTMLTextAreaElement, caretPosition: numbe
 }
 
 const ScreenerSearchPage: NextPage = () => {
+  const { asOfDate } = useAsOfDate()
   const [query, setQuery] = useState('')
   const [submittedQuery, setSubmittedQuery] = useState('')
+  const [engine, setEngine] = useState('')
   const [rows, setRows] = useState<SearchRow[]>([])
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
   const [loading, setLoading] = useState(false)
@@ -274,7 +282,8 @@ const ScreenerSearchPage: NextPage = () => {
   const loadSuggestions = async (value: string) => {
     if (!value.trim()) {
       setSuggestions([])
-      return
+      
+return
     }
 
     try {
@@ -295,7 +304,8 @@ const ScreenerSearchPage: NextPage = () => {
     const searchTerm = activeLineContext.fieldText.trim()
     if (!editorFocused || !searchTerm) {
       setSuggestions([])
-      return
+      
+return
     }
 
     const handle = setTimeout(() => {
@@ -314,7 +324,9 @@ const ScreenerSearchPage: NextPage = () => {
     if (!q) {
       setRows([])
       setSubmittedQuery('')
-      return
+      setEngine('')
+      
+return
     }
 
     try {
@@ -324,14 +336,18 @@ const ScreenerSearchPage: NextPage = () => {
         params: {
           q,
           limit: 50,
+          as_of_date: asOfDate || undefined,
         },
+        timeout: 300000,
       })
       const payload = (res?.data?.data || {}) as SearchResponse
       setRows(Array.isArray(payload.rows) ? payload.rows : [])
       setSubmittedQuery(payload.query || q)
+      setEngine(payload.engine || '')
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'Failed to search stocks')
       setRows([])
+      setEngine('')
     } finally {
       setLoading(false)
     }
@@ -360,13 +376,15 @@ const ScreenerSearchPage: NextPage = () => {
     if (event.key === 'ArrowDown') {
       event.preventDefault()
       setActiveSuggestionIndex((current) => (current + 1) % suggestions.length)
-      return
+      
+return
     }
 
     if (event.key === 'ArrowUp') {
       event.preventDefault()
       setActiveSuggestionIndex((current) => (current - 1 + suggestions.length) % suggestions.length)
-      return
+      
+return
     }
 
     if (event.key === 'Tab') {
@@ -377,9 +395,9 @@ const ScreenerSearchPage: NextPage = () => {
 
   const suggestionOpen = Boolean(editorFocused && suggestions.length && cursorPosition && activeLineContext.fieldText.trim())
   const examplePresets = [
-    'Sales growth > 12\nAND Profit growth > 15\nAND Return on capital employed > 15\nAND Debt to equity < 0.5',
-    'Price to earning < 30\nAND PEG Ratio < 1.5\nAND Market Capitalization > 500\nAND Current price < 50',
-    'Promoter holding > 50\nAND Return on equity > 15\nAND Dividend yield > 2',
+    'Price from 52 week high < 20\nAND Promoter holding > 40\nAND Current price < 100\nAND Volume > 100000\nAND 1 month return > 5\nAND 1 week return > 1\nAND DMA 50 > DMA 200',
+    'Promoter holding > 50\nAND Return on equity > 15\nAND Return on capital employed > 15\nAND Debt to equity < 0.5',
+    'Current price < 50\nAND Price vs 50 DMA > 0\nAND RSI 14 < 35\nAND MACD line > MACD signal',
   ]
 
   return (
@@ -401,8 +419,9 @@ const ScreenerSearchPage: NextPage = () => {
                   Query Stocks Like Screener
                 </Typography>
                 <Typography variant='body1' sx={{ color: 'rgba(255,255,255,0.76)', maxWidth: 900 }}>
-                  Write one clause per line, use <b>AND</b> between rules, and the backend will evaluate it on the active
-                  VALID universe. Suggestions now follow the active line while you type.
+                  Write one clause per line, use <b>AND</b> between rules, and the backend will evaluate it against the
+                  active VALID universe using stored EOD snapshots and as-of split fundamentals. Suggestions now follow
+                  the active line while you type.
                 </Typography>
               </Grid>
               <Grid item xs={12} md={4}>
@@ -412,7 +431,7 @@ const ScreenerSearchPage: NextPage = () => {
                       Example block
                     </Typography>
                     <Typography component='pre' variant='body2' sx={{ mt: 1.5, color: 'rgba(255,255,255,0.84)', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
-                      {`Sales growth > 12\nAND Profit growth > 15\nAND Return on capital employed > 15\nAND Debt to equity < 0.5`}
+                      {`Price from 52 week high < 20\nAND Promoter holding > 40\nAND Current price < 100\nAND Volume > 100000\nAND 1 month return > 5\nAND 1 week return > 1\nAND DMA 50 > DMA 200`}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -433,7 +452,7 @@ const ScreenerSearchPage: NextPage = () => {
                     multiline
                     minRows={6}
                     label='Search Query'
-                    placeholder='Sales growth > 12&#10;AND Profit growth > 15&#10;AND Return on capital employed > 15'
+                    placeholder='Price from 52 week high < 20&#10;AND Promoter holding > 40&#10;AND Current price < 100&#10;AND Volume > 100000'
                     value={query}
                     onChange={(event) => {
                       setQuery(event.target.value)
@@ -515,9 +534,16 @@ const ScreenerSearchPage: NextPage = () => {
                     {loading ? 'Searching...' : 'Search'}
                   </Button>
                   <Chip label='Active + VALID stocks only' size='small' variant='outlined' />
+                  <Chip label={`As of ${asOfDate || 'latest'}`} size='small' variant='outlined' />
+                  <Chip label='Snapshot EOD + split rows' size='small' variant='outlined' />
                   <Chip label={suggestionLoading ? 'Updating suggestions...' : 'Suggestions follow cursor'} size='small' variant='outlined' />
                   <Chip label='Parsed on backend' size='small' variant='outlined' />
                 </Stack>
+
+                <Alert severity='info' variant='outlined'>
+                  Snapshot-friendly fields stay on the fast path. Growth, valuation, and other history-heavy rules still work,
+                  but they may use the slower fallback engine.
+                </Alert>
               </Stack>
             </form>
 
@@ -551,7 +577,7 @@ const ScreenerSearchPage: NextPage = () => {
       </Grid>
 
       <Grid item xs={12}>
-        <Accordion defaultExpanded>
+        <Accordion defaultExpanded={false}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
               <LightbulbIcon fontSize='small' />
@@ -580,8 +606,9 @@ const ScreenerSearchPage: NextPage = () => {
                       Available screener-style fields
                     </Typography>
                     <Typography variant='body2' color='text.secondary'>
-                      Sales growth, Profit growth, Return on capital employed, Debt to equity, Price to earning, PEG Ratio,
-                      Market Capitalization, Current price, Dividend yield, Promoter holding, and more.
+                      Fast snapshot fields include current price, volume, returns, 52-week/ATH, DMA, momentum indicators,
+                      promoter holding, ROE/ROCE, debt metrics, sales, net profit, EPS, and liquidity checks. History-heavy
+                      valuation and growth rules still work, but may use the slower fallback engine.
                     </Typography>
                   </CardContent>
                 </Card>
@@ -594,11 +621,12 @@ const ScreenerSearchPage: NextPage = () => {
       <Grid item xs={12}>
         <Card sx={{ borderRadius: 3 }}>
           <CardContent>
-            <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
-              <Chip label={`Query: ${submittedQuery || '-'}`} color='primary' variant='outlined' />
-              <Chip label={`Results: ${rows.length}`} color='success' />
-              <Chip label='Top 50 matches' variant='outlined' />
-            </Stack>
+                <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
+                  <Chip label={`Query: ${submittedQuery || '-'}`} color='primary' variant='outlined' />
+                  <Chip label={`Results: ${rows.length}`} color='success' />
+                  <Chip label='Top 50 matches' variant='outlined' />
+                  <Chip label={engine ? `Engine: ${engine}` : 'Engine: default'} variant='outlined' />
+                </Stack>
 
             <TableContainer component={Paper} variant='outlined' sx={{ borderRadius: 2 }}>
               <Table size='small'>
@@ -618,7 +646,8 @@ const ScreenerSearchPage: NextPage = () => {
                 <TableBody>
                   {rows.map((row) => {
                     const expanded = expandedSymbol === row.symbol
-                    return (
+                    
+return (
                       <Fragment key={String(row.symbol || row.master_id)}>
                         <TableRow hover sx={{ '& td': { borderBottomColor: 'divider' } }}>
                           <TableCell>
@@ -670,7 +699,13 @@ const ScreenerSearchPage: NextPage = () => {
                                             <Chip
                                               label={match.status || '?'}
                                               size='small'
-                                              color={match.status === 'pass' ? 'success' : match.status === 'unmatched' ? 'warning' : 'error'}
+                                              color={
+                                                match.status === 'match'
+                                                  ? 'success'
+                                                  : match.status === 'invalid'
+                                                    ? 'warning'
+                                                    : 'error'
+                                              }
                                             />
                                           </TableCell>
                                         </TableRow>

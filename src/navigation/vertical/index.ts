@@ -30,6 +30,11 @@ const navigation = (): VerticalNavItemsType => {
       path: '/ollama-chat'
     },
     {
+      title: 'Gemini Chat',
+      icon: Table,
+      path: '/gemini-chat'
+    },
+    {
       title: 'News Creator',
       icon: Table,
       path: '/news-creator'
@@ -88,9 +93,19 @@ const navigation = (): VerticalNavItemsType => {
       path: '/historical-universe'
     },
     {
+      title: 'Historical Query Fields',
+      icon: Table,
+      path: '/historical-query-fields'
+    },
+    {
       title: 'Historical Screener',
       icon: Table,
       path: '/historical-screener'
+    },
+    {
+      title: 'Stock Shorts',
+      icon: Table,
+      path: '/stock-shorts'
     },
     {
       title: 'IPO',
@@ -203,6 +218,11 @@ const navigation = (): VerticalNavItemsType => {
       path: '/ollama-chat'
     },
     {
+      title: 'Gemini Chat',
+      icon: Table,
+      path: '/gemini-chat'
+    },
+    {
       title: 'News Creator',
       icon: Table,
       path: '/news-creator'
@@ -259,6 +279,16 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Historical Universe',
       icon: Table,
       path: '/historical-universe'
+    },
+    {
+      title: 'Historical Query Fields',
+      icon: Table,
+      path: '/historical-query-fields'
+    },
+    {
+      title: 'Stock Shorts',
+      icon: Table,
+      path: '/stock-shorts'
     },
     {
       title: 'IPO',

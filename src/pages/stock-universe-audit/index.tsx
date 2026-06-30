@@ -130,7 +130,8 @@ const RowsTable = ({
     for (let i = 0; i < inputRows.length; i += size) {
       chunks.push(inputRows.slice(i, i + size))
     }
-    return chunks
+    
+return chunks
   }
 
   const handleRowAction = async (row: AuditRow) => {
@@ -449,7 +450,8 @@ const PriceTable = ({
   const { showSnackbar } = useSnackbar()
   const normalizeId = (value: unknown) => {
     const num = Number(value)
-    return Number.isFinite(num) && num > 0 ? num : null
+    
+return Number.isFinite(num) && num > 0 ? num : null
   }
 
   const symbolMatchesPattern = (symbol: string, pattern: string) => {
@@ -503,27 +505,32 @@ const PriceTable = ({
     return checks.every(([key, value]) => {
       const threshold = Number(appliedMinValues[key])
       if (!Number.isFinite(threshold) || appliedMinValues[key] === '') return true
-      return Number(value) === threshold
+      
+return Number(value) === threshold
     })
   })
   const samePriceFilteredRows = filteredRows.filter(row => {
     if (!appliedOnlySamePrice) return true
     const values = [row.ltp, row.open, row.high, row.low, row.close].map(value => Number(value ?? 0))
-    return values.every(value => Number.isFinite(value)) && values.every(value => value === values[0])
+    
+return values.every(value => Number.isFinite(value)) && values.every(value => value === values[0])
   })
   const ltpThresholdValue = Number(appliedLtpThreshold)
   const thresholdFilteredRows = samePriceFilteredRows.filter(row => {
     if (!appliedLtpThreshold.trim() || !Number.isFinite(ltpThresholdValue)) return true
-    return Number(row.ltp ?? 0) >= ltpThresholdValue
+    
+return Number(row.ltp ?? 0) >= ltpThresholdValue
   })
   const patternFilteredRows = thresholdFilteredRows.filter(row => {
     if (!appliedSymbolPattern || appliedSymbolPattern === 'any') return true
-    return symbolMatchesPattern(String(row.symbol || row.activeSymbol || ''), appliedSymbolPattern)
+    
+return symbolMatchesPattern(String(row.symbol || row.activeSymbol || ''), appliedSymbolPattern)
   })
   const actionableRows = patternFilteredRows.filter(row => {
     const activeId = normalizeId(row.activeStockId)
     if (!activeId) return false
-    return !protectedIds.includes(activeId)
+    
+return !protectedIds.includes(activeId)
   })
   const hasAppliedFilters =
     Object.values(appliedMinValues).some(value => String(value).trim() !== '') ||

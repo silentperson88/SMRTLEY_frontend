@@ -84,45 +84,52 @@ const gradeColor = (grade: string) => {
   if (grade === 'PIVOT Ready') return 'success' as const
   if (grade === 'PIVOT Watch') return 'warning' as const
   if (grade === 'PIVOT Weak') return 'info' as const
-  return 'default' as const
+  
+return 'default' as const
 }
 
 const itemColor = (item: any) => {
   if (item?.type === 'reject') return 'error' as const
   if (item?.type === 'flag') return 'warning' as const
-  return item?.passed ? 'success' as const : 'default' as const
+  
+return item?.passed ? 'success' as const : 'default' as const
 }
 
 const formatNumber = (value: any, digits = 2) => {
   const n = Number(value)
   if (!Number.isFinite(n)) return 'n/a'
-  return n.toFixed(digits)
+  
+return n.toFixed(digits)
 }
 
 const formatPercent = (value: any, digits = 2) => {
   const n = Number(value)
   if (!Number.isFinite(n)) return 'n/a'
-  return `${n.toFixed(digits)}%`
+  
+return `${n.toFixed(digits)}%`
 }
 
 const formatCurrency = (value: any, digits = 2) => {
   const n = Number(value)
   if (!Number.isFinite(n)) return 'n/a'
-  return `Rs. ${n.toFixed(digits)}`
+  
+return `Rs. ${n.toFixed(digits)}`
 }
 
 const valueText = (value: any): string => {
   if (value === null || value === undefined) return 'n/a'
   if (Array.isArray(value)) return value.map((item) => valueText(item)).join(', ')
   if (typeof value === 'number') return formatNumber(value)
-  return String(value)
+  
+return String(value)
 }
 
 const focusValue = (tier: 'small' | 'mid' | 'large', row: PivotRow) => {
   const m = row?.pivot_metrics || {}
   if (tier === 'small') return `${m.revenue_2q_avg ? formatCurrency(m.revenue_2q_avg) : 'n/a'} avg revenue`
   if (tier === 'mid') return `${m.revenue_cagr_3y ? formatPercent(m.revenue_cagr_3y) : 'n/a'} revenue CAGR`
-  return `${m.profit_cagr_3y ? formatPercent(m.profit_cagr_3y) : 'n/a'} profit CAGR`
+  
+return `${m.profit_cagr_3y ? formatPercent(m.profit_cagr_3y) : 'n/a'} profit CAGR`
 }
 
 const TierTable = ({ tier, rows }: { tier: 'small' | 'mid' | 'large'; rows: PivotRow[] }) => {
@@ -153,7 +160,8 @@ const TierTable = ({ tier, rows }: { tier: 'small' | 'mid' | 'large'; rows: Pivo
           {rows.map((row) => {
             const isOpen = expanded === String(row.symbol)
             const m = row?.pivot_metrics || {}
-            return (
+            
+return (
               <FragmentRow
                 key={row.symbol}
                 row={row}
@@ -186,7 +194,8 @@ const FragmentRow = ({
   const m = row?.pivot_metrics || {}
   const analysis = row?.analysis || {}
   const signalCount = (analysis.layer1 || []).filter((item: any) => item.passed).length
-  return (
+  
+return (
     <>
       <TableRow hover onClick={onToggle} sx={{ cursor: 'pointer' }}>
         <TableCell>
@@ -350,7 +359,8 @@ const PivotStrategiesPage: NextPage = () => {
     params.set('grade', grade)
     if (minScore !== '' && minScore !== null) params.set('minScore', String(minScore))
     params.set('includeRejected', String(showRejected))
-    return `${ENDURL.GET_STOCK_PIVOT_ANALYSIS}?${params.toString()}`
+    
+return `${ENDURL.GET_STOCK_PIVOT_ANALYSIS}?${params.toString()}`
   }, [limit, grade, minScore, showRejected])
 
   const { data, isLoading, error } = useSWR<PivotResponse>(pivotUrl, simpleGet, {

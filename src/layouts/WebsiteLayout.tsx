@@ -52,7 +52,8 @@ const WebsiteLayout = ({ children }: Props) => {
       VerticalNavItems().filter((item): item is NavLink => {
         if (!('title' in item) || !item.path) return false
         if (item.openInNewTab) return false
-        return !['/auth/login', '/auth/register', '/pages/error'].includes(item.path)
+        
+return !['/auth/login', '/auth/register', '/pages/error'].includes(item.path)
       }),
     []
   )

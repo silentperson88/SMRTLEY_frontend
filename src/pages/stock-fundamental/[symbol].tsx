@@ -337,13 +337,15 @@ const renameMetricTitle = (title: string): string => {
 const formatNumber = (value: unknown, digits = 2) => {
   const parsed = Number(value)
   if (value === null || value === undefined || !Number.isFinite(parsed)) return '-'
-  return parsed.toFixed(digits)
+  
+return parsed.toFixed(digits)
 }
 
 const formatSignedPct = (value: unknown, digits = 2) => {
   const parsed = Number(value)
   if (value === null || value === undefined || !Number.isFinite(parsed)) return '-'
-  return `${parsed >= 0 ? '+' : ''}${parsed.toFixed(digits)}%`
+  
+return `${parsed >= 0 ? '+' : ''}${parsed.toFixed(digits)}%`
 }
 
 const getMomentumChipColor = (signal?: string | null) => {

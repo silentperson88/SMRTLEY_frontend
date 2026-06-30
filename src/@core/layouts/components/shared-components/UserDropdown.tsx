@@ -173,13 +173,15 @@ const UserDropdown = () => {
     if (isPortfoliosLoading) {
       handleDropdownClose()
       showSnackbar('Loading portfolios. Please try again.', 'error')
-      return
+      
+return
     }
 
     if (!isPortfoliosLoading && (!portfolios || portfolios.length === 0)) {
       handleDropdownClose()
       showSnackbar('Create portfolio first.', 'error')
-      return
+      
+return
     }
 
     handleDropdownClose()
@@ -205,7 +207,8 @@ const UserDropdown = () => {
     const err = validateAmount(addAmount)
     if (err) {
       setAddAmountError(err)
-      return
+      
+return
     }
 
     try {
@@ -224,12 +227,14 @@ const UserDropdown = () => {
     const err = validateAmount(transferAmount)
     if (err) {
       setTransferAmountError(err)
-      return
+      
+return
     }
 
     if (!selectedPortfolioId) {
       showSnackbar('Please select a portfolio.', 'error')
-      return
+      
+return
     }
 
     try {
@@ -294,12 +299,14 @@ const UserDropdown = () => {
     const onOpenTransferFund = () => {
       if (isPortfoliosLoading) {
         showSnackbar('Loading portfolios. Please try again.', 'error')
-        return
+        
+return
       }
 
       if (!isPortfoliosLoading && (!portfolios || portfolios.length === 0)) {
         showSnackbar('Create portfolio first.', 'error')
-        return
+        
+return
       }
 
       resetTransferState()

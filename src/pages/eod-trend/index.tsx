@@ -345,28 +345,32 @@ const TREND_RULES: Record<TrendState, string> = {
 const getTrendColor = (trend: TrendState) => {
   if (trend === 'Strong Uptrend' || trend === 'Uptrend') return 'success'
   if (trend === 'Strong Downtrend' || trend === 'Downtrend') return 'error'
-  return 'warning'
+  
+return 'warning'
 }
 
 const getVolatilityColor = (state: VolatilityState) => {
   if (state === 'Very Low Volatility') return 'info'
   if (state === 'Low Volatility') return 'success'
   if (state === 'Moderate Volatility') return 'warning'
-  return 'error'
+  
+return 'error'
 }
 
 const getBollingerColor = (state: BollingerState) => {
   if (state === 'Overbought') return 'error'
   if (state === 'Oversold') return 'success'
   if (state === 'Squeeze (Big Move Coming)') return 'warning'
-  return 'primary'
+  
+return 'primary'
 }
 
 const getReturnVolatilityColor = (state: ReturnVolatilityState) => {
   if (state === 'Calm') return 'success'
   if (state === 'Normal') return 'primary'
   if (state === 'Elevated') return 'warning'
-  return 'error'
+  
+return 'error'
 }
 
 const getBreakoutTypeColor = (signal: BreakoutType) => {
@@ -374,40 +378,46 @@ const getBreakoutTypeColor = (signal: BreakoutType) => {
   if (signal.includes('Breakout (Unconfirmed)')) return 'warning'
   if (signal.includes('Breakdown (Confirmed)')) return 'error'
   if (signal.includes('Breakdown (Unconfirmed)')) return 'warning'
-  return 'primary'
+  
+return 'primary'
 }
 
 const getBreakoutReadinessColor = (signal: BreakoutReadiness) => {
   if (signal === 'Imminent Breakout') return 'error'
   if (signal === 'Near Breakout') return 'warning'
   if (signal === 'Watching Zone') return 'info'
-  return 'primary'
+  
+return 'primary'
 }
 
 const getConsolidationColor = (signal: ConsolidationSignal) => {
   if (signal === 'Tight Consolidation (Breakout Setup)') return 'success'
   if (signal === 'Moderate Consolidation') return 'warning'
-  return 'primary'
+  
+return 'primary'
 }
 
 const getBreakoutStatusColor = (signal: BreakoutStatus) => {
   if (signal === 'False Breakout') return 'error'
   if (signal === 'Breakout Holding') return 'success'
-  return 'primary'
+  
+return 'primary'
 }
 
 const getSeasonalityColor = (value: number | null) => {
   if (value === null || !Number.isFinite(value)) return 'primary'
   if (value > 0) return value >= 5 ? 'success' : 'info'
   if (value < 0) return value <= -5 ? 'error' : 'warning'
-  return 'primary'
+  
+return 'primary'
 }
 
 const getVolumeSpikeColor = (state: VolumeSpikeState) => {
   if (state === 'Extreme Spike') return 'error'
   if (state === 'High Spike') return 'warning'
   if (state === 'Moderate Spike') return 'info'
-  return 'success'
+  
+return 'success'
 }
 
 const getFlowColor = (signal: FlowSignal) => {
@@ -417,7 +427,8 @@ const getFlowColor = (signal: FlowSignal) => {
 const getFlowConsensusColor = (signal: 'Accumulation' | 'Distribution' | 'Mixed') => {
   if (signal === 'Accumulation') return 'success'
   if (signal === 'Distribution') return 'error'
-  return 'warning'
+  
+return 'warning'
 }
 
 const getPriceVolumeColor = (signal: PriceVolumeSignal) => {
@@ -425,7 +436,8 @@ const getPriceVolumeColor = (signal: PriceVolumeSignal) => {
   if (signal === 'Weak Bullish') return 'info'
   if (signal === 'Weak Bearish') return 'warning'
   if (signal === 'Strong Bearish') return 'error'
-  return 'primary'
+  
+return 'primary'
 }
 
 const getMomentumColor = (signal: string) => {
@@ -442,7 +454,8 @@ const getMomentumColor = (signal: string) => {
   if (normalized.includes('oversold')) {
     return 'success'
   }
-  return 'primary'
+  
+return 'primary'
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
@@ -462,7 +475,8 @@ const stddev = (values: Array<number | null | undefined>) => {
   if (mean === null) return null
 
   const variance = filtered.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / (filtered.length - 1)
-  return Math.sqrt(variance)
+  
+return Math.sqrt(variance)
 }
 
 const percentChange = (current: number, previous: number | null | undefined) => {
@@ -475,17 +489,20 @@ const percentChange = (current: number, previous: number | null | undefined) => 
 
 const formatPct = (value: number | null, digits = 2) => {
   if (value === null || value === undefined || !Number.isFinite(value)) return '-'
-  return `${value >= 0 ? '+' : ''}${value.toFixed(digits)}%`
+  
+return `${value >= 0 ? '+' : ''}${value.toFixed(digits)}%`
 }
 
 const formatPosPct = (value: number | null, digits = 2) => {
   if (value === null || value === undefined || !Number.isFinite(value)) return '-'
-  return `${value.toFixed(digits)}%`
+  
+return `${value.toFixed(digits)}%`
 }
 
 const formatBandPosPct = (value: number | null, digits = 2) => {
   if (value === null || value === undefined || !Number.isFinite(value)) return '-'
-  return `${(value * 100).toFixed(digits)}%`
+  
+return `${(value * 100).toFixed(digits)}%`
 }
 
 const renderSummaryChip = (label: string, color: 'default' | 'primary' | 'success' | 'warning' | 'error' | 'info') => (
@@ -502,7 +519,8 @@ const classifyVolatility = (atrPct: number | null): VolatilityState => {
   if (atrPct < 3) return 'Low Volatility'
   if (atrPct < 5) return 'Moderate Volatility'
   if (atrPct < 8) return 'High Volatility'
-  return 'Very High Volatility'
+  
+return 'Very High Volatility'
 }
 
 const classifyBollinger = (params: { close: number; upper: number; lower: number; bandwidth: number }): BollingerState => {
@@ -510,7 +528,8 @@ const classifyBollinger = (params: { close: number; upper: number; lower: number
   if (close >= upper) return 'Overbought'
   if (close <= lower) return 'Oversold'
   if (bandwidth < 5) return 'Squeeze (Big Move Coming)'
-  return 'Normal'
+  
+return 'Normal'
 }
 
 const classifyReturnVolatility = (value: number | null): ReturnVolatilityState => {
@@ -519,7 +538,8 @@ const classifyReturnVolatility = (value: number | null): ReturnVolatilityState =
   if (value < 20) return 'Normal'
   if (value < 30) return 'Elevated'
   if (value < 45) return 'High'
-  return 'Very High'
+  
+return 'Very High'
 }
 
 const toValidDate = (value: string | Date) => {
@@ -582,14 +602,16 @@ const computeTrendAnalysis = (candles: EodCandle[]): TrendAnalysisResult => {
     if (idx + 1 < window) return null
     const end = idx + 1
     const sum = prefix[end] - prefix[end - window]
-    return sum / window
+    
+return sum / window
   }
 
   const rollingVolumeAverage = (idx: number, window: number) => {
     if (idx + 1 < window) return null
     const end = idx + 1
     const sum = volumePrefix[end] - volumePrefix[end - window]
-    return sum / window
+    
+return sum / window
   }
 
   const classifyTrend = (close: number, sma20: number, sma50: number, sma200: number): TrendState => {
@@ -597,7 +619,8 @@ const computeTrendAnalysis = (candles: EodCandle[]): TrendAnalysisResult => {
     if (close > sma50 && sma50 > sma200) return 'Uptrend'
     if (close < sma20 && sma20 < sma50 && sma50 < sma200) return 'Strong Downtrend'
     if (close < sma50 && sma50 < sma200) return 'Downtrend'
-    return 'Sideways'
+    
+return 'Sideways'
   }
 
   const baseRows = source
@@ -777,7 +800,8 @@ const computeVolatilityAnalysis = (candles: EodCandle[]): VolatilityAnalysisResu
     if (idx + 1 < window) return null
     const end = idx + 1
     const sum = trPrefix[end] - trPrefix[end - window]
-    return sum / window
+    
+return sum / window
   }
 
   const atrSeries = trueRanges.map((_, idx) => rollingAtr(idx, 14))
@@ -882,7 +906,8 @@ const computeBollingerAnalysis = (candles: EodCandle[]): BollingerAnalysisResult
     if (idx + 1 < window) return null
     const end = idx + 1
     const sum = prefix[end] - prefix[end - window]
-    return sum / window
+    
+return sum / window
   }
 
   const rollingStdDev = (idx: number, window: number) => {
@@ -891,7 +916,8 @@ const computeBollingerAnalysis = (candles: EodCandle[]): BollingerAnalysisResult
     const slice = closes.slice(start, idx + 1)
     const mean = slice.reduce((sum, value) => sum + value, 0) / slice.length
     const variance = slice.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / Math.max(slice.length - 1, 1)
-    return Math.sqrt(variance)
+    
+return Math.sqrt(variance)
   }
 
   const rows = source
@@ -1005,7 +1031,8 @@ const computeReturnVolatilityAnalysis = (candles: EodCandle[]): ReturnVolatility
     if (idx === 0) return null
     const prev = source?.[idx - 1]?.close ?? null
     if (!prev || !Number.isFinite(prev) || prev <= 0 || row.close <= 0) return null
-    return Math.log(row.close / prev)
+    
+return Math.log(row.close / prev)
   })
 
   const annualizeVolatility = (idx: number, window: number) => {
@@ -1014,7 +1041,8 @@ const computeReturnVolatilityAnalysis = (candles: EodCandle[]): ReturnVolatility
     if (slice.length < window) return null
     const mean = slice.reduce((sum, value) => sum + value, 0) / slice.length
     const variance = slice.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / Math.max(slice.length - 1, 1)
-    return Math.sqrt(variance) * Math.sqrt(252) * 100
+    
+return Math.sqrt(variance) * Math.sqrt(252) * 100
   }
 
   const rows = source
@@ -1087,7 +1115,8 @@ const computeVolumeAnalysis = (candles: EodCandle[]): VolumeAnalysisResult => {
     if (idx + 1 < window) return null
     const end = idx + 1
     const sum = volumePrefix[end] - volumePrefix[end - window]
-    return sum / window
+    
+return sum / window
   }
 
   const rows: VolumePoint[] = []
@@ -1229,7 +1258,8 @@ const computeMomentumAnalysis = (candles: EodCandle[]): MomentumAnalysisResult =
     if (idx + 1 < window) return null
     const end = idx + 1
     const sum = prefix[end] - prefix[end - window]
-    return sum / window
+    
+return sum / window
   }
 
   const gains = [0]
@@ -1301,11 +1331,13 @@ const computeMomentumAnalysis = (candles: EodCandle[]): MomentumAnalysisResult =
 
     const bullishCount = [rsiSignal, macdSignal, stochSignal].filter(value => {
       const normalized = value.toLowerCase()
-      return normalized.includes('bullish') || normalized.includes('oversold')
+      
+return normalized.includes('bullish') || normalized.includes('oversold')
     }).length
     const bearishCount = [rsiSignal, macdSignal, stochSignal].filter(value => {
       const normalized = value.toLowerCase()
-      return normalized.includes('bearish') || normalized.includes('overbought')
+      
+return normalized.includes('bearish') || normalized.includes('overbought')
     }).length
 
     const momentumScore: MomentumSignal =
@@ -1381,7 +1413,8 @@ const computeBreakoutAnalysis = (candles: EodCandle[]): BreakoutAnalysisResult =
   const sliceWindow = (idx: number, window: number, includeCurrent = true) => {
     const end = includeCurrent ? idx + 1 : idx
     const start = Math.max(0, end - window)
-    return source.slice(start, end)
+    
+return source.slice(start, end)
   }
 
   const rangeMax = (items: ParsedCandle[], key: 'high' | 'low') =>
@@ -1639,7 +1672,8 @@ const computeSeasonalityAnalysis = (candles: EodCandle[]): SeasonalityAnalysisRe
     const positiveYears = returns.filter(value => value > 0).length
     const totalYears = returns.length
     const winRatePct = totalYears ? Number(((positiveYears / totalYears) * 100).toFixed(0)) : null
-    return {
+    
+return {
       month,
       monthName: name,
       avgReturnPct,
@@ -1678,7 +1712,8 @@ const computeSeasonalityAnalysis = (candles: EodCandle[]): SeasonalityAnalysisRe
     const positiveYears = returns.filter(value => value > 0).length
     const totalYears = returns.length
     const winRatePct = totalYears ? Number(((positiveYears / totalYears) * 100).toFixed(0)) : null
-    return {
+    
+return {
       quarter,
       quarterLabel: label,
       avgReturnPct,
@@ -1707,7 +1742,8 @@ const computeSeasonalityAnalysis = (candles: EodCandle[]): SeasonalityAnalysisRe
     const positiveDays = values.filter(value => value > 0).length
     const totalDays = values.length
     const winRatePct = totalDays ? Number(((positiveDays / totalDays) * 100).toFixed(0)) : null
-    return {
+    
+return {
       dayNum,
       dayName: name,
       avgReturnPct,
@@ -1732,7 +1768,8 @@ const computeSeasonalityAnalysis = (candles: EodCandle[]): SeasonalityAnalysisRe
         yearOpen && yearOpen !== 0 && yearClose !== null ? Number((((yearClose - yearOpen) / yearOpen) * 100).toFixed(2)) : null
       const yearResult: SeasonalityYearPoint['yearResult'] =
         yearlyReturnPct === null ? 'Flat' : yearlyReturnPct > 0 ? 'Positive' : yearlyReturnPct < 0 ? 'Negative' : 'Flat'
-      return {
+      
+return {
         year,
         yearOpen,
         yearClose,
@@ -1796,7 +1833,8 @@ const EodTrendPage = () => {
     })
   const overviewChartSeries = useMemo(() => {
     const chartRows = trend.rows.slice(-260)
-    return [
+    
+return [
       {
         name: 'Close',
         type: 'line',
@@ -1985,7 +2023,8 @@ const EodTrendPage = () => {
     if (riskSignals >= 2) {
       return { label: 'Risky / choppy', color: 'error' as const, helper: 'Price action looks noisy or stretched. Use caution.' }
     }
-    return { label: 'Neutral', color: 'info' as const, helper: 'No strong edge yet. Wait for better confirmation.' }
+    
+return { label: 'Neutral', color: 'info' as const, helper: 'No strong edge yet. Wait for better confirmation.' }
   }, [latestTrend, latestRisk, latestBreakout, latestVolume])
 
   const breakoutChartAnnotations = useMemo<ApexOptions['annotations']>(() => {
@@ -2185,7 +2224,8 @@ const EodTrendPage = () => {
 
   const breakoutCandlestickSeries = useMemo(() => {
     const chartRows = breakout.rows.slice(-180)
-    return [
+    
+return [
       {
         name: 'OHLC',
         data: chartRows.map(row => ({
@@ -2373,7 +2413,8 @@ const EodTrendPage = () => {
     const id = String(stock?.master_id || '').trim()
     if (!id) {
       setError('Selected stock does not have a master id.')
-      return
+      
+return
     }
 
     try {
@@ -2488,7 +2529,8 @@ const EodTrendPage = () => {
                               const masterId = String(item.id || '').trim()
                               if (!masterId) {
                                 setError('Selected stock is missing a master id.')
-                                return
+                                
+return
                               }
 
                               setStockSearch(item.name || item.symbol || '')

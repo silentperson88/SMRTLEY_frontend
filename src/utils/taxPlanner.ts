@@ -125,24 +125,28 @@ export const toDateInput = (value: Date) => {
   const year = value.getFullYear()
   const month = `${value.getMonth() + 1}`.padStart(2, '0')
   const day = `${value.getDate()}`.padStart(2, '0')
-  return `${year}-${month}-${day}`
+  
+return `${year}-${month}-${day}`
 }
 
 export const daysBetween = (fromDate: string, toDate: string) => {
   const start = new Date(fromDate)
   const end = new Date(toDate)
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0
-  return Math.max(0, Math.floor((end.getTime() - start.getTime()) / MS_PER_DAY))
+  
+return Math.max(0, Math.floor((end.getTime() - start.getTime()) / MS_PER_DAY))
 }
 
 export const getCurrentFinancialYearStart = (referenceDate = new Date()) => {
   const year = referenceDate.getMonth() >= 3 ? referenceDate.getFullYear() : referenceDate.getFullYear() - 1
-  return `${year}-04-01`
+  
+return `${year}-04-01`
 }
 
 export const getCurrentFinancialYearLabel = (referenceDate = new Date()) => {
   const startYear = referenceDate.getMonth() >= 3 ? referenceDate.getFullYear() : referenceDate.getFullYear() - 1
-  return `${startYear}-${startYear + 1}`
+  
+return `${startYear}-${startYear + 1}`
 }
 
 export const formatCurrencyNumber = (value: number) =>
@@ -152,14 +156,16 @@ export const formatCurrencyNumber = (value: number) =>
 
 const parseDate = (value: string) => {
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? null : date
+  
+return Number.isNaN(date.getTime()) ? null : date
 }
 
 const sortByDateAsc = <T extends { buyDate?: string; sellDate?: string }>(items: T[], key: 'buyDate' | 'sellDate') =>
   [...items].sort((a, b) => {
     const aTime = parseDate(String(a[key] || ''))?.getTime() || 0
     const bTime = parseDate(String(b[key] || ''))?.getTime() || 0
-    return aTime - bTime
+    
+return aTime - bTime
   })
 
 const calcLtcgTaxIncrement = (
@@ -170,12 +176,14 @@ const calcLtcgTaxIncrement = (
 ) => {
   const beforeTaxable = Math.max(0, existingBookedLtcg - exemption)
   const afterTaxable = Math.max(0, existingBookedLtcg + additionalLtcgGain - exemption)
-  return Math.max(0, afterTaxable - beforeTaxable) * (ratePercent / 100)
+  
+return Math.max(0, afterTaxable - beforeTaxable) * (ratePercent / 100)
 }
 
 const formatLotLabel = (symbol: string, buyDate: string, value: number) => {
   const dateLabel = buyDate ? ` (${buyDate})` : ''
-  return `${symbol}${dateLabel} Rs. ${formatCurrencyNumber(Math.abs(value))}`
+  
+return `${symbol}${dateLabel} Rs. ${formatCurrencyNumber(Math.abs(value))}`
 }
 
 export const matchLotsAndSummarize = (
@@ -405,7 +413,8 @@ export const matchLotsAndSummarize = (
     const priority = (bucket: 'STCG' | 'LTCG') => (bucket === 'STCG' ? 0 : 1)
     const bucketDiff = priority(a.bucket) - priority(b.bucket)
     if (bucketDiff !== 0) return bucketDiff
-    return b.fullGain - a.fullGain
+    
+return b.fullGain - a.fullGain
   })
 
   const showLossHarvesting = settings.showLossHarvesting

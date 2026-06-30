@@ -61,12 +61,14 @@ const parseHighlights = (text: string) => {
 
 const isGreetingScene = (heading: string, text: string) => {
   const probe = `${heading} ${text}`.toLowerCase()
-  return ['greeting', 'welcome', 'hello', 'hi everyone', 'namaskar', 'नमस्कार', 'स्वागत'].some(k => probe.includes(k))
+  
+return ['greeting', 'welcome', 'hello', 'hi everyone', 'namaskar', 'नमस्कार', 'स्वागत'].some(k => probe.includes(k))
 }
 
 const isConclusionScene = (heading: string, text: string) => {
   const probe = `${heading} ${text}`.toLowerCase()
-  return ['conclusion', 'thanks', 'thank you', 'wrap', 'समापन', 'धन्यवाद'].some(k => probe.includes(k))
+  
+return ['conclusion', 'thanks', 'thank you', 'wrap', 'समापन', 'धन्यवाद'].some(k => probe.includes(k))
 }
 
 const paletteByPreset = (stylePreset: 'flash' | 'data' | 'story') => {
@@ -88,7 +90,8 @@ const paletteByPreset = (stylePreset: 'flash' | 'data' | 'story') => {
       accent: '#fde68a'
     }
   }
-  return {
+  
+return {
     bg: 'radial-gradient(circle at 18% 15%, rgba(251,191,36,0.22), transparent 35%), radial-gradient(circle at 82% 80%, rgba(14,165,233,0.26), transparent 40%), linear-gradient(160deg, #0f172a 0%, #111827 42%, #1f2937 100%)',
     text: '#f8fafc',
     panel: 'rgba(15,23,42,0.6)',
@@ -195,7 +198,8 @@ const SceneBlock: React.FC<{
         {bullets.map((line, idx) => {
           const rowIn = spring({ fps, frame: localFrame - idx * 4, config: { damping: 210 } })
           const rowOpacity = Math.min(1, rowIn) * fadeOut
-          return (
+          
+return (
             <div
               key={`${scene.id}-${idx}`}
               style={{
@@ -282,7 +286,8 @@ export const NewsScriptHighlightsComposition: React.FC<NewsScriptHighlightsProps
     const durationInFrames = Math.max(1, Math.round(Number(scene.durationSec || 1) * fps))
     const item = { scene, startFrame: cursor, durationInFrames }
     cursor += durationInFrames
-    return item
+    
+return item
   })
 
   return (

@@ -14,6 +14,13 @@ export interface PortfolioType {
   updatedAt?: string
 }
 
+export interface PortfolioMeta {
+  mode?: 'BACKTEST'
+  as_of_date?: string | null
+  query?: string
+  watchlist_master_ids?: number[]
+}
+
 export interface MyPortfolio {
   id: string
   name: string
@@ -25,5 +32,6 @@ export interface MyPortfolio {
   initial_fund: number
   available_fund: number
   pnl: number
+  meta?: PortfolioMeta
   created_at: string
 }

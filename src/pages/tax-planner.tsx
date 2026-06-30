@@ -148,7 +148,8 @@ const TaxPlannerPage: NextPage = () => {
       return plans
     } catch (err: any) {
       showSnackbar(err?.response?.data?.message || err?.message || 'Failed to load saved plans', 'error')
-      return []
+      
+return []
     }
   }
 
@@ -181,7 +182,8 @@ const TaxPlannerPage: NextPage = () => {
         if (planId && !opts.silent) {
           showSnackbar('Selected planner was not found', 'warning')
         }
-        return
+        
+return
       }
       if (!opts.silent) {
         showSnackbar(err?.response?.data?.message || err?.message || 'Failed to load saved planner', 'error')
@@ -343,11 +345,13 @@ const TaxPlannerPage: NextPage = () => {
         if (category === 'TAX_FREE_LTCG') return 0
         if (category === 'STCG_PROFIT') return 1
         if (category === 'TAXABLE_LTCG') return 2
-        return 3
+        
+return 3
       }
       const categoryDiff = priority(a.category) - priority(b.category)
       if (categoryDiff !== 0) return categoryDiff
-      return a.symbol.localeCompare(b.symbol)
+      
+return a.symbol.localeCompare(b.symbol)
     })
   }, [planner.tradePlan])
 
@@ -397,7 +401,8 @@ const TaxPlannerPage: NextPage = () => {
 
       const boughtQty = group.buyLots.reduce((sum, item) => sum + Number(item.qty || 0), 0)
       const soldQty = group.sellTrades.reduce((sum, item) => sum + Number(item.qty || 0), 0)
-      return {
+      
+return {
         symbol,
         currentPrice,
         boughtQty,

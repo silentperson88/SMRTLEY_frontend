@@ -76,19 +76,22 @@ const DEFAULT_LIMIT = 120
 const getNumeric = (value: unknown) => {
   if (value === null || value === undefined || value === '') return null
   const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : null
+  
+return Number.isFinite(parsed) ? parsed : null
 }
 
 const formatNumber = (value: unknown, digits = 2) => {
   const numeric = getNumeric(value)
-  if (numeric === null) return '—'
-  return numeric.toFixed(digits)
+  if (numeric === null) return 'ï¿½'
+  
+return numeric.toFixed(digits)
 }
 
 const formatPercent = (value: unknown) => {
   const numeric = getNumeric(value)
-  if (numeric === null) return '—'
-  return `${numeric.toFixed(2)}%`
+  if (numeric === null) return 'ï¿½'
+  
+return `${numeric.toFixed(2)}%`
 }
 
 const gradeColor = (grade?: string) => {
@@ -109,7 +112,8 @@ const recommendationColor = (recommendation?: string) => {
   if (text.includes('Strong')) return 'success'
   if (text.includes('Watchlist')) return 'warning'
   if (text.includes('Weak')) return 'error'
-  return 'default'
+  
+return 'default'
 }
 
 const GrowthAnalysisPage: NextPage = () => {
@@ -150,7 +154,8 @@ const GrowthAnalysisPage: NextPage = () => {
         if (recommendation.includes('Strong')) acc.strong += 1
         else if (recommendation.includes('Watchlist')) acc.watchlist += 1
         else acc.weak += 1
-        return acc
+        
+return acc
       },
       { total: 0, strong: 0, watchlist: 0, weak: 0 },
     )
@@ -316,13 +321,13 @@ const GrowthAnalysisPage: NextPage = () => {
                                 <TableCell>{score}</TableCell>
                                 <TableCell>
                                   <Stack>
-                                    <Typography variant='subtitle2'>{row?.symbol || '—'}</Typography>
+                                    <Typography variant='subtitle2'>{row?.symbol || 'ï¿½'}</Typography>
                                     <Typography variant='caption' color='text.secondary'>
                                       {row?.exchange || ''}
                                     </Typography>
                                   </Stack>
                                 </TableCell>
-                                <TableCell>{row?.company_name || row?.name || '—'}</TableCell>
+                                <TableCell>{row?.company_name || row?.name || 'ï¿½'}</TableCell>
                                 <TableCell align='right'>{formatPercent(salesCagr)}</TableCell>
                                 <TableCell align='right'>{formatPercent(profitCagr)}</TableCell>
                                 <TableCell align='right'>{formatPercent(roe)}</TableCell>
@@ -364,13 +369,13 @@ const GrowthAnalysisPage: NextPage = () => {
                                             </Typography>
                                             <Stack spacing={0.75} sx={{ mt: 0.75 }}>
                                               <Typography variant='body2'>
-                                                Profit: {row?.latest_profit_period || '—'}
+                                                Profit: {row?.latest_profit_period || 'ï¿½'}
                                               </Typography>
                                               <Typography variant='body2'>
-                                                Cash Flow: {row?.latest_cash_period || '—'}
+                                                Cash Flow: {row?.latest_cash_period || 'ï¿½'}
                                               </Typography>
                                               <Typography variant='body2'>
-                                                Balance Sheet: {row?.latest_balance_period || '—'}
+                                                Balance Sheet: {row?.latest_balance_period || 'ï¿½'}
                                               </Typography>
                                             </Stack>
                                           </Grid>
@@ -435,7 +440,7 @@ const GrowthAnalysisPage: NextPage = () => {
                 <CardContent>
                   <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 1.5 }}>
                     <ShowChartIcon fontSize='small' color='primary' />
-                    <Typography variant='h6'>What We’re Ranking For</Typography>
+                    <Typography variant='h6'>What Weï¿½re Ranking For</Typography>
                   </Stack>
                   <Stack spacing={1}>
                     <Typography variant='body2' color='text.secondary'>

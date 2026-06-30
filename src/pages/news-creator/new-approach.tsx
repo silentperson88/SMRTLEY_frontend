@@ -80,7 +80,8 @@ const NewApproachPage: NextPage = () => {
       raw = raw.replace(/^\/?tts\/audio\//, 'content/tts/audio/')
     }
     const normalized = raw.startsWith('/') ? raw : `/${raw}`
-    return `${apiBase}${normalized}`
+    
+return `${apiBase}${normalized}`
   }
   const getAudioDuration = (src: string): Promise<number> =>
     new Promise(resolve => {
@@ -146,7 +147,8 @@ const NewApproachPage: NextPage = () => {
       setScript(String(cached.scriptHindi || '').trim())
       setAudioFileName(String(cached.scriptAudioHindi || '').trim())
       setAudioSrc(toAbsoluteSrc(String(cached.scriptAudioHindi || '').trim()))
-      return
+      
+return
     }
     setScript(String(cached.scriptEnglish || '').trim())
     setAudioFileName(String(cached.scriptAudioEnglish || '').trim())
@@ -237,7 +239,8 @@ const NewApproachPage: NextPage = () => {
           highlightTermsPositive: [],
           highlightTermsNegative: []
         }
-        return language === 'hindi'
+        
+return language === 'hindi'
           ? { ...base, scriptHindi: text, scriptAudioHindi: '' }
           : { ...base, scriptEnglish: text, scriptAudioEnglish: '' }
       })
@@ -282,7 +285,8 @@ const NewApproachPage: NextPage = () => {
           highlightTermsPositive: [],
           highlightTermsNegative: []
         }
-        return language === 'hindi'
+        
+return language === 'hindi'
           ? { ...base, scriptAudioHindi: audioUrl }
           : { ...base, scriptAudioEnglish: audioUrl }
       })
@@ -387,7 +391,8 @@ const NewApproachPage: NextPage = () => {
   const previewHeading = useMemo(() => {
     const company = String(companyName || '').trim()
     if (company) return company
-    return `News ${newsId || ''}`.trim() || 'Major News Update'
+    
+return `News ${newsId || ''}`.trim() || 'Major News Update'
   }, [companyName, newsId])
 
   const mergedHighlightTerms = useMemo(
