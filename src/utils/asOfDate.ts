@@ -4,7 +4,8 @@ const pad = (value: number) => String(value).padStart(2, '0')
 
 export const getTodayIsoDate = () => {
   const now = new Date()
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+  
+return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
 }
 
 export const normalizeAsOfDate = (value?: string | null) => {
@@ -21,7 +22,8 @@ export const normalizeAsOfDate = (value?: string | null) => {
 export const getStoredAsOfDate = () => {
   if (typeof window === 'undefined') return getTodayIsoDate()
   const normalized = normalizeAsOfDate(window.localStorage.getItem(AS_OF_DATE_STORAGE_KEY))
-  return normalized || getTodayIsoDate()
+  
+return normalized || getTodayIsoDate()
 }
 
 export const setStoredAsOfDate = (value: string) => {
@@ -36,5 +38,6 @@ export const shouldAttachAsOfDate = (url?: string, method?: string) => {
   const normalizedUrl = String(url || '').replace(/^\/+/, '')
   const normalizedMethod = String(method || 'get').toLowerCase()
   if (normalizedMethod !== 'get') return false
-  return MARKET_API_PREFIXES.some(prefix => normalizedUrl.startsWith(prefix))
+  
+return MARKET_API_PREFIXES.some(prefix => normalizedUrl.startsWith(prefix))
 }

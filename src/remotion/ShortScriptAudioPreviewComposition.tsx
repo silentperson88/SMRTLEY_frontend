@@ -115,7 +115,8 @@ const paletteByPreset = (stylePreset: 'flash' | 'data' | 'story') => {
       pillText: '#fde68a'
     }
   }
-  return {
+  
+return {
     bg: 'radial-gradient(circle at 15% 12%, rgba(56,189,248,0.2), transparent 35%), radial-gradient(circle at 85% 82%, rgba(251,191,36,0.2), transparent 36%), linear-gradient(150deg, #0f172a 0%, #111827 48%, #1f2937 100%)',
     panel: 'rgba(2,6,23,0.62)',
     pillBorder: 'rgba(251,191,36,0.45)',
@@ -134,7 +135,8 @@ const extractBulletItems = (text: string) => {
     .filter((line, idx) => /^[-*•]\s+/.test(lines[idx]) || /^\d+[.)]\s+/.test(lines[idx]))
 
   if (bullets.length >= 2) return bullets.slice(0, 6)
-  return []
+  
+return []
 }
 
 export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPreviewProps> = ({
@@ -207,12 +209,14 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
         const idx = i % next.length
         next[idx] = Math.max(1, next[idx] + step)
       }
-      return next
+      
+return next
     }
 
     if (!totalWords) {
       const fallback = Math.max(6, Math.floor(durationInFrames / lineCount))
-      return new Array(lineCount).fill(fallback)
+      
+return new Array(lineCount).fill(fallback)
     }
 
     const baseFrames = wordCounts.map(count => Math.max(1, Math.round((count / totalWords) * durationInFrames)))
@@ -225,7 +229,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
       const idx = i % next.length
       next[idx] = Math.max(1, next[idx] + step)
     }
-    return next
+    
+return next
   }, [durationInFrames, lineCount, providedSentenceFrames, totalWords, wordCounts])
   const sentenceBoundaries = React.useMemo(() => {
     const boundaries: number[] = []
@@ -234,7 +239,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
       acc += count
       boundaries.push(acc)
     })
-    return boundaries
+    
+return boundaries
   }, [weightedFrames])
   const timelineOverlays = React.useMemo(
     () =>
@@ -309,13 +315,15 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
   const bgVideoUrl = staticFile('images/news/news-channel-starting-video.mp4')
   const clipRanges = React.useMemo(() => {
     if (!clips.length) return []
-    return clips
+    
+return clips
       .map(clip => {
         const indices = Array.isArray(clip.sentenceIdx) ? clip.sentenceIdx.slice().sort((a, b) => a - b) : []
         if (!indices.length) return null
         const startIdx = indices[0]
         const endIdx = indices[indices.length - 1]
-        return {
+        
+return {
           startIdx,
           endIdx,
           images: Array.isArray(clip.images) ? clip.images : [],
@@ -359,7 +367,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
 
     if (timelineSegments.length) {
       let startFrame = 0
-      return timelineSegments.map(item => {
+      
+return timelineSegments.map(item => {
         const durationFrames = Math.max(1, Math.round(item.durationSec * fps))
         const endFrame = startFrame + durationFrames
         const built = {
@@ -376,7 +385,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
           endIdx: Math.max(0, item.endIdx)
         }
         startFrame = endFrame
-        return built
+        
+return built
       })
     }
 
@@ -560,7 +570,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
     if (transition === 'none') {
       opacity = 1
       transform = 'scale(1)'
-      return { opacity, transform }
+      
+return { opacity, transform }
     }
 
     if (transition === 'slide-left') {
@@ -596,7 +607,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
   const overlayItems = React.useMemo(() => {
     const baseItems = (Array.isArray(mediaOverlays) ? mediaOverlays : []).filter(item => item && item.url)
     const totalDurationSec = durationInFrames / fps
-    return baseItems.flatMap(item => {
+    
+return baseItems.flatMap(item => {
       const startSec = Math.max(0, Number(item.startSec || 0))
       const endSec = Math.max(startSec + 0.01, Number(item.endSec || startSec + 0.01))
       const durationSec = Math.max(0.01, endSec - startSec)
@@ -606,7 +618,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
           .split(',')
           .map(entry => Number(String(entry).trim()))
           .filter(value => Number.isFinite(value) && value >= 0)
-        return starts.map(nextStart => ({
+        
+return starts.map(nextStart => ({
           ...item,
           startSec: nextStart,
           endSec: Math.min(totalDurationSec, nextStart + durationSec)
@@ -631,7 +644,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
           randomStarts.push(Number(nextStart.toFixed(3)))
         }
         randomStarts.sort((a, b) => a - b)
-        return randomStarts.map(nextStart => ({
+        
+return randomStarts.map(nextStart => ({
           ...item,
           startSec: nextStart,
           endSec: Math.min(totalDurationSec, nextStart + randomDurationSec)
@@ -649,7 +663,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
           endSec: Math.min(totalDurationSec, nextStart + durationSec)
         })
       }
-      return expanded
+      
+return expanded
     })
   }, [mediaOverlays, durationInFrames, fps])
   const renderHighlighted = (value: string) => {
@@ -665,11 +680,13 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
       .filter(Boolean)
     if (!keywords.length) {
       const autoParts = src.split(AUTO_HIGHLIGHT_REGEX)
-      return autoParts.map((part, idx) => {
+      
+return autoParts.map((part, idx) => {
         if (!part) return null
         if (AUTO_HIGHLIGHT_REGEX.test(part)) {
           AUTO_HIGHLIGHT_REGEX.lastIndex = 0
-          return (
+          
+return (
             <span
               key={`ah-${idx}-${part}`}
               style={{
@@ -685,7 +702,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
           )
         }
         AUTO_HIGHLIGHT_REGEX.lastIndex = 0
-        return <span key={`an-${idx}`}>{part}</span>
+        
+return <span key={`an-${idx}`}>{part}</span>
       })
     }
     const escaped = keywords.map(item => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
@@ -705,7 +723,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
           : isNegative
           ? { background: 'rgba(239,68,68,0.26)', color: '#7f1d1d' }
           : { background: 'rgba(250,204,21,0.35)', color: '#7c2d12' }
-        return (
+        
+return (
           <span
             key={`h-${idx}-${part}`}
             style={{
@@ -719,16 +738,19 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
           </span>
         )
       }
-      return <span key={`n-${idx}`}>{part}</span>
+      
+return <span key={`n-${idx}`}>{part}</span>
     })
     if (explicitHit) return rendered
 
     const autoParts = src.split(AUTO_HIGHLIGHT_REGEX)
-    return autoParts.map((part, idx) => {
+    
+return autoParts.map((part, idx) => {
       if (!part) return null
       if (AUTO_HIGHLIGHT_REGEX.test(part)) {
         AUTO_HIGHLIGHT_REGEX.lastIndex = 0
-        return (
+        
+return (
           <span
             key={`fh-${idx}-${part}`}
             style={{
@@ -744,7 +766,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
         )
       }
       AUTO_HIGHLIGHT_REGEX.lastIndex = 0
-      return <span key={`fn-${idx}`}>{part}</span>
+      
+return <span key={`fn-${idx}`}>{part}</span>
     })
   }
 
@@ -846,7 +869,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
             />
           )
         }
-        return <Img key={`overlay-${idx}`} src={overlay.url} style={style} />
+        
+return <Img key={`overlay-${idx}`} src={overlay.url} style={style} />
       })}
 
       <AbsoluteFill style={{ background: 'transparent' }} />
@@ -1028,7 +1052,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
                   const separator = item.indexOf(':')
                   const lead = separator > 0 ? item.slice(0, separator + 1) : ''
                   const rest = separator > 0 ? item.slice(separator + 1).trim() : item
-                  return (
+                  
+return (
                     <div
                       key={`${idx}-${item.slice(0, 10)}`}
                       style={{
@@ -1131,7 +1156,8 @@ export const ShortScriptAudioPreviewComposition: React.FC<ShortScriptAudioPrevie
                     extrapolateLeft: 'clamp',
                     extrapolateRight: 'clamp'
                   })
-                  return (
+                  
+return (
                     <div
                       key={`${idx}-${item.slice(0, 8)}`}
                       style={{

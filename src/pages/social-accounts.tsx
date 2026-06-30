@@ -70,7 +70,8 @@ const toDatetimeLocalValue = (value?: string | null) => {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return String(value).slice(0, 16)
   const pad = (input: number) => `${input}`.padStart(2, '0')
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+  
+return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
 const normalizeInputValue = (value: any, type: SocialAccountFieldSchema['type']) => {
@@ -79,7 +80,8 @@ const normalizeInputValue = (value: any, type: SocialAccountFieldSchema['type'])
   if (typeof value === 'string') return value
   if (typeof value === 'number' || typeof value === 'boolean') return String(value)
   if (Array.isArray(value)) return value.join(', ')
-  return JSON.stringify(value)
+  
+return JSON.stringify(value)
 }
 
 const SocialAccountsPage: NextPage = () => {
@@ -95,7 +97,8 @@ const SocialAccountsPage: NextPage = () => {
   const platformMap = useMemo(() => {
     return (schema?.platforms || []).reduce<Record<string, SocialAccountPlatformSchema>>((acc, item) => {
       acc[item.platform] = item
-      return acc
+      
+return acc
     }, {})
   }, [schema])
 
@@ -215,7 +218,8 @@ const SocialAccountsPage: NextPage = () => {
       const saved = response.data?.data as SocialAccountRow
       setConnections(prev => {
         const filtered = prev.filter(item => item.platform !== platform)
-        return [...filtered, saved].sort((a, b) => a.platform.localeCompare(b.platform))
+        
+return [...filtered, saved].sort((a, b) => a.platform.localeCompare(b.platform))
       })
       setDrafts(prev => ({
         ...prev,
@@ -310,7 +314,8 @@ const SocialAccountsPage: NextPage = () => {
                 <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
                   {(schema?.platforms || []).map(platform => {
                     const connected = Boolean(connections.find(item => item.platform === platform.platform)?.is_connected)
-                    return (
+                    
+return (
                       <Chip
                         key={platform.platform}
                         label={`${platform.label} ${connected ? 'Connected' : 'Not linked'}`}
@@ -343,7 +348,8 @@ const SocialAccountsPage: NextPage = () => {
             .map(platform => {
               const draft = drafts[platform.platform] || emptyDraft()
               const connected = Boolean(connections.find(item => item.platform === platform.platform)?.is_connected)
-              return (
+              
+return (
                 <Card key={platform.platform}>
                   <CardContent>
                     <Stack spacing={3}>

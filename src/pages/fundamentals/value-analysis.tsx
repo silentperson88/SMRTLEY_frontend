@@ -117,32 +117,37 @@ const DEFAULT_LIMIT = 50
 const getNumeric = (value: unknown) => {
   if (value === null || value === undefined || value === '') return null
   const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : null
+  
+return Number.isFinite(parsed) ? parsed : null
 }
 
 const formatNumber = (value: unknown, digits = 2) => {
   const numeric = getNumeric(value)
   if (numeric === null) return '?'
-  return numeric.toFixed(digits)
+  
+return numeric.toFixed(digits)
 }
 
 const formatPercent = (value: unknown) => {
   const numeric = getNumeric(value)
   if (numeric === null) return '?'
-  return `${numeric.toFixed(2)}%`
+  
+return `${numeric.toFixed(2)}%`
 }
 
 const formatRatio = (value: unknown) => {
   const numeric = getNumeric(value)
   if (numeric === null) return '?'
-  return numeric.toFixed(2)
+  
+return numeric.toFixed(2)
 }
 
 const formatChange = (value: unknown) => {
   const numeric = getNumeric(value)
   if (numeric === null) return '?'
   const sign = numeric > 0 ? '+' : ''
-  return `${sign}${numeric.toFixed(2)} pp`
+  
+return `${sign}${numeric.toFixed(2)} pp`
 }
 
 const gradeColor = (grade?: string) => {
@@ -169,7 +174,8 @@ const recommendationColor = (recommendation?: string) => {
   if (text.includes('Value')) return 'primary'
   if (text.includes('Watch')) return 'warning'
   if (text.includes('Reject')) return 'error'
-  return 'default'
+  
+return 'default'
 }
 
 const tierCards = [
@@ -294,7 +300,8 @@ const ValueAnalysisPage: NextPage = () => {
         else if (recommendation.includes('Value')) acc.buy += 1
         else if (recommendation.includes('Watch')) acc.watch += 1
         else acc.reject += 1
-        return acc
+        
+return acc
       },
       { total: 0, strong: 0, buy: 0, watch: 0, reject: 0 },
     )
@@ -387,7 +394,8 @@ const ValueAnalysisPage: NextPage = () => {
               const expanded = expandedSymbol === row.symbol
               const focusColor = getTierTint(tier)
               const rules = getTierRules(row, tier)
-              return (
+              
+return (
                 <Fragment key={String(row.symbol || row.master_id)}>
                   <TableRow hover sx={{ '& td': { borderBottomColor: 'divider' } }}>
                     <TableCell>
@@ -526,7 +534,8 @@ const ValueAnalysisPage: NextPage = () => {
         <TableBody>
           {tableRows.map(row => {
             const expanded = expandedSymbol === row.symbol
-            return (
+            
+return (
               <Fragment key={String(row.symbol || row.master_id)}>
                 <TableRow
                   hover

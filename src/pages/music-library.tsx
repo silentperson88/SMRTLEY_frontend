@@ -77,7 +77,8 @@ const MusicLibraryPage: NextPage = () => {
     const value = String(url || '').trim()
     if (!value) return ''
     if (/^https?:\/\//i.test(value)) return value
-    return `${apiBase}/${value.replace(/^\/+/, '')}`
+    
+return `${apiBase}/${value.replace(/^\/+/, '')}`
   }
 
   const loadData = async () => {
@@ -139,7 +140,8 @@ const MusicLibraryPage: NextPage = () => {
     try {
       if (!pendingFiles.length) {
         setError('Select one or more audio files first.')
-        return
+        
+return
       }
       setError('')
       setSuccess('')
@@ -273,7 +275,8 @@ const MusicLibraryPage: NextPage = () => {
                       {(selected as Array<string | number>).map(item => {
                         const id = Number(item)
                         const category = categories.find(categoryItem => Number(categoryItem.id) === id)
-                        return <Chip key={id} size='small' label={category?.category_name || String(id)} />
+                        
+return <Chip key={id} size='small' label={category?.category_name || String(id)} />
                       })}
                       {!selected.length ? (
                         <Typography variant='body2' color='text.secondary'>

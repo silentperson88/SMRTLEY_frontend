@@ -236,7 +236,8 @@ const AudioVoiceStylesPage: NextPage = () => {
   const outputAudioSrc = useMemo(() => {
     if (!outputAudioUrl) return ''
     const normalizedPath = outputAudioUrl.startsWith('/') ? outputAudioUrl : `/${outputAudioUrl}`
-    return `${apiBase}${normalizedPath}`
+    
+return `${apiBase}${normalizedPath}`
   }, [outputAudioUrl])
 
   const setStyleProfile = (nextStyle: VoiceStyle) => {

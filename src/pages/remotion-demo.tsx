@@ -55,7 +55,8 @@ const extractBullets = (text: string) => {
     .split(/\r?\n/)
     .map(line => line.trim())
     .filter(Boolean)
-  return lines
+  
+return lines
     .map(line => line.replace(/^[-*•]\s+|^\d+[.)]\s+/, '').trim())
     .filter((line, idx) => /^[-*•]\s+/.test(lines[idx]) || /^\d+[.)]\s+/.test(lines[idx]))
 }
@@ -66,11 +67,13 @@ const toSpokenBulletNarration = (text: string, lang: Language) => {
   if (lang === 'hi') {
     const intro = 'मुख्य बिंदु ध्यान से सुनिए।'
     const points = bullets.map((item, idx) => `मुद्दा ${idx + 1}: ${item}।`).join(' ')
-    return `${intro} ${points} यही आज का सार है।`
+    
+return `${intro} ${points} यही आज का सार है।`
   }
   const intro = 'Here are the key points.'
   const points = bullets.map((item, idx) => `Point ${idx + 1}: ${item}.`).join(' ')
-  return `${intro} ${points} That is the quick summary.`
+  
+return `${intro} ${points} That is the quick summary.`
 }
 
 const defaultApproaches: DemoApproach[] = [
@@ -165,7 +168,8 @@ const RemotionDemoPage: NextPage = () => {
     if (!url) return ''
     if (url.startsWith('http://') || url.startsWith('https://')) return url
     const normalized = url.startsWith('/') ? url : `/${url}`
-    return `${apiBase}${normalized}`
+    
+return `${apiBase}${normalized}`
   }
 
   const getLang = (id: string): Language => templateLanguage[id] || 'hi'
@@ -201,7 +205,8 @@ const RemotionDemoPage: NextPage = () => {
         const current = item.multiScenesByLang[lang] || []
         const next = [...current]
         next[index] = { ...next[index], [field]: value }
-        return {
+        
+return {
           ...item,
           multiScenesByLang: {
             hi: item.multiScenesByLang.hi || [],
@@ -251,7 +256,8 @@ const RemotionDemoPage: NextPage = () => {
         setPreviewDurationFrames(durationFrames)
         setPreviewScenes([])
         setSuccess(`Audio and preview generated (${(duration || 0).toFixed(1)}s) in ${lang.toUpperCase()}.`)
-        return
+        
+return
       }
 
       const scenesInput = (approach.multiScenesByLang?.[lang] || []).map((scene, idx) => ({
@@ -279,7 +285,8 @@ const RemotionDemoPage: NextPage = () => {
         returned.map(async scene => {
           const audioUrl = toAbsolute(String(scene?.audioUrl || ''))
           const d = await getAudioDuration(audioUrl)
-          return {
+          
+return {
             id: Number(scene?.id || 0),
             heading: String(scene?.heading || 'Scene'),
             onScreenText: String(scene?.narration || ''),
@@ -321,7 +328,8 @@ const RemotionDemoPage: NextPage = () => {
           {approaches.map(approach => {
             const lang = getLang(approach.id)
             const scenes = approach.multiScenesByLang?.[lang] || []
-            return (
+            
+return (
               <Card key={approach.id} variant={approach.id === selectedId ? 'elevation' : 'outlined'}>
                 <CardContent>
                   <Stack spacing={2}>

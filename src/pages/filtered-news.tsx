@@ -192,13 +192,15 @@ const toDateInput = (date: Date) => {
   const year = date.getFullYear()
   const month = `${date.getMonth() + 1}`.padStart(2, '0')
   const day = `${date.getDate()}`.padStart(2, '0')
-  return `${year}-${month}-${day}`
+  
+return `${year}-${month}-${day}`
 }
 
 const shiftDate = (base: Date, offsetDays: number) => {
   const next = new Date(base)
   next.setDate(next.getDate() + offsetDays)
-  return next
+  
+return next
 }
 
 const getDateRangeFromPreset = (preset: DateRangePreset, customFromDate: string, customToDate: string) => {
@@ -208,12 +210,14 @@ const getDateRangeFromPreset = (preset: DateRangePreset, customFromDate: string,
   if (preset === 'today') return { fromDate: todayStr, toDate: todayStr }
   if (preset === 'yesterday') {
     const yesterday = toDateInput(shiftDate(today, -1))
-    return { fromDate: yesterday, toDate: yesterday }
+    
+return { fromDate: yesterday, toDate: yesterday }
   }
   if (preset === 'last7') return { fromDate: toDateInput(shiftDate(today, -6)), toDate: todayStr }
   if (preset === 'last30') return { fromDate: toDateInput(shiftDate(today, -29)), toDate: todayStr }
   if (preset === 'custom') return { fromDate: customFromDate || '', toDate: customToDate || '' }
-  return { fromDate: '', toDate: '' }
+  
+return { fromDate: '', toDate: '' }
 }
 
 const FilteredNewsPage: NextPage = () => {
@@ -275,7 +279,8 @@ const FilteredNewsPage: NextPage = () => {
   const clampWords = (text: string, maxWords: number) => {
     const words = String(text || '').trim().split(/\s+/).filter(Boolean)
     if (words.length <= maxWords) return words.join(' ')
-    return `${words.slice(0, maxWords).join(' ')}...`
+    
+return `${words.slice(0, maxWords).join(' ')}...`
   }
 
   const lineClampStyle = (lines: number) => ({
@@ -290,7 +295,8 @@ const FilteredNewsPage: NextPage = () => {
     const value = String(url || '').trim()
     if (!value) return ''
     if (/^https?:\/\//i.test(value)) return value
-    return `${apiBase}/${value.replace(/^\/+/, '')}`
+    
+return `${apiBase}/${value.replace(/^\/+/, '')}`
   }
 
   useEffect(() => {
@@ -341,7 +347,8 @@ const FilteredNewsPage: NextPage = () => {
         .map(item => String(item || '').trim())
         .filter(Boolean)
         .join('\n')
-      return { title, caption: `${templateText}${footerBlock}`.trim() }
+      
+return { title, caption: `${templateText}${footerBlock}`.trim() }
     }
 
     if (templateType === 'templateTwo') {
@@ -355,7 +362,8 @@ const FilteredNewsPage: NextPage = () => {
         .map(item => String(item || '').trim())
         .filter(Boolean)
         .join('\n')
-      return { title, caption: `${templateText}${footerBlock}`.trim() }
+      
+return { title, caption: `${templateText}${footerBlock}`.trim() }
     }
 
     const title = String(detailRow?.template_three?.title || detailRow?.template_two?.heading?.[0] || detailRow?.title || '').trim()
@@ -367,7 +375,8 @@ const FilteredNewsPage: NextPage = () => {
       .map(item => String(item || '').trim())
       .filter(Boolean)
       .join('\n')
-    return { title, caption: `${templateText}${footerBlock}`.trim() }
+    
+return { title, caption: `${templateText}${footerBlock}`.trim() }
   }
 
   const openPostReview = (templateType: PostTemplateType) => {
@@ -400,7 +409,8 @@ const FilteredNewsPage: NextPage = () => {
       detailRow.template_one?.shortText ||
       detailRow.template_one?.mediumText ||
       ''
-    return {
+    
+return {
       ...detailRow.template_one,
       brand: 'Run4Dream',
       title: postReviewTitle || detailRow.template_one?.title || detailRow.title || '',
@@ -524,7 +534,8 @@ const FilteredNewsPage: NextPage = () => {
     if (isPlatformPosted('Facebook')) {
       setFacebookRenderMessage('Facebook is already posted for this item.')
       setFacebookPublishReady(false)
-      return
+      
+return
     }
     setFacebookPreparing(true)
     setFacebookPublishReady(false)
@@ -575,11 +586,13 @@ const FilteredNewsPage: NextPage = () => {
     setPostReviewPlatform(platform)
     if (platform !== 'Facebook') {
       setPostReviewInfo(`${platform} selected. Facebook publishing is wired first; the other platform posts stay in review mode for now.`)
-      return
+      
+return
     }
     if (isPlatformPosted('Facebook')) {
       setPostReviewInfo('Facebook is already posted for this item.')
-      return
+      
+return
     }
     setPostPublishing(true)
     setPostReviewInfo('Publishing to Facebook...')
@@ -636,11 +649,13 @@ const FilteredNewsPage: NextPage = () => {
     const scheduledAt = String(postScheduleAt || '').trim()
     if (!scheduledAt) {
       setPostReviewInfo('Choose a schedule date and time first.')
-      return
+      
+return
     }
     if (isPlatformPosted(platform)) {
       setPostReviewInfo(`${platform} has already been posted for this item.`)
-      return
+      
+return
     }
     setPostPublishing(true)
     setPostReviewInfo(`Scheduling for ${platform}...`)
@@ -688,7 +703,8 @@ const FilteredNewsPage: NextPage = () => {
 
   const normalizeMusicSelection = (selection?: TemplateMusicSelection | null): TemplateMusicSelection => {
     const source = selection || {}
-    return {
+    
+return {
       templateOne: source.templateOne || null,
       templateTwo: source.templateTwo || null,
       templateThree: source.templateThree || null,
@@ -697,7 +713,8 @@ const FilteredNewsPage: NextPage = () => {
 
   const getSelectedMusicTrack = (template: 'templateOne' | 'templateTwo' | 'templateThree') => {
     const selection = detailRow?.template_music_selection || musicSelectionDraft
-    return selection?.[template] || null
+    
+return selection?.[template] || null
   }
 
   const updateDraftPage = (index: number, patch: Partial<SocialTemplatePage>) => {
@@ -735,7 +752,8 @@ const FilteredNewsPage: NextPage = () => {
           }))
           .filter(item => Boolean(item.url))
       )
-      return
+      
+return
     }
     syncImageItems(fallbackSources || [])
   }
@@ -759,10 +777,12 @@ const FilteredNewsPage: NextPage = () => {
       }
       setDetailRow(nextRow)
       setRows(prevRows => prevRows.map(row => (row.id === detailRow.id ? nextRow : row)))
-      return res?.data?.data || null
+      
+return res?.data?.data || null
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'Failed to save selected images')
-      return null
+      
+return null
     }
   }
 
@@ -780,7 +800,8 @@ const FilteredNewsPage: NextPage = () => {
         setRows(prevRows => prevRows.map(row => (row.id === detailRow.id ? { ...row, images: selected } : row)))
       }
       void persistSelectedImages(next)
-      return next
+      
+return next
     })
   }
 
@@ -793,7 +814,8 @@ const FilteredNewsPage: NextPage = () => {
         setRows(prevRows => prevRows.map(row => (row.id === detailRow.id ? { ...row, images: selectedImages } : row)))
       }
       void persistSelectedImages(next)
-      return next
+      
+return next
     })
   }
 
@@ -811,7 +833,8 @@ const FilteredNewsPage: NextPage = () => {
       setTemplateOneTitleDraft(nextTitle)
       setTemplateOneDescriptionDraft(nextDescription)
       setRows(prev => prev.map(row => (row.id === detailRow.id ? { ...row, template_one: next } : row)))
-      return
+      
+return
     }
 
     if (templateType === 'templateTwo') {
@@ -821,7 +844,8 @@ const FilteredNewsPage: NextPage = () => {
       }
       setDetailRow({ ...detailRow, template_two: next })
       setRows(prev => prev.map(row => (row.id === detailRow.id ? { ...row, template_two: next } : row)))
-      return
+      
+return
     }
 
     const next = {
@@ -920,21 +944,25 @@ const FilteredNewsPage: NextPage = () => {
 
   const getPlatformState = (platform: PostPlatform) => {
     const key = String(platform || '').trim().toLowerCase() as keyof PlatformPostStateMap
-    return detailRow?.platform_post_state?.[key] || null
+    
+return detailRow?.platform_post_state?.[key] || null
   }
 
   const isPlatformPosted = (platform: PostPlatform) => Boolean(getPlatformState(platform)?.published)
   const getPlatformScheduleState = (platform: PostPlatform) => {
     const key = String(platform || '').trim().toLowerCase() as keyof PlatformScheduleStateMap
-    return detailRow?.platform_schedule_state?.[key] || null
+    
+return detailRow?.platform_schedule_state?.[key] || null
   }
   const isPlatformScheduled = (platform: PostPlatform) => {
     const state = getPlatformScheduleState(platform)
-    return Boolean(state?.scheduled) && !Boolean(getPlatformState(platform)?.published)
+    
+return Boolean(state?.scheduled) && !Boolean(getPlatformState(platform)?.published)
   }
   const platformButtonSx = (platform: PostPlatform) => {
     if (!isPlatformPosted(platform)) return undefined
-    return {
+    
+return {
       bgcolor: 'success.main',
       color: 'common.white',
       '&:hover': { bgcolor: 'success.dark' },
@@ -972,7 +1000,8 @@ const FilteredNewsPage: NextPage = () => {
       setFacebookPublishReady(false)
       setFacebookPreviewUrl('')
       setFacebookPreparing(false)
-      return
+      
+return
     }
 
     const status = String(state.status || 'queued').toLowerCase() as 'idle' | 'queued' | 'rendering' | 'completed' | 'failed'
@@ -1071,11 +1100,13 @@ const FilteredNewsPage: NextPage = () => {
   const toggleImageMode = (template: 'templateOne' | 'templateTwo' | 'templateThree') => {
     if (template === 'templateOne') {
       setTemplateOneImageMode(prev => (prev === 'custom' ? 'original' : 'custom'))
-      return
+      
+return
     }
     if (template === 'templateTwo') {
       setTemplateTwoImageMode(prev => (prev === 'custom' ? 'original' : 'custom'))
-      return
+      
+return
     }
     setTemplateThreeImageMode(prev => (prev === 'custom' ? 'original' : 'custom'))
   }
@@ -1104,10 +1135,12 @@ const FilteredNewsPage: NextPage = () => {
       const nextRows = Array.isArray(listRes?.data?.data) ? listRes.data.data : []
       setRows(nextRows)
       setProgress(progRes?.data?.data || { pending: 0, processing: 0, completed: 0, failed: 0 })
-      return nextRows
+      
+return nextRows
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'Failed to load filtered news')
-      return []
+      
+return []
     } finally {
       setLoading(false)
     }
@@ -1210,7 +1243,8 @@ const FilteredNewsPage: NextPage = () => {
     const timer = setInterval(() => {
       setCarouselIndex(prev => (total ? (prev + 1) % total : 0))
     }, 2500)
-    return () => clearInterval(timer)
+    
+return () => clearInterval(timer)
   }, [detailOpen, detailRow?.images?.length])
 
   useEffect(() => {
@@ -1219,7 +1253,8 @@ const FilteredNewsPage: NextPage = () => {
     const timer = setInterval(() => {
       setTemplateSlideIndex(prev => (prev + 1) % 3)
     }, 2600)
-    return () => clearInterval(timer)
+    
+return () => clearInterval(timer)
   }, [detailOpen])
 
   const handleFetchArticleBody = async () => {
@@ -1276,7 +1311,8 @@ const FilteredNewsPage: NextPage = () => {
           setRows(prevRows => prevRows.map(row => (row.id === detailRow.id ? { ...row, images: selected } : row)))
         }
         void persistSelectedImages(next)
-        return next
+        
+return next
       })
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'Failed to upload images')
@@ -1299,7 +1335,8 @@ const FilteredNewsPage: NextPage = () => {
   useEffect(() => {
     if (dateRangePreset !== 'custom') {
       load()
-      return
+      
+return
     }
 
     if (customFromDate && customToDate) {
@@ -2161,7 +2198,8 @@ const FilteredNewsPage: NextPage = () => {
                         const start = (carouselIndex % totalImages) * perImage
                         const slice = points.slice(start, start + perImage)
                         const visible = slice.length ? slice : points.slice(0, perImage)
-                        return (
+                        
+return (
                           <div
                             style={{
                               position: 'absolute',
@@ -2429,7 +2467,8 @@ const FilteredNewsPage: NextPage = () => {
                   const absoluteUrl = toAbsoluteUrl(track.file_url)
                   const selectedTrack = musicDialogTemplate ? getSelectedMusicTrack(musicDialogTemplate) : null
                   const isSelected = Boolean(selectedTrack && selectedTrack.id === track.id)
-                  return (
+                  
+return (
                     <ListItem
                       key={track.id}
                       divider

@@ -85,7 +85,8 @@ type FullVideoRow = {
 
 const isoToday = () => {
   const d = new Date()
-  return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}-${`${d.getDate()}`.padStart(2, '0')}`
+  
+return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}-${`${d.getDate()}`.padStart(2, '0')}`
 }
 
 const NewsCreatorListPage: NextPage = () => {
@@ -128,7 +129,8 @@ const NewsCreatorListPage: NextPage = () => {
     if (!raw) return ''
     if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
     const normalized = raw.startsWith('/') ? raw : `/${raw}`
-    return `${apiBase}${normalized}`
+    
+return `${apiBase}${normalized}`
   }
   const getAudioDuration = (src: string): Promise<number> =>
     new Promise(resolve => {
@@ -216,7 +218,8 @@ const NewsCreatorListPage: NextPage = () => {
           a.click()
           a.remove()
           setSuccess('Render completed. Download started.')
-          return
+          
+return
         }
         if (status === 'failed') {
           const errMsg = String(statusRes?.data?.data?.error || 'Render failed')
@@ -364,7 +367,8 @@ const NewsCreatorListPage: NextPage = () => {
 
     poll()
     timer = setInterval(poll, 2000)
-    return () => {
+    
+return () => {
       stopped = true
       if (timer) clearInterval(timer)
     }
@@ -505,7 +509,8 @@ const NewsCreatorListPage: NextPage = () => {
       const durations = await Promise.all(
         composedItems.map(async item => {
           const d = await getAudioDuration(item.audioUrl || '')
-          return Math.max(3, Number(d || 6))
+          
+return Math.max(3, Number(d || 6))
         })
       )
       const frames = Math.max(PREVIEW_FPS * 10, Math.round(durations.reduce((sum, sec) => sum + sec, 0) * PREVIEW_FPS))
@@ -565,7 +570,8 @@ const NewsCreatorListPage: NextPage = () => {
       const durations = await Promise.all(
         candidates.map(async item => {
           const d = await getAudioDuration(item.audioUrl || '')
-          return Math.max(3, Number(d || 6))
+          
+return Math.max(3, Number(d || 6))
         })
       )
       const frames = Math.max(PREVIEW_FPS * 10, Math.round(durations.reduce((sum, sec) => sum + sec, 0) * PREVIEW_FPS))

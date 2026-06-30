@@ -107,6 +107,7 @@ const TableStickyHeader = ({
             variant='contained'
             color='primary'
             onClick={() => handleStockCheck(id, token, name, exch_seg)}
+
             // disabled={status === 'approved' || status === 'rejected'}
           >
             Check

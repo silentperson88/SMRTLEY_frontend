@@ -86,19 +86,22 @@ const DEFAULT_MIN_ROCE = 0
 const getNumeric = (value: unknown) => {
   if (value === null || value === undefined || value === '') return null
   const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : null
+  
+return Number.isFinite(parsed) ? parsed : null
 }
 
 const formatNumber = (value: unknown, digits = 2) => {
   const numeric = getNumeric(value)
   if (numeric === null) return '—'
-  return numeric.toFixed(digits)
+  
+return numeric.toFixed(digits)
 }
 
 const formatPercent = (value: unknown) => {
   const numeric = getNumeric(value)
   if (numeric === null) return '—'
-  return `${numeric.toFixed(2)}%`
+  
+return `${numeric.toFixed(2)}%`
 }
 
 const gradeColor = (grade?: string) => {
@@ -175,7 +178,8 @@ const DividendAnalysisPage: NextPage = () => {
         if (scoreDiff !== 0) return scoreDiff
         const yieldDiff = Number(b?.analysis?.metrics?.dividend_yield ?? b?.dividend_yield ?? 0) - Number(a?.analysis?.metrics?.dividend_yield ?? a?.dividend_yield ?? 0)
         if (yieldDiff !== 0) return yieldDiff
-        return String(a?.symbol || '').localeCompare(String(b?.symbol || ''))
+        
+return String(a?.symbol || '').localeCompare(String(b?.symbol || ''))
       })
   }, [rows, minScore, minYield, minRoe, minRoce, showOnlyPassing])
 
@@ -185,7 +189,8 @@ const DividendAnalysisPage: NextPage = () => {
         const grade = String(row?.analysis?.grade || 'D').toUpperCase()
         acc.total += 1
         acc.byGrade[grade] = (acc.byGrade[grade] || 0) + 1
-        return acc
+        
+return acc
       },
       { total: 0, byGrade: {} as Record<string, number> },
     )

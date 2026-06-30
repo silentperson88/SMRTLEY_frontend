@@ -36,7 +36,8 @@ const HIGHLIGHT_REGEX =
 const isHighlightedFragment = (value: string) => {
   const fragment = String(value || '').trim()
   if (!fragment) return false
-  return /^(\d+(?:\.\d+)?\s*%|(?:₹|rs\.?|inr)\s*\d[\d,]*(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s*(?:₹|rs\.?|inr)|\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}|\d{4}-\d{2}-\d{2}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december)\s+\d{1,2}(?:,)?\s+\d{4})$/i.test(
+  
+return /^(\d+(?:\.\d+)?\s*%|(?:₹|rs\.?|inr)\s*\d[\d,]*(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s*(?:₹|rs\.?|inr)|\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}|\d{4}-\d{2}-\d{2}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december)\s+\d{1,2}(?:,)?\s+\d{4})$/i.test(
     fragment
   )
 }
@@ -60,7 +61,8 @@ const renderHighlightedText = (
     const escaped = safeKeywords.map(item => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
     const exactRegex = new RegExp(`(${escaped.join('|')})`, 'gi')
     const parts = String(text || '').split(exactRegex)
-    return parts.map((part, idx) => {
+    
+return parts.map((part, idx) => {
       if (!part) return null
       const token = part.toLowerCase().trim()
       const isExact = safeKeywords.some(item => item.toLowerCase().trim() === token)
@@ -72,7 +74,8 @@ const renderHighlightedText = (
           : isNegative
           ? { background: 'rgba(239,68,68,0.26)', color: '#7f1d1d' }
           : { background: 'rgba(250,204,21,0.35)', color: '#7c2d12' }
-        return (
+        
+return (
           <span
             key={`kx-${idx}-${part}`}
             style={{
@@ -86,13 +89,15 @@ const renderHighlightedText = (
           </span>
         )
       }
-      return <span key={`kt-${idx}`}>{part}</span>
+      
+return <span key={`kt-${idx}`}>{part}</span>
     })
   }
 
   const src = String(text || '')
   const parts = src.split(HIGHLIGHT_REGEX)
-  return parts.map((part, idx) => {
+  
+return parts.map((part, idx) => {
     if (!part) return null
     if (isHighlightedFragment(part)) {
       return (
@@ -110,7 +115,8 @@ const renderHighlightedText = (
         </span>
       )
     }
-    return <span key={`tx-${idx}`}>{part}</span>
+    
+return <span key={`tx-${idx}`}>{part}</span>
   })
 }
 

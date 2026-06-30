@@ -101,7 +101,8 @@ const ResetPasswordPage = () => {
     }
 
     setErrors(errorState)
-    return Object.values(errorState).every(x => x === '' || x === false)
+    
+return Object.values(errorState).every(x => x === '' || x === false)
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

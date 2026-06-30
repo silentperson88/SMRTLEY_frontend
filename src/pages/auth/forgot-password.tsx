@@ -53,7 +53,8 @@ const ForgotPasswordPage = () => {
     setError('')
     if (!values.email.trim()) {
       setError('Email is required')
-      return
+      
+return
     }
 
     const res = await forgotPassword({ email: values.email })

@@ -31,7 +31,8 @@ export const SocialTemplateThreeHeaderComposition: React.FC<SocialTemplateThreeH
   imageMode = 'custom'
 }) => {
   const isOriginal = imageMode === 'original'
-  return (
+  
+return (
     <AbsoluteFill style={{ background: '#0b1220', color: '#f8fafc', fontFamily: 'Inter, Montserrat, Arial, sans-serif' }}>
       {image ? (
         <AbsoluteFill>

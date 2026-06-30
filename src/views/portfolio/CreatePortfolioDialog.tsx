@@ -33,17 +33,26 @@ interface portfolioPayload {
   name: string
   portfolio_type_id: string
   initial_fund: number
+  meta?: {
+    mode?: 'BACKTEST'
+    as_of_date?: string
+    query?: string
+    watchlist_master_ids?: number[]
+  }
 }
 
 const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Props) => {
   const [portfolioName, setPortfolioName] = useState('')
   const [selectedType, setSelectedType] = useState<PortfolioType | null>(null)
   const [initialFund, setInitialFund] = useState<number | ''>('')
+  const [backtestDate, setBacktestDate] = useState('')
+  const [backtestQuery, setBacktestQuery] = useState('')
   const [accepted, setAccepted] = useState(false)
   const { showSnackbar } = useSnackbar()
 
   const { trigger } = useMutationSWR<{ message: string }, portfolioPayload>(ENDURL.GET_MY_PORTFOLIOS)
   const [fundError, setFundError] = useState<string>('')
+  const isBacktesting = selectedType?.code === 'BACKTESTING'
 
   const handleCreate = async () => {
     if (!portfolioName || !selectedType || !accepted) return
@@ -53,7 +62,23 @@ const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Pr
       const payload: portfolioPayload = {
         name: portfolioName,
         portfolio_type_id: selectedType.id,
-        initial_fund: initialFund || 0
+        initial_fund: initialFund || 0,
+        meta: isBacktesting
+          ? {
+              mode: 'BACKTEST',
+              as_of_date: backtestDate,
+              query: backtestQuery.trim(),
+              watchlist_master_ids: []
+            }
+          : {
+              watchlist_master_ids: []
+            }
+      }
+
+      if (isBacktesting && !backtestDate) {
+        setFundError('Backtesting portfolio requires an as of date.')
+        
+return
       }
 
       console.log('CREATE PORTFOLIO PAYLOAD', payload)
@@ -84,6 +109,10 @@ const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Pr
 
     setSelectedType(type)
     setInitialFund(type.fund || 0)
+    if (type.code !== 'BACKTESTING') {
+      setBacktestDate('')
+      setBacktestQuery('')
+    }
   }
 
   useEffect(() => {
@@ -136,6 +165,30 @@ const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Pr
           </Alert>
         )}
 
+        {isBacktesting && (
+          <>
+            <TextField
+              fullWidth
+              type='date'
+              label='As Of Date'
+              margin='normal'
+              value={backtestDate}
+              onChange={e => setBacktestDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              fullWidth
+              multiline
+              minRows={3}
+              label='Saved Query'
+              margin='normal'
+              placeholder='Paste the historical screener query you want to keep with this portfolio.'
+              value={backtestQuery}
+              onChange={e => setBacktestQuery(e.target.value)}
+            />
+          </>
+        )}
+
         {/* Initial Fund */}
         <TextField
           fullWidth
@@ -186,7 +239,11 @@ const CreatePortfolioDialog = ({ open, onClose, portfolioTypes, selectedId }: Pr
         <Button onClick={onClose} color='secondary'>
           Cancel
         </Button>
-        <Button variant='contained' onClick={handleCreate} disabled={!portfolioName || !selectedType || !accepted}>
+        <Button
+          variant='contained'
+          onClick={handleCreate}
+          disabled={!portfolioName || !selectedType || !accepted || (isBacktesting && !backtestDate)}
+        >
           Create Portfolio
         </Button>
       </DialogActions>

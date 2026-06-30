@@ -64,7 +64,8 @@ const VerifyEmailPage = () => {
 
     if (!emailFromSession) {
       router.replace('/auth/register')
-      return
+      
+return
     }
 
     setValues(prev => ({ ...prev, email: emailFromSession }))
@@ -84,9 +85,11 @@ const VerifyEmailPage = () => {
         if (prev <= 1) {
           clearInterval(timer)
           setCanResend(true)
-          return 0
+          
+return 0
         }
-        return prev - 1
+        
+return prev - 1
       })
     }, 1000)
 

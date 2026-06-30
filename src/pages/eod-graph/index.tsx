@@ -168,9 +168,21 @@ interface PredictionSignal {
   details: string
 }
 
-const formatDate = (d: Date) => d.toISOString().slice(0, 10)
+const indiaDateFormatter = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Asia/Kolkata',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+
+const formatDate = (d: Date) => indiaDateFormatter.format(d)
 
 const toValidDate = (value: string | Date) => {
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const dateOnly = new Date(`${value}T00:00:00+05:30`)
+    if (!Number.isNaN(dateOnly.getTime())) return dateOnly
+  }
+
   const direct = new Date(value)
   if (!Number.isNaN(direct.getTime())) return direct
 
@@ -206,14 +218,16 @@ const getWeekStartTs = (ts: number) => {
   const diffToMonday = (day + 6) % 7
   d.setUTCDate(d.getUTCDate() - diffToMonday)
   d.setUTCHours(0, 0, 0, 0)
-  return d.getTime()
+  
+return d.getTime()
 }
 
 const getMonthStartTs = (ts: number) => {
   const d = new Date(ts)
   d.setUTCDate(1)
   d.setUTCHours(0, 0, 0, 0)
-  return d.getTime()
+  
+return d.getTime()
 }
 
 const DRAW_TOOL_LABEL: Record<DrawTool, string> = {
@@ -358,7 +372,8 @@ const EodGraphPage = () => {
 
           if (matched?.master_id) return String(matched.master_id)
           if (prev && merged.some(item => String(item.master_id) === String(prev))) return prev
-          return merged[0]?.master_id ? String(merged[0].master_id) : ''
+          
+return merged[0]?.master_id ? String(merged[0].master_id) : ''
         })
       } catch (e: any) {
         if (!active) return
@@ -427,9 +442,11 @@ const EodGraphPage = () => {
     if (range === 'ALL') return allCandles
     if (range === 'CUSTOM') {
       if (!customFromDate || !customToDate) return allCandles
-      return allCandles.filter(c => {
+      
+return allCandles.filter(c => {
         const tradeDate = candleDateToIso(c.trade_date)
-        return tradeDate ? tradeDate >= customFromDate && tradeDate <= customToDate : false
+        
+return tradeDate ? tradeDate >= customFromDate && tradeDate <= customToDate : false
       })
     }
 
@@ -447,7 +464,8 @@ const EodGraphPage = () => {
 
     return allCandles.filter(c => {
       const tradeDate = candleDateToIso(c.trade_date)
-      return tradeDate ? tradeDate >= fromDate : false
+      
+return tradeDate ? tradeDate >= fromDate : false
     })
   }, [allCandles, customFromDate, customToDate, range])
 
@@ -457,7 +475,8 @@ const EodGraphPage = () => {
     const to = toValidDate(customToDate)
     if (!from || !to || to <= from) return false
     const diffMs = to.getTime() - from.getTime()
-    return diffMs > 1000 * 60 * 60 * 24 * 365.25 * 5
+    
+return diffMs > 1000 * 60 * 60 * 24 * 365.25 * 5
   }, [customFromDate, customToDate, range])
 
   const rangeCandles = useMemo(() => {
@@ -474,7 +493,8 @@ const EodGraphPage = () => {
         if (!d || !Number.isFinite(open) || !Number.isFinite(high) || !Number.isFinite(low) || !Number.isFinite(close)) {
           return null
         }
-        return {
+        
+return {
           ts: d.getTime(),
           open,
           high,
@@ -532,7 +552,8 @@ const EodGraphPage = () => {
         if (!d || !Number.isFinite(open) || !Number.isFinite(high) || !Number.isFinite(low) || !Number.isFinite(close)) {
           return null
         }
-        return { d, open, high, low, close }
+        
+return { d, open, high, low, close }
       })
       .filter(Boolean) as Array<{ d: Date; open: number; high: number; low: number; close: number }>
 
@@ -614,7 +635,8 @@ const EodGraphPage = () => {
         }
         ath = Math.max(ath, c.high)
       }
-      return events
+      
+return events
     }
 
     const runRangeBreak = (lookback: number) => {
@@ -641,17 +663,20 @@ const EodGraphPage = () => {
 
     if (breakoutType === 'swing20') {
       runRangeBreak(20)
-      return events
+      
+return events
     }
 
     if (breakoutType === 'range20') {
       runRangeBreak(20)
-      return events
+      
+return events
     }
 
     if (breakoutType === 'range55') {
       runRangeBreak(55)
-      return events
+      
+return events
     }
 
     if (breakoutType === 'regression50') {
@@ -686,7 +711,8 @@ const EodGraphPage = () => {
           pushEvent(c.ts, 'down', lower, c.close, 'Regression Down Break', 'Close moved below the 2σ regression channel.')
         }
       }
-      return events
+      
+return events
     }
 
     return events
@@ -694,14 +720,16 @@ const EodGraphPage = () => {
 
   const latestBreakout = useMemo(() => {
     if (!breakoutEvents.length) return null
-    return breakoutEvents[breakoutEvents.length - 1]
+    
+return breakoutEvents[breakoutEvents.length - 1]
   }, [breakoutEvents])
 
   const breakoutAnnotations = useMemo(() => {
     if (!breakoutEvents.length) return undefined
     const recent = breakoutEvents.slice(-20)
     const latest = recent[recent.length - 1]
-    return {
+    
+return {
       points: recent.map(ev => ({
         x: ev.ts,
         y: ev.close,
@@ -761,7 +789,8 @@ const EodGraphPage = () => {
         num += (xs[i] - meanX) * (vals[i] - meanY)
         den += (xs[i] - meanX) ** 2
       }
-      return den === 0 ? 0 : num / den
+      
+return den === 0 ? 0 : num / den
     }
 
     const calcAtr = (endIdx: number) => {
@@ -773,7 +802,8 @@ const EodGraphPage = () => {
         const tr = Math.max(c.high - c.low, Math.abs(c.high - prevClose), Math.abs(c.low - prevClose))
         sum += tr
       }
-      return sum / atrPeriod
+      
+return sum / atrPeriod
     }
 
     for (let i = Math.max(lookback, slopeBars, atrPeriod) + 1; i < parsedCandles.length; i += 1) {
@@ -831,7 +861,8 @@ const EodGraphPage = () => {
 
   const latestPrediction = useMemo(() => {
     if (!predictionSignals.length) return null
-    return predictionSignals[predictionSignals.length - 1]
+    
+return predictionSignals[predictionSignals.length - 1]
   }, [predictionSignals])
 
   const predictionAnnotations = useMemo(() => {
@@ -885,7 +916,8 @@ const EodGraphPage = () => {
     const pPoints = predictionAnnotations?.points || []
     const pYaxis = predictionAnnotations?.yaxis || []
     if (!bPoints.length && !bYaxis.length && !pPoints.length && !pYaxis.length) return undefined
-    return {
+    
+return {
       points: [...bPoints, ...pPoints],
       yaxis: [...bYaxis, ...pYaxis]
     }
@@ -902,7 +934,8 @@ const EodGraphPage = () => {
                 const x = toValidDate(c.trade_date)
                 const close = Number(c.close)
                 if (!x || !Number.isFinite(close)) return null
-                return { x, y: close }
+                
+return { x, y: close }
               })
               .filter(Boolean)
           }
@@ -952,7 +985,8 @@ const EodGraphPage = () => {
     if (!Number.isFinite(low) || !Number.isFinite(high) || low >= high) return null
 
     const pad = (high - low) * 0.05
-    return {
+    
+return {
       minTs: Number(minTs),
       maxTs: Number(maxTs),
       minPrice: low - pad,
@@ -993,7 +1027,8 @@ const EodGraphPage = () => {
   useEffect(() => {
     if (!dataBounds) {
       setViewport(null)
-      return
+      
+return
     }
 
     setViewport({ min: dataBounds.min, max: dataBounds.max })
@@ -1124,7 +1159,8 @@ const EodGraphPage = () => {
     const price = visibleBounds.maxPrice - yRatio * (visibleBounds.maxPrice - visibleBounds.minPrice)
 
     if (!Number.isFinite(ts) || !Number.isFinite(price)) return null
-    return { ts, price }
+    
+return { ts, price }
   }
 
   const applyMagnet = (point: LinePoint): LinePoint => {
@@ -1249,7 +1285,8 @@ const EodGraphPage = () => {
       }
     }
     if (!best || best.dist > 14) return null
-    return { kind: best.kind, id: best.id }
+    
+return { kind: best.kind, id: best.id }
   }
 
   const moveSelectedDrawing = (deltaTs: number, deltaPrice: number) => {
@@ -1321,29 +1358,34 @@ const EodGraphPage = () => {
 
     if (drawTool === 'select') {
       setSelectedDrawing(getNearestDrawing(rawPoint))
-      return
+      
+return
     }
 
     const point = applyMagnet(rawPoint)
 
     if (drawTool === 'hline') {
       setHorizontalLines(prev => [...prev, { id: `${Date.now()}-${Math.random()}`, price: point.price }])
-      return
+      
+return
     }
 
     if (drawTool === 'hray') {
       setHorizontalRays(prev => [...prev, { id: `${Date.now()}-${Math.random()}`, ts: point.ts, price: point.price }])
-      return
+      
+return
     }
 
     if (drawTool === 'vline') {
       setVerticalLines(prev => [...prev, { id: `${Date.now()}-${Math.random()}`, ts: point.ts }])
-      return
+      
+return
     }
 
     if (drawTool === 'cross') {
       setCrossLines(prev => [...prev, { id: `${Date.now()}-${Math.random()}`, ts: point.ts, price: point.price }])
-      return
+      
+return
     }
 
     const nextPending = [...pendingPoints, point]
@@ -1359,7 +1401,8 @@ const EodGraphPage = () => {
     ) {
       if (nextPending.length < 3) {
         setPendingPoints(nextPending)
-        return
+        
+return
       }
 
       const [a, b, c] = nextPending
@@ -1379,34 +1422,40 @@ const EodGraphPage = () => {
         setInsidePitchforks(prev => [...prev, { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, a, b, c }])
       }
       setPendingPoints([])
-      return
+      
+return
     }
 
     if (drawTool === 'rect') {
       if (nextPending.length < 2) {
         setPendingPoints(nextPending)
-        return
+        
+return
       }
       const [a, b] = nextPending
       setRectangles(prev => [...prev, { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, a, b }])
       setPendingPoints([])
-      return
+      
+return
     }
 
     if (drawTool === 'fib') {
       if (nextPending.length < 2) {
         setPendingPoints(nextPending)
-        return
+        
+return
       }
       const [a, b] = nextPending
       setFibs(prev => [...prev, { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, a, b }])
       setPendingPoints([])
-      return
+      
+return
     }
 
     if (nextPending.length < 2) {
       setPendingPoints(nextPending)
-      return
+      
+return
     }
 
     const [start, end] = nextPending
@@ -1436,14 +1485,16 @@ const EodGraphPage = () => {
     if (!visibleBounds || plotRect.width <= 0) return 0
     const span = visibleBounds.maxTs - visibleBounds.minTs
     if (span <= 0) return 0
-    return ((ts - visibleBounds.minTs) / span) * plotRect.width
+    
+return ((ts - visibleBounds.minTs) / span) * plotRect.width
   }
 
   const toPixelY = (price: number) => {
     if (!visibleBounds || plotRect.height <= 0) return 0
     const span = visibleBounds.maxPrice - visibleBounds.minPrice
     if (span <= 0) return 0
-    return ((visibleBounds.maxPrice - price) / span) * plotRect.height
+    
+return ((visibleBounds.maxPrice - price) / span) * plotRect.height
   }
 
   const getInfiniteLineEndpoints = (start: LinePoint, end: LinePoint) => {
@@ -1491,14 +1542,16 @@ const EodGraphPage = () => {
     if (uniq.length < 2) return null
 
     uniq.sort((a, b) => a.t - b.t)
-    return { first: uniq[0], last: uniq[uniq.length - 1], startPx: { x: x1, y: y1 } }
+    
+return { first: uniq[0], last: uniq[uniq.length - 1], startPx: { x: x1, y: y1 } }
   }
 
   const getRayEndpoint = (start: LinePoint, end: LinePoint) => {
     const inf = getInfiniteLineEndpoints(start, end)
     if (!inf) return null
     const target = inf.last.t >= 0 ? inf.last : inf.first
-    return { start: inf.startPx, end: { x: target.x, y: target.y } }
+    
+return { start: inf.startPx, end: { x: target.x, y: target.y } }
   }
 
   const clipPixelLine = (x1: number, y1: number, x2: number, y2: number) => {
@@ -1536,7 +1589,8 @@ const EodGraphPage = () => {
     }
     if (uniq.length < 2) return null
     uniq.sort((a, b) => a.t - b.t)
-    return { first: uniq[0], last: uniq[uniq.length - 1] }
+    
+return { first: uniq[0], last: uniq[uniq.length - 1] }
   }
 
   const renderPitchfork = (shape: ThreePointShape, mode: 'standard' | 'schiff' | 'modified' | 'inside') => {
@@ -1613,7 +1667,8 @@ const EodGraphPage = () => {
     const delta = line.end.price - line.start.price
     const pct = line.start.price !== 0 ? (delta / line.start.price) * 100 : 0
     const days = Math.round(Math.abs(line.end.ts - line.start.ts) / (1000 * 60 * 60 * 24))
-    return `${delta >= 0 ? '+' : ''}${delta.toFixed(2)} (${pct.toFixed(2)}%) | ${days}d`
+    
+return `${delta >= 0 ? '+' : ''}${delta.toFixed(2)} (${pct.toFixed(2)}%) | ${days}d`
   }
 
   const getAngleLabel = (line: TrendLine) => {
@@ -1622,7 +1677,8 @@ const EodGraphPage = () => {
     const x2 = toPixelX(line.end.ts)
     const y2 = toPixelY(line.end.price)
     const angle = (Math.atan2(y1 - y2, x2 - x1) * 180) / Math.PI
-    return `${angle.toFixed(1)}°`
+    
+return `${angle.toFixed(1)}°`
   }
 
   const options: ApexOptions = {
@@ -1776,11 +1832,13 @@ const EodGraphPage = () => {
                         onClick={() => {
                           if (!customFromDate || !customToDate) {
                             setCustomRangeError('Please select both from and to dates.')
-                            return
+                            
+return
                           }
                           if (customFromDate > customToDate) {
                             setCustomRangeError('From date must be before To date.')
-                            return
+                            
+return
                           }
                           setCustomRangeError('')
                           setRange('CUSTOM')
@@ -2227,7 +2285,8 @@ const EodGraphPage = () => {
                     {rayLines.map(line => {
                       const ray = getRayEndpoint(line.start, line.end)
                       if (!ray) return null
-                      return (
+                      
+return (
                         <line
                           key={line.id}
                           x1={ray.start.x}
@@ -2242,7 +2301,8 @@ const EodGraphPage = () => {
                     {extendedLines.map(line => {
                       const inf = getInfiniteLineEndpoints(line.start, line.end)
                       if (!inf) return null
-                      return (
+                      
+return (
                         <line
                           key={line.id}
                           x1={inf.first.x}
@@ -2261,7 +2321,8 @@ const EodGraphPage = () => {
                       const y2 = toPixelY(line.end.price)
                       const mx = (x1 + x2) / 2
                       const my = (y1 + y2) / 2
-                      return (
+                      
+return (
                         <g key={line.id}>
                           <line
                             x1={x1}
@@ -2284,7 +2345,8 @@ const EodGraphPage = () => {
                       const y2 = toPixelY(line.end.price)
                       const mx = (x1 + x2) / 2
                       const my = (y1 + y2) / 2
-                      return (
+                      
+return (
                         <g key={line.id}>
                           <line
                             x1={x1}
@@ -2312,7 +2374,8 @@ const EodGraphPage = () => {
                       const y1l = toPixelY(meta.y1 - meta.std)
                       const y2l = toPixelY(meta.y2 - meta.std)
                       const poly = `${x1},${y1u} ${x2},${y2u} ${x2},${y2l} ${x1},${y1l}`
-                      return (
+                      
+return (
                         <g key={line.id}>
                           <polygon points={poly} fill='rgba(25,118,210,0.12)' />
                           <line
@@ -2397,7 +2460,8 @@ const EodGraphPage = () => {
                       const dy = by - ay
                       const dx2 = cx + dx
                       const dy2 = cy + dy
-                      return (
+                      
+return (
                         <g key={line.id}>
                           <line x1={ax} y1={ay} x2={bx} y2={by} stroke='#5e35b1' strokeWidth='1.8' />
                           <line
@@ -2420,7 +2484,8 @@ const EodGraphPage = () => {
                       const by = toPixelY(shape.b.price)
                       const cx = toPixelX(shape.c.ts)
                       const cy = toPixelY(shape.c.price)
-                      return (
+                      
+return (
                         <g key={shape.id}>
                           <line
                             x1={ax}
@@ -2452,7 +2517,8 @@ const EodGraphPage = () => {
                       const cy = toPixelY(shape.c.price)
                       const dx = bx - ax
                       const dy = by - ay
-                      return (
+                      
+return (
                         <g key={shape.id}>
                           <line
                             x1={ax}
@@ -2476,7 +2542,8 @@ const EodGraphPage = () => {
                     {pitchforks.map(shape => {
                       const lines = renderPitchfork(shape, 'standard')
                       if (!lines) return null
-                      return (
+                      
+return (
                         <g key={shape.id}>
                           {lines.map((ln, idx) => (
                             <line
@@ -2496,7 +2563,8 @@ const EodGraphPage = () => {
                     {schiffPitchforks.map(shape => {
                       const lines = renderPitchfork(shape, 'schiff')
                       if (!lines) return null
-                      return (
+                      
+return (
                         <g key={shape.id}>
                           {lines.map((ln, idx) => (
                             <line
@@ -2518,7 +2586,8 @@ const EodGraphPage = () => {
                     {modifiedSchiffPitchforks.map(shape => {
                       const lines = renderPitchfork(shape, 'modified')
                       if (!lines) return null
-                      return (
+                      
+return (
                         <g key={shape.id}>
                           {lines.map((ln, idx) => (
                             <line
@@ -2546,7 +2615,8 @@ const EodGraphPage = () => {
                     {insidePitchforks.map(shape => {
                       const lines = renderPitchfork(shape, 'inside')
                       if (!lines) return null
-                      return (
+                      
+return (
                         <g key={shape.id}>
                           {lines.map((ln, idx) => (
                             <line
@@ -2574,7 +2644,8 @@ const EodGraphPage = () => {
                       const top = Math.min(y1, y2)
                       const width = Math.abs(x2 - x1)
                       const height = Math.abs(y2 - y1)
-                      return (
+                      
+return (
                         <rect
                           key={shape.id}
                           x={left}
@@ -2594,11 +2665,13 @@ const EodGraphPage = () => {
                       const right = Math.max(x1, x2)
                       const levels = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1]
                       const priceAt = (lvl: number) => fib.a.price + (fib.b.price - fib.a.price) * lvl
-                      return (
+                      
+return (
                         <g key={fib.id}>
                           {levels.map(lvl => {
                             const y = toPixelY(priceAt(lvl))
-                            return (
+                            
+return (
                               <g key={`${fib.id}-${lvl}`}>
                                 <line
                                   x1={left}

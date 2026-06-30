@@ -548,7 +548,8 @@ const mapSplitRowsFromApi = (
   const sortedRows = [...rows].sort((a, b) => {
     const diff = createPeriodSortKey(a.period, a.period_numeric) - createPeriodSortKey(b.period, b.period_numeric)
     if (diff !== 0) return diff
-    return String(a.period || a.period_numeric || '').localeCompare(String(b.period || b.period_numeric || ''), undefined, {
+    
+return String(a.period || a.period_numeric || '').localeCompare(String(b.period || b.period_numeric || ''), undefined, {
       numeric: true,
       sensitivity: 'base'
     })
@@ -560,7 +561,8 @@ const mapSplitRowsFromApi = (
     label: metric.label,
     cells: sortedRows.map(row => {
       const value = row?.[metric.key as keyof QuarterlyFlatApiRow]
-      return value === null || value === undefined || value === '' ? '-' : (value as string | number)
+      
+return value === null || value === undefined || value === '' ? '-' : (value as string | number)
     }),
     level: 0,
     hasChildren: false
@@ -628,13 +630,15 @@ const renameMetricTitle = (title: string): string => {
 const formatNumber = (value: unknown, digits = 2) => {
   const parsed = Number(value)
   if (value === null || value === undefined || !Number.isFinite(parsed)) return '-'
-  return parsed.toFixed(digits)
+  
+return parsed.toFixed(digits)
 }
 
 const formatSignedPct = (value: unknown, digits = 2) => {
   const parsed = Number(value)
   if (value === null || value === undefined || !Number.isFinite(parsed)) return '-'
-  return `${parsed >= 0 ? '+' : ''}${parsed.toFixed(digits)}%`
+  
+return `${parsed >= 0 ? '+' : ''}${parsed.toFixed(digits)}%`
 }
 
 const getMomentumChipColor = (signal?: string | null) => {

@@ -29,7 +29,8 @@ const weightFromText = (value: string) => {
     .split(/\s+/)
     .map(item => item.trim())
     .filter(Boolean).length
-  return Math.max(6, Math.min(44, words))
+  
+return Math.max(6, Math.min(44, words))
 }
 
 const buildSegments = (props: MarketUpdatesSequenceProps, totalFrames: number): Segment[] => {
@@ -56,7 +57,8 @@ const buildSegments = (props: MarketUpdatesSequenceProps, totalFrames: number): 
   let cursor = 0
   const segments: Segment[] = keys.map((key, idx) => {
     const raw = Math.max(24, Math.round((weights[idx] / totalWeight) * safeTotal))
-    return {
+    
+return {
       kind: key.kind,
       itemIndex: key.itemIndex,
       start: 0,
@@ -69,7 +71,8 @@ const buildSegments = (props: MarketUpdatesSequenceProps, totalFrames: number): 
       segment.start = cursor
       segment.duration = Math.max(24, safeTotal - cursor)
       cursor = safeTotal
-      return
+      
+return
     }
     segment.start = cursor
     cursor += segment.duration
@@ -305,7 +308,8 @@ export const MarketUpdatesSequenceComposition: React.FC<MarketUpdatesSequencePro
 
         if (segment.kind === 'item') {
           const item = items[Number(segment.itemIndex || 0)] || { company: 'Company', headline: '' }
-          return (
+          
+return (
             <Sequence key={`seg-${idx}`} from={segment.start} durationInFrames={segment.duration}>
               <SceneCard
                 title={String(item.company || 'Company')}

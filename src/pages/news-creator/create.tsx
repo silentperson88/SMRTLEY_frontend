@@ -81,7 +81,8 @@ const compressImageToDataUrl = async (file: File): Promise<string> => {
   const ctx = canvas.getContext('2d')
   if (!ctx) return originalDataUrl
   ctx.drawImage(img, 0, 0, targetW, targetH)
-  return canvas.toDataURL('image/jpeg', 0.82)
+  
+return canvas.toDataURL('image/jpeg', 0.82)
 }
 
 const RemotionPlayer = dynamic(() => import('@remotion/player').then(mod => mod.Player), {
@@ -134,7 +135,8 @@ const NewsCreatorBuildPage: NextPage = () => {
   const workingScript = useMemo(() => {
     const short = String(shortScript || '').trim()
     if (short) return short
-    return String(longScript || '').trim()
+    
+return String(longScript || '').trim()
   }, [longScript, shortScript])
   const apiBase = useMemo(
     () => String(process.env.NEXT_PUBLIC_API_URL || axiosInstance.defaults.baseURL || '').replace(/\/+$/, ''),
@@ -144,7 +146,8 @@ const NewsCreatorBuildPage: NextPage = () => {
     if (!url) return ''
     if (url.startsWith('http://') || url.startsWith('https://')) return url
     const normalized = url.startsWith('/') ? url : `/${url}`
-    return `${apiBase}${normalized}`
+    
+return `${apiBase}${normalized}`
   }
   const previewDurationInFrames = useMemo(() => Math.max(PREVIEW_FPS, Math.round(totalDuration * PREVIEW_FPS)), [totalDuration])
   const previewScenes = useMemo(
@@ -403,7 +406,8 @@ const NewsCreatorBuildPage: NextPage = () => {
           const generated = byId.get(Number(scene.id))
           if (!generated) return scene
           const audioUrl = String(generated.audioUrl || '')
-          return {
+          
+return {
             ...scene,
             fileName: String(generated.fileName || ''),
             audioUrl,
@@ -486,7 +490,8 @@ const NewsCreatorBuildPage: NextPage = () => {
       setRenderProgress(progress)
       if (status === 'completed') {
         setRenderVideoUrl(getAbsoluteSrc(videoUrl))
-        return
+        
+return
       }
       if (status === 'failed') throw new Error(String(res?.data?.data?.error || 'Video render failed'))
       await new Promise(resolve => window.setTimeout(resolve, 3000))

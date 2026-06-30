@@ -109,7 +109,8 @@ const getStoredRuleState = () => {
     const raw = window.localStorage.getItem(HISTORICAL_UNIVERSE_RULES_STORAGE_KEY)
     if (!raw) return null
     const parsed = JSON.parse(raw)
-    return parsed && typeof parsed === 'object' ? parsed : null
+    
+return parsed && typeof parsed === 'object' ? parsed : null
   } catch {
     return null
   }
@@ -121,7 +122,8 @@ const gradeColor = (grade?: string) => {
   if (text.includes('VALUE')) return 'primary'
   if (text.includes('WATCH')) return 'warning'
   if (text.includes('REJECT')) return 'error'
-  return 'default'
+  
+return 'default'
 }
 
 const getActiveLineContext = (query: string, cursorIndex: number): ActiveLineContext => {
@@ -244,7 +246,8 @@ const HistoricalScreenerPage: NextPage = () => {
   const activeLineContext = useMemo(() => getActiveLineContext(query, cursorIndex), [query, cursorIndex])
   const enabledRuleCount = useMemo(() => {
     const stored = getStoredRuleState() as Record<string, RuleState> | null
-    return Object.values(stored || {}).filter(rule => Boolean(rule?.enabled)).length
+    
+return Object.values(stored || {}).filter(rule => Boolean(rule?.enabled)).length
   }, [])
 
   const updateCaretState = () => {
@@ -258,7 +261,8 @@ const HistoricalScreenerPage: NextPage = () => {
   const loadSuggestions = async (value: string) => {
     if (!value.trim()) {
       setSuggestions([])
-      return
+      
+return
     }
 
     try {
@@ -279,7 +283,8 @@ const HistoricalScreenerPage: NextPage = () => {
     const searchTerm = activeLineContext.fieldText.trim()
     if (!editorFocused || !searchTerm) {
       setSuggestions([])
-      return
+      
+return
     }
 
     const handle = setTimeout(() => {
@@ -298,7 +303,8 @@ const HistoricalScreenerPage: NextPage = () => {
     if (!q) {
       setRows([])
       setUniverse(null)
-      return
+      
+return
     }
 
     try {
@@ -345,12 +351,14 @@ const HistoricalScreenerPage: NextPage = () => {
     if (event.key === 'ArrowDown') {
       event.preventDefault()
       setActiveSuggestionIndex((current) => (current + 1) % suggestions.length)
-      return
+      
+return
     }
     if (event.key === 'ArrowUp') {
       event.preventDefault()
       setActiveSuggestionIndex((current) => (current - 1 + suggestions.length) % suggestions.length)
-      return
+      
+return
     }
     if (event.key === 'Tab') {
       event.preventDefault()
@@ -533,7 +541,8 @@ const HistoricalScreenerPage: NextPage = () => {
                     rows.map((row, index) => {
                       const symbol = String(row.symbol || '')
                       const expanded = expandedSymbol === symbol
-                      return (
+                      
+return (
                         <>
                           <TableRow key={symbol || String(index)} hover>
                             <TableCell>{index + 1}</TableCell>

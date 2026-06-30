@@ -28,7 +28,8 @@ export const AsOfDateProvider = ({ children }: { children: ReactNode }) => {
     }
 
     window.addEventListener('storage', onStorage)
-    return () => window.removeEventListener('storage', onStorage)
+    
+return () => window.removeEventListener('storage', onStorage)
   }, [])
 
   const setAsOfDate = (value: string) => {

@@ -74,7 +74,8 @@ const NewsContentListPage: NextPage = () => {
       if (created?.id) {
         setSuccess('Video draft created.')
         router.push(`/news-content/${created.id}`)
-        return
+        
+return
       }
       await load()
     } catch (err: any) {

@@ -118,7 +118,8 @@ const LiveStocks = () => {
                 existing.add(key)
               }
             }
-            return next
+            
+return next
           })()
 
     setAllStocks(nextStocks)
@@ -209,11 +210,13 @@ const LiveStocks = () => {
     if (!masterId) return
     if (!fromDate || !toDate) {
       showSnackbar('Please select both from and to dates', 'error')
-      return
+      
+return
     }
     if (fromDate > toDate) {
       showSnackbar('From date must be before or equal to to date', 'error')
-      return
+      
+return
     }
 
     const res = await triggerEodFetch({ master_id: masterId, fromDate, toDate })

@@ -10,6 +10,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Menu from 'mdi-material-ui/Menu'
 import Magnify from 'mdi-material-ui/Magnify'
 import OnlinePredictionIcon from '@mui/icons-material/OnlinePrediction'
+import SyncIcon from '@mui/icons-material/Sync'
 
 // ** Type Import
 import { Settings } from 'src/@core/context/settingsContext'
@@ -41,6 +42,10 @@ interface serverStatus {
 
 interface LoginResponse {
   status: number
+}
+
+interface TriggerResponse {
+  message?: string
 }
 
 interface SearchList {
@@ -89,6 +94,10 @@ const AppBarContent = (props: Props) => {
   }
 
   const { trigger, isMutating } = useMutationSWR<LoginResponse, { data: string }>(ENDURL.POST_SMART_LOGIN)
+  const { trigger: triggerDailyFullSync, isMutating: isDailyFullSyncMutating } = useMutationSWR<
+    TriggerResponse,
+    { master_id?: number }
+  >(ENDURL.POST_EOD_SYNC_DAILY_FULL_TRIGGER)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -113,6 +122,15 @@ const AppBarContent = (props: Props) => {
 
       // Manually revalidate GET only on success
       mutate(ENDURL.GET_SERVER_STATUS)
+    } catch (err) {
+      showSnackbar(getErrorMessage(err), 'error')
+    }
+  }
+
+  const handleDailyFullSync = async () => {
+    try {
+      await triggerDailyFullSync({})
+      showSnackbar('Daily EOD FULL sync started.', 'success')
     } catch (err) {
       showSnackbar(getErrorMessage(err), 'error')
     }
@@ -228,9 +246,29 @@ const AppBarContent = (props: Props) => {
               <Button variant='contained' sx={{ marginRight: 3.5 }} onClick={handleAngelLogin} disabled={isMutating}>
                 Start
               </Button>
+              <Button
+                variant='outlined'
+                startIcon={<SyncIcon />}
+                sx={{ marginRight: 3.5 }}
+                onClick={handleDailyFullSync}
+                disabled={isDailyFullSyncMutating}
+              >
+                Sync EOD
+              </Button>
             </>
           ) : (
-            <OnlinePredictionIcon color='primary' />
+            <>
+              <Button
+                variant='outlined'
+                startIcon={<SyncIcon />}
+                sx={{ marginRight: 2 }}
+                onClick={handleDailyFullSync}
+                disabled={isDailyFullSyncMutating}
+              >
+                Sync EOD
+              </Button>
+              <OnlinePredictionIcon color='primary' />
+            </>
           )
         ) : null}
         <ModeToggler settings={settings} saveSettings={saveSettings} />

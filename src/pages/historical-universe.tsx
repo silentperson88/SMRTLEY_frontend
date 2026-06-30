@@ -1,4 +1,5 @@
-import { FormEvent, KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import type { NextPage } from 'next'
 import axiosInstance from 'src/api/axios/axiosBaseQuery'
 import { ENDURL } from 'src/utils/constants/endurl.utils'
@@ -12,29 +13,33 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
-import Collapse from '@mui/material/Collapse'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
 import Alert from '@mui/material/Alert'
 import LinearProgress from '@mui/material/LinearProgress'
 import Chip from '@mui/material/Chip'
-import Divider from '@mui/material/Divider'
-import Accordion from '@mui/material/Accordion'
-import AccordionSummary from '@mui/material/AccordionSummary'
-import AccordionDetails from '@mui/material/AccordionDetails'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import Paper from '@mui/material/Paper'
+import Tabs from '@mui/material/Tabs'
+import Tab from '@mui/material/Tab'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import TablePagination from '@mui/material/TablePagination'
-import Paper from '@mui/material/Paper'
-import Tabs from '@mui/material/Tabs'
-import Tab from '@mui/material/Tab'
-import IconButton from '@mui/material/IconButton'
-import SearchIcon from '@mui/icons-material/Search'
+import Collapse from '@mui/material/Collapse'
+import Accordion from '@mui/material/Accordion'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { useSimpleSWR, useMutationSWR } from 'src/hooks/swr/swrhooks'
+import type { PortfolioType } from 'src/types/portfolio'
+import { useSnackbar } from 'src/layouts/components/SnackbarContext'
+import { mutate } from 'swr'
 
 interface RuleDefinition {
   id: string
@@ -72,6 +77,7 @@ interface UniverseStockRow {
 
 interface UniverseResponse {
   as_of_date: string
+  universe_state_key?: string | null
   total_candidates: number
   included_count: number
   excluded_count: number
@@ -81,12 +87,9 @@ interface UniverseResponse {
   excluded_stocks: UniverseStockRow[]
 }
 
-interface SearchSuggestion {
-  key?: string
-  label?: string
-  aliases?: string[]
-  example?: string
-  unit?: string | null
+interface UniverseSnapshot {
+  stateKey: string
+  result: UniverseResponse
 }
 
 interface SearchMatch {
@@ -98,7 +101,7 @@ interface SearchMatch {
   reason?: string
 }
 
-interface HistoricalSearchRow {
+interface SearchRow {
   master_id?: number | string | null
   symbol?: string | null
   name?: string | null
@@ -107,6 +110,7 @@ interface HistoricalSearchRow {
   analysis?: {
     score?: number
     grade?: string
+    recommendation?: string
   }
   search?: {
     matches?: SearchMatch[]
@@ -114,18 +118,28 @@ interface HistoricalSearchRow {
   }
 }
 
-interface HistoricalSearchResponse {
-  rows?: HistoricalSearchRow[]
+interface SearchUniverseSummary {
+  as_of_date?: string
+  total_candidates?: number
+  included_count?: number
+  excluded_count?: number
+  failure_counts?: Record<string, number>
+}
+
+interface SearchResponse {
+  query?: string
+  rows?: SearchRow[]
   total?: number
+  universe?: SearchUniverseSummary
   suggestions?: SearchSuggestion[]
-  engine?: string
-  timings?: {
-    universe_duration_ms?: number
-    query_duration_ms?: number
-    total_duration_ms?: number
-    included_stock_count?: number
-    used_provided_master_ids?: boolean
-  }
+}
+
+interface SearchSuggestion {
+  key?: string
+  label?: string
+  aliases?: string[]
+  example?: string
+  unit?: string | null
 }
 
 interface ActiveLineContext {
@@ -145,42 +159,91 @@ interface CursorPosition {
   lineHeight: number
 }
 
-const HISTORICAL_UNIVERSE_RULES_STORAGE_KEY = 'historical-universe-rules-v1'
+interface CreatePortfolioPayload {
+  name: string
+  portfolio_type_id: string
+  initial_fund: number
+  meta?: {
+    mode?: 'BACKTEST'
+    as_of_date?: string
+    query?: string
+    watchlist_master_ids?: number[]
+  }
+}
+
+const RULES_STORAGE_KEY = 'historical-universe-rules-v4'
+const SNAPSHOT_STORAGE_KEY = 'historical-universe-filter-snapshot-v4'
+const APPLIED_FILTER_SETUP_KEY = 'historical-universe-applied-setup-v1'
+const UNIVERSE_STATE_VERSION = 'v5'
 const FIELD_PATTERN = /^(.+?)\s*(>=|<=|!=|==|=|>|<|contains|starts with|ends with)\s*(.*)$/i
 
-const getStoredRuleState = () => {
+const normalizeDateKey = (value: string) => String(value || '').slice(0, 10).replace(/-/g, '')
+
+const stableRuleSignature = (rules: Record<string, RuleState>) =>
+  Object.keys(rules)
+    .sort()
+    .map(ruleId => {
+      const state = rules[ruleId] || { enabled: false, parameters: {} }
+      const params = Object.keys(state.parameters || {})
+        .sort()
+        .map(paramKey => `${paramKey}=${state.parameters?.[paramKey]}`)
+        .join(',')
+      
+return `${ruleId}:${state.enabled ? 1 : 0}:${params}`
+    })
+    .join('|')
+
+const hashUniverseSignature = (input: string) => {
+  let hash = 2166136261
+  for (let index = 0; index < input.length; index += 1) {
+    hash ^= input.charCodeAt(index)
+    hash = Math.imul(hash, 16777619)
+  }
+  
+return (hash >>> 0).toString(16).padStart(8, '0').slice(0, 8)
+}
+
+const buildUniverseStateKey = (asOfDate: string, rules: Record<string, RuleState>) => {
+  const dateKey = normalizeDateKey(asOfDate)
+  const rulesHash = hashUniverseSignature(stableRuleSignature(rules))
+  
+return `${UNIVERSE_STATE_VERSION}-${dateKey}-${rulesHash}`
+}
+
+const formatLabel = (key: string) =>
+  String(key || '')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, letter => letter.toUpperCase())
+
+const readJson = <T,>(key: string): T | null => {
   if (typeof window === 'undefined') return null
   try {
-    const raw = window.localStorage.getItem(HISTORICAL_UNIVERSE_RULES_STORAGE_KEY)
+    const raw = window.localStorage.getItem(key)
     if (!raw) return null
-    const parsed = JSON.parse(raw)
-    return parsed && typeof parsed === 'object' ? parsed : null
+    
+return JSON.parse(raw) as T
   } catch {
     return null
   }
 }
 
-const setStoredRuleState = (value: Record<string, RuleState>) => {
+const writeJson = (key: string, value: unknown) => {
   if (typeof window === 'undefined') return
   try {
-    window.localStorage.setItem(HISTORICAL_UNIVERSE_RULES_STORAGE_KEY, JSON.stringify(value))
+    window.localStorage.setItem(key, JSON.stringify(value))
   } catch {
     // ignore storage failures
   }
 }
 
-const formatLabel = (key: string) => {
-  return String(key || '')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, letter => letter.toUpperCase())
-}
-
-const formatMetaValue = (value: unknown): string => {
-  if (Array.isArray(value)) return value.length ? value.join(', ') : '-'
-  if (value && typeof value === 'object') return JSON.stringify(value)
-  if (value === null || value === undefined || value === '') return '-'
-  return String(value)
+const removeStoredSnapshot = () => {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.removeItem(SNAPSHOT_STORAGE_KEY)
+  } catch {
+    // ignore storage failures
+  }
 }
 
 const getActiveLineContext = (query: string, cursorIndex: number): ActiveLineContext => {
@@ -262,7 +325,7 @@ const getCaretCoordinates = (textarea: HTMLTextAreaElement, caretPosition: numbe
   div.style.top = '0'
   div.style.left = '-9999px'
 
-  properties.forEach(property => {
+  properties.forEach((property) => {
     div.style.setProperty(property, styles.getPropertyValue(property))
   })
 
@@ -288,205 +351,60 @@ const HistoricalUniversePage: NextPage = () => {
   const { asOfDate } = useAsOfDate()
   const [ruleDefinitions, setRuleDefinitions] = useState<RuleDefinition[]>([])
   const [ruleState, setRuleState] = useState<Record<string, RuleState>>({})
-  const [result, setResult] = useState<UniverseResponse | null>(null)
   const [loadingRules, setLoadingRules] = useState(false)
-  const [running, setRunning] = useState(false)
-  const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState(0)
-  const [filtersExpanded, setFiltersExpanded] = useState(false)
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(25)
-  const [resultSectionTab, setResultSectionTab] = useState(0)
-  const [query, setQuery] = useState('')
-  const [queryRows, setQueryRows] = useState<HistoricalSearchRow[]>([])
+  const [filterLoading, setFilterLoading] = useState(false)
   const [queryLoading, setQueryLoading] = useState(false)
-  const [suggestionLoading, setSuggestionLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [result, setResult] = useState<UniverseResponse | null>(null)
+  const [query, setQuery] = useState('')
+  const [queryRows, setQueryRows] = useState<SearchRow[]>([])
+  const [queryUniverse, setQueryUniverse] = useState<SearchUniverseSummary | null>(null)
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
-  const [queryTimings, setQueryTimings] = useState<HistoricalSearchResponse['timings'] | null>(null)
-  const [queryEngineLabel, setQueryEngineLabel] = useState('')
-  const [editorFocused, setEditorFocused] = useState(false)
-  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0)
+  const [suggestionLoading, setSuggestionLoading] = useState(false)
   const [cursorIndex, setCursorIndex] = useState(0)
   const [cursorPosition, setCursorPosition] = useState<CursorPosition | null>(null)
-  const [expandedQuerySymbol, setExpandedQuerySymbol] = useState<string | null>(null)
+  const [editorFocused, setEditorFocused] = useState(false)
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0)
+  const [expandedSymbol, setExpandedSymbol] = useState<string | null>(null)
+  const [rulesExpanded, setRulesExpanded] = useState(false)
+  const [createBacktestOpen, setCreateBacktestOpen] = useState(false)
+  const [backtestPortfolioName, setBacktestPortfolioName] = useState('')
+  const [backtestInitialFund, setBacktestInitialFund] = useState<number | ''>('')
+  const [backtestFormError, setBacktestFormError] = useState('')
+  const [appliedStateKey, setAppliedStateKey] = useState<string | null>(() => {
+    const appliedSetup = readJson<string>(APPLIED_FILTER_SETUP_KEY)
+    if (appliedSetup) return appliedSetup
+    const snapshot = readJson<UniverseSnapshot>(SNAPSHOT_STORAGE_KEY)
+    
+return snapshot?.stateKey || null
+  })
+  const [resultTab, setResultTab] = useState(0)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const { showSnackbar } = useSnackbar()
+  const { data: portfolioTypesData } = useSimpleSWR<PortfolioType[]>(ENDURL.GET_PORTFOLIO_TYPES)
+  const { trigger: createPortfolioTrigger, isMutating: creatingBacktestPortfolio } =
+    useMutationSWR<any, CreatePortfolioPayload>(ENDURL.CREATE_PORTFOLIO)
 
-  const runHistoricalQuery = async (endpoint: string, engineLabel: string) => {
-    try {
-      setQueryLoading(true)
-      setError('')
-      const includedMasterIds = (result?.included_stocks || []).map(item => item.master_id)
-      if (!includedMasterIds.length) {
-        setError('Run the historical universe filter first so the screener query can use the included stocks.')
-        setQueryRows([])
-        setQueryTimings(null)
-        setQueryEngineLabel('')
-        return
-      }
-      const res = await axiosInstance.post(
-        endpoint,
-        {
-          as_of_date: asOfDate,
-          query: query.trim(),
-          limit: 100,
-          master_ids: includedMasterIds,
-          universe: result
-            ? {
-                as_of_date: result.as_of_date,
-                total_candidates: result.total_candidates,
-                included_count: result.included_count,
-                excluded_count: result.excluded_count,
-                failure_counts: result.failure_counts,
-                applied_rules: result.applied_rules,
-              }
-            : null,
-          rules: Object.fromEntries(
-            Object.entries(ruleState).map(([ruleId, state]) => [
-              ruleId,
-              {
-                enabled: Boolean(state.enabled),
-                ...(state.parameters || {}),
-              },
-            ])
-          ),
-        },
-        {
-          timeout: 120000,
-        }
-      )
-      const payload = (res?.data?.data || {}) as HistoricalSearchResponse
-      setQueryRows(Array.isArray(payload.rows) ? payload.rows : [])
-      setQueryTimings(payload.timings || null)
-      setQueryEngineLabel(engineLabel)
-      setExpandedQuerySymbol(null)
-    } catch (e: any) {
-      setError(e?.response?.data?.message || 'Failed to run historical screener query')
-      setQueryRows([])
-      setQueryTimings(null)
-      setQueryEngineLabel('')
-    } finally {
-      setQueryLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    let active = true
-
-    const loadRules = async () => {
-      try {
-        setLoadingRules(true)
-        setError('')
-        const res = await axiosInstance.get(ENDURL.GET_HISTORICAL_UNIVERSE_RULES)
-        if (!active) return
-        const rows: RuleDefinition[] = Array.isArray(res?.data?.data) ? res.data.data : []
-        setRuleDefinitions(rows)
-        const storedRuleState = getStoredRuleState()
-        setRuleState(
-          rows.reduce((acc, rule) => {
-            const stored = storedRuleState?.[rule.id]
-            acc[rule.id] = {
-              enabled: typeof stored?.enabled === 'boolean' ? stored.enabled : Boolean(rule.defaultEnabled),
-              parameters: Object.entries(rule.parameters || {}).reduce((paramAcc, [paramKey, defaultValue]) => {
-                const storedValue = Number(stored?.parameters?.[paramKey])
-                paramAcc[paramKey] = Number.isFinite(storedValue) && storedValue > 0 ? Math.floor(storedValue) : defaultValue
-                return paramAcc
-              }, {} as Record<string, number>)
-            }
-            return acc
-          }, {} as Record<string, RuleState>)
-        )
-      } catch (e: any) {
-        if (!active) return
-        setError(e?.response?.data?.message || 'Failed to load historical universe rules')
-      } finally {
-        if (active) setLoadingRules(false)
-      }
-    }
-
-    loadRules()
-
-    return () => {
-      active = false
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!Object.keys(ruleState).length) return
-    setStoredRuleState(ruleState)
-  }, [ruleState])
-
-  const handleToggleRule = (ruleId: string, enabled: boolean) => {
-    setRuleState(prev => ({
-      ...prev,
-      [ruleId]: {
-        ...(prev[ruleId] || { enabled: false, parameters: {} }),
-        enabled
-      }
-    }))
-  }
-
-  const handleParamChange = (ruleId: string, paramKey: string, value: string) => {
-    const parsed = Math.max(1, Math.floor(Number(value) || 0))
-    setRuleState(prev => ({
-      ...prev,
-      [ruleId]: {
-        ...(prev[ruleId] || { enabled: false, parameters: {} }),
-        parameters: {
-          ...((prev[ruleId] || {}).parameters || {}),
-          [paramKey]: parsed
-        }
-      }
-    }))
-  }
-
-  const runFilter = async () => {
-    try {
-      setRunning(true)
-      setError('')
-      const payload = {
-        as_of_date: asOfDate,
-        rules: Object.fromEntries(
-          Object.entries(ruleState).map(([ruleId, state]) => [
-            ruleId,
-            {
-              enabled: Boolean(state.enabled),
-              ...(state.parameters || {})
-            }
-          ])
-        )
-      }
-
-      const res = await axiosInstance.post(ENDURL.POST_HISTORICAL_UNIVERSE_FILTER, payload)
-      setResult(res?.data?.data || null)
-      setActiveTab(0)
-      setPage(0)
-    } catch (e: any) {
-      setError(e?.response?.data?.message || 'Failed to build historical universe')
-    } finally {
-      setRunning(false)
-    }
-  }
-
-  const failureRows = useMemo(() => {
-    if (!result) return []
-    return Object.entries(result.failure_counts || {}).map(([ruleId, count]) => ({
-      ruleId,
-      count,
-      label: result.applied_rules?.[ruleId]?.label || ruleId
-    }))
-  }, [result])
-
-  const enabledRuleCount = useMemo(
-    () => Object.values(ruleState).filter(rule => Boolean(rule.enabled)).length,
-    [ruleState]
-  )
-
-  const activeRows = activeTab === 0 ? result?.included_stocks || [] : result?.excluded_stocks || []
-  const paginatedRows = useMemo(
-    () => activeRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [activeRows, page, rowsPerPage]
-  )
+  const currentStateKey = useMemo(() => buildUniverseStateKey(asOfDate, ruleState), [asOfDate, ruleState])
+  const isFilterApplied = Boolean(appliedStateKey && appliedStateKey === currentStateKey)
+  const hasQueryText = Boolean(query.trim())
+  const canRunScreenerQuery = Boolean(isFilterApplied && hasQueryText && !queryLoading)
   const activeLineContext = useMemo(() => getActiveLineContext(query, cursorIndex), [query, cursorIndex])
+  const backtestingType = useMemo(
+    () => (portfolioTypesData || []).find(type => String(type.code || '').toUpperCase() === 'BACKTESTING') || null,
+    [portfolioTypesData],
+  )
+  const matchedMasterIds = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (queryRows || [])
+            .map(row => Number(row.master_id))
+            .filter(value => Number.isFinite(value) && value > 0),
+        ),
+      ),
+    [queryRows],
+  )
 
   const updateCaretState = () => {
     const textarea = textareaRef.current
@@ -499,6 +417,7 @@ const HistoricalUniversePage: NextPage = () => {
   const loadSuggestions = async (value: string) => {
     if (!value.trim()) {
       setSuggestions([])
+
       return
     }
 
@@ -507,7 +426,7 @@ const HistoricalUniversePage: NextPage = () => {
       const res = await axiosInstance.get(ENDURL.GET_STOCK_SEARCH_SUGGESTIONS, {
         params: { q: value.trim() },
       })
-      const payload = (res?.data?.data || {}) as HistoricalSearchResponse
+      const payload = (res?.data?.data || {}) as SearchResponse
       setSuggestions(Array.isArray(payload.suggestions) ? payload.suggestions : [])
     } catch {
       setSuggestions([])
@@ -515,264 +434,466 @@ const HistoricalUniversePage: NextPage = () => {
       setSuggestionLoading(false)
     }
   }
+  const canCreateBacktestingPortfolio = Boolean(
+    isFilterApplied &&
+      query.trim() &&
+      matchedMasterIds.length > 0 &&
+      backtestingType &&
+      !creatingBacktestPortfolio,
+  )
+
+  const filterRulesPayload = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(ruleState).map(([ruleId, state]) => [
+          ruleId,
+          {
+            enabled: Boolean(state.enabled),
+            ...(state.parameters || {}),
+          },
+        ]),
+      ),
+    [ruleState],
+  )
+
+  useEffect(() => {
+    let active = true
+
+    const loadRules = async () => {
+      try {
+        setLoadingRules(true)
+        setError('')
+        const res = await axiosInstance.get(ENDURL.GET_HISTORICAL_UNIVERSE_RULES)
+        if (!active) return
+
+        const rows: RuleDefinition[] = Array.isArray(res?.data?.data) ? res.data.data : []
+        setRuleDefinitions(rows)
+
+        const storedRuleState = readJson<Record<string, RuleState>>(RULES_STORAGE_KEY)
+        setRuleState(
+          rows.reduce((acc, rule) => {
+            const stored = storedRuleState?.[rule.id]
+            acc[rule.id] = {
+              enabled: typeof stored?.enabled === 'boolean' ? stored.enabled : Boolean(rule.defaultEnabled),
+              parameters: Object.entries(rule.parameters || {}).reduce((paramAcc, [paramKey, defaultValue]) => {
+                const storedValue = Number(stored?.parameters?.[paramKey])
+                paramAcc[paramKey] = Number.isFinite(storedValue) && storedValue > 0 ? Math.floor(storedValue) : defaultValue
+                
+return paramAcc
+              }, {} as Record<string, number>),
+            }
+            
+return acc
+          }, {} as Record<string, RuleState>),
+        )
+      } catch (e: any) {
+        if (!active) return
+        setError(e?.response?.data?.message || 'Failed to load historical universe rules')
+      } finally {
+        if (active) setLoadingRules(false)
+      }
+    }
+
+    void loadRules()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!Object.keys(ruleState).length) return
+    writeJson(RULES_STORAGE_KEY, ruleState)
+  }, [ruleState])
+
+  useEffect(() => {
+    const snapshot = readJson<UniverseSnapshot>(SNAPSHOT_STORAGE_KEY)
+    if (snapshot?.stateKey === currentStateKey && snapshot?.result) {
+      setResult(snapshot.result)
+    } else {
+      setResult(null)
+    }
+  }, [currentStateKey])
+
+  useEffect(() => {
+    setResultTab(0)
+  }, [result?.as_of_date, result?.universe_state_key])
+
+  useEffect(() => {
+    setRulesExpanded(!isFilterApplied)
+  }, [isFilterApplied])
 
   useEffect(() => {
     const searchTerm = activeLineContext.fieldText.trim()
-    if (!editorFocused || !searchTerm) {
+    if (!editorFocused || !searchTerm || !isFilterApplied) {
       setSuggestions([])
+
       return
     }
 
-    const handle = setTimeout(() => {
+    const handle = window.setTimeout(() => {
       void loadSuggestions(searchTerm)
     }, 160)
 
-    return () => clearTimeout(handle)
-  }, [activeLineContext.fieldText, editorFocused])
+    return () => window.clearTimeout(handle)
+  }, [activeLineContext.fieldText, editorFocused, isFilterApplied])
 
   useEffect(() => {
     setActiveSuggestionIndex(0)
   }, [suggestions])
 
+  useEffect(() => {
+    setQueryRows([])
+    setQueryUniverse(null)
+    setExpandedSymbol(null)
+  }, [result?.universe_state_key, asOfDate])
+
+  useEffect(() => {
+    if (backtestingType?.fund !== undefined && backtestingType?.fund !== null && backtestInitialFund === '') {
+      setBacktestInitialFund(backtestingType.fund)
+    }
+  }, [backtestingType, backtestInitialFund])
+
+  const handleToggleRule = (ruleId: string, enabled: boolean) => {
+    setRuleState(prev => ({
+      ...prev,
+      [ruleId]: {
+        ...(prev[ruleId] || { enabled: false, parameters: {} }),
+        enabled,
+      },
+    }))
+    removeStoredSnapshot()
+    writeJson(APPLIED_FILTER_SETUP_KEY, null)
+    setAppliedStateKey(null)
+  }
+
+  const handleParamChange = (ruleId: string, paramKey: string, value: string) => {
+    const parsed = Math.max(1, Math.floor(Number(value) || 0))
+    setRuleState(prev => ({
+      ...prev,
+      [ruleId]: {
+        ...(prev[ruleId] || { enabled: false, parameters: {} }),
+        parameters: {
+          ...((prev[ruleId] || {}).parameters || {}),
+          [paramKey]: parsed,
+        },
+      },
+    }))
+    removeStoredSnapshot()
+    writeJson(APPLIED_FILTER_SETUP_KEY, null)
+    setAppliedStateKey(null)
+  }
+
+  const runUniverseFilter = async () => {
+    if (!ruleDefinitions.length || !Object.keys(ruleState).length) return
+
+    try {
+      setFilterLoading(true)
+      setError('')
+
+      const res = await axiosInstance.post(
+        ENDURL.POST_HISTORICAL_UNIVERSE_FILTER,
+        {
+          as_of_date: asOfDate,
+          rules: filterRulesPayload,
+        },
+        {
+          timeout: 120000,
+        },
+      )
+
+      const payload = (res?.data?.data || {}) as Partial<UniverseResponse> & { cache_key?: string | null; result?: UniverseResponse | null }
+      const universeResult = (payload.result || payload) as UniverseResponse
+      const nextStateKey = universeResult?.universe_state_key || payload.cache_key || currentStateKey
+
+      setResult(universeResult)
+      setAppliedStateKey(nextStateKey)
+      writeJson(APPLIED_FILTER_SETUP_KEY, nextStateKey)
+      const snapshot: UniverseSnapshot = {
+        stateKey: nextStateKey,
+        result: universeResult,
+      }
+      writeJson(SNAPSHOT_STORAGE_KEY, snapshot)
+      setResultTab(0)
+    } catch (e: any) {
+      setError(e?.response?.data?.message || 'Failed to build historical universe')
+    } finally {
+      setFilterLoading(false)
+    }
+  }
+
+  const runScreenerQuery = async () => {
+    const trimmedQuery = query.trim()
+    if (!trimmedQuery) {
+      setQueryRows([])
+      setQueryUniverse(null)
+
+      return
+    }
+
+    try {
+      setQueryLoading(true)
+      setError('')
+
+      const res = await axiosInstance.post(
+        ENDURL.POST_HISTORICAL_UNIVERSE_SEARCH_SPLIT,
+        {
+          as_of_date: asOfDate,
+          query: trimmedQuery,
+          limit: 100,
+          universe: result
+            ? {
+                as_of_date: result.as_of_date,
+                total_candidates: result.total_candidates,
+                included_count: result.included_count,
+                excluded_count: result.excluded_count,
+                failure_counts: result.failure_counts,
+                applied_rules: result.applied_rules,
+              }
+            : null,
+        },
+        {
+          timeout: 300000,
+        },
+      )
+
+      const payload = (res?.data?.data || {}) as SearchResponse
+      setQueryRows(Array.isArray(payload.rows) ? payload.rows : [])
+      setQueryUniverse(payload.universe || null)
+      setExpandedSymbol(null)
+    } catch (e: any) {
+      setError(e?.response?.data?.message || 'Failed to run historical screener query')
+      setQueryRows([])
+      setQueryUniverse(null)
+    } finally {
+      setQueryLoading(false)
+    }
+  }
+
+  const applySuggestion = (suggestion: SearchSuggestion) => {
+    const { nextQuery, nextCursor } = replaceLineField(query, activeLineContext, suggestion)
+    setQuery(nextQuery)
+    setEditorFocused(true)
+    requestAnimationFrame(() => {
+      if (!textareaRef.current) return
+      textareaRef.current.focus()
+      textareaRef.current.setSelectionRange(nextCursor, nextCursor)
+      updateCaretState()
+    })
+  }
+
+  const onEditorKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (!suggestions.length) return
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      setActiveSuggestionIndex((current) => (current + 1) % suggestions.length)
+
+      return
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      setActiveSuggestionIndex((current) => (current - 1 + suggestions.length) % suggestions.length)
+
+      return
+    }
+    if (event.key === 'Tab') {
+      event.preventDefault()
+      applySuggestion(suggestions[activeSuggestionIndex])
+    }
+  }
+
+  const suggestionOpen = Boolean(isFilterApplied && editorFocused && suggestions.length && cursorPosition && activeLineContext.fieldText.trim())
+
+  const openCreateBacktestingDialog = () => {
+    if (!backtestingType) {
+      showSnackbar('Backtesting portfolio type is not available yet.', 'error')
+
+      return
+    }
+
+    setBacktestFormError('')
+    setBacktestPortfolioName(
+      backtestPortfolioName || `Backtest ${asOfDate} ${matchedMasterIds.length} Stocks`,
+    )
+    if (backtestInitialFund === '' && backtestingType.fund !== null && backtestingType.fund !== undefined) {
+      setBacktestInitialFund(backtestingType.fund)
+    }
+    setCreateBacktestOpen(true)
+  }
+
+  const handleCreateBacktestingPortfolio = async () => {
+    if (!backtestingType) {
+      setBacktestFormError('Backtesting portfolio type was not found.')
+
+      return
+    }
+
+    if (!backtestPortfolioName.trim()) {
+      setBacktestFormError('Portfolio name is required.')
+
+      return
+    }
+
+    const initialFund = Number(backtestInitialFund || 0)
+    if (!Number.isFinite(initialFund) || initialFund < 0) {
+      setBacktestFormError('Initial fund must be 0 or greater.')
+
+      return
+    }
+
+    if (!matchedMasterIds.length) {
+      setBacktestFormError('No matched stocks are available to add to watchlist.')
+
+      return
+    }
+
+    try {
+      setBacktestFormError('')
+      await createPortfolioTrigger({
+        name: backtestPortfolioName.trim(),
+        portfolio_type_id: backtestingType.id,
+        initial_fund: initialFund,
+        meta: {
+          mode: 'BACKTEST',
+          as_of_date: asOfDate,
+          query: query.trim(),
+          watchlist_master_ids: matchedMasterIds,
+        },
+      })
+      await mutate(ENDURL.GET_MY_PORTFOLIOS)
+      showSnackbar('Backtesting portfolio created from current historical query.', 'success')
+      setCreateBacktestOpen(false)
+      setBacktestPortfolioName('')
+      setBacktestInitialFund(backtestingType.fund ?? '')
+    } catch (e: any) {
+      const message = e?.response?.data?.message || 'Failed to create backtesting portfolio'
+      setBacktestFormError(message)
+      showSnackbar(message, 'error')
+    }
+  }
+
+  const gradeColor = (grade?: string) => {
+    const text = String(grade || '').toUpperCase()
+    if (text.includes('DEEP')) return 'success'
+    if (text.includes('VALUE')) return 'primary'
+    if (text.includes('WATCH')) return 'warning'
+    if (text.includes('REJECT')) return 'error'
+
+    return 'default'
+  }
+
+  const enabledRuleCount = useMemo(
+    () => Object.values(ruleState).filter(rule => Boolean(rule.enabled)).length,
+    [ruleState],
+  )
+
+  const activeRows =
+    resultTab === 1
+      ? result?.included_stocks || []
+      : resultTab === 2
+        ? result?.excluded_stocks || []
+        : []
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <Card>
-          <CardHeader
-            title='Historical Universe'
-            subheader='Phase 1 filters out unusable historical stocks before we run any screener or backtest logic.'
-            action={
-              <Stack direction='row' spacing={1} alignItems='center'>
-                <Button variant='contained' onClick={runFilter} disabled={loadingRules || running || !ruleDefinitions.length}>
-                  Run Query
-                </Button>
-                <IconButton onClick={() => setFiltersExpanded(prev => !prev)} aria-label={filtersExpanded ? 'Collapse filters' : 'Expand filters'}>
-                  <ExpandMoreIcon
-                    sx={{
-                      transform: filtersExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                      transition: theme => theme.transitions.create('transform', { duration: theme.transitions.duration.shortest })
-                    }}
-                  />
-                </IconButton>
-              </Stack>
-            }
-          />
-          {(loadingRules || running) && <LinearProgress />}
-          <CardContent>
-            <Stack spacing={3}>
-              <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'flex-start', md: 'center' }} flexWrap='wrap' useFlexGap>
-                <Alert severity='info' sx={{ py: 0, alignItems: 'center' }}>
-                  Using global As Of Date: <strong>{asOfDate}</strong>
-                </Alert>
+        <Accordion
+          expanded={rulesExpanded}
+          onChange={(_, expanded) => setRulesExpanded(expanded)}
+          disableGutters
+          elevation={0}
+          sx={{
+            '&:before': { display: 'none' },
+            borderRadius: 1,
+            overflow: 'hidden',
+          }}
+        >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Stack
+              direction={{ xs: 'column', md: 'row' }}
+              spacing={1.5}
+              alignItems={{ xs: 'flex-start', md: 'center' }}
+              justifyContent='space-between'
+              sx={{ width: '100%', pr: 1 }}
+            >
+              <Box>
+                <Typography variant='h6'>Historical Universe Rules</Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  Apply the active rules for the selected as-of date.
+                </Typography>
+              </Box>
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                <Chip size='small' label={`As Of Date: ${asOfDate}`} variant='outlined' />
                 <Chip size='small' label={`${enabledRuleCount} rule${enabledRuleCount === 1 ? '' : 's'} enabled`} variant='outlined' />
-                <Chip size='small' label={filtersExpanded ? 'Filters expanded' : 'Filters collapsed'} variant='outlined' />
-              </Stack>
-
-              {error ? <Alert severity='error'>{error}</Alert> : null}
-
-              <Collapse in={filtersExpanded} timeout='auto' unmountOnExit>
-                <Stack spacing={4}>
-                  <Grid container spacing={4}>
-                    {ruleDefinitions.map(rule => {
-                      const current = ruleState[rule.id] || { enabled: rule.defaultEnabled, parameters: rule.parameters || {} }
-
-                      return (
-                        <Grid item xs={12} md={6} key={rule.id}>
-                          <Paper variant='outlined' sx={{ p: 4, height: '100%' }}>
-                            <Stack spacing={2.5}>
-                              <Box>
-                                <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between'>
-                                  <Typography variant='h6'>{rule.label}</Typography>
-                                  <FormControlLabel
-                                    control={<Switch checked={Boolean(current.enabled)} onChange={(_, checked) => handleToggleRule(rule.id, checked)} />}
-                                    label={current.enabled ? 'On' : 'Off'}
-                                    sx={{ mr: 0 }}
-                                  />
-                                </Stack>
-                                <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-                                  {rule.description}
-                                </Typography>
-                              </Box>
-
-                              <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
-                                {Object.entries(rule.parameters || {}).map(([paramKey]) => (
-                                  <TextField
-                                    key={paramKey}
-                                    size='small'
-                                    type='number'
-                                    label={formatLabel(paramKey)}
-                                    value={current.parameters?.[paramKey] ?? ''}
-                                    onChange={event => handleParamChange(rule.id, paramKey, event.target.value)}
-                                    inputProps={{ min: 1 }}
-                                    sx={{ minWidth: 180 }}
-                                  />
-                                ))}
-                              </Stack>
-                            </Stack>
-                          </Paper>
-                        </Grid>
-                      )
-                    })}
-                  </Grid>
-
-                  <Typography variant='body2' color='text.secondary'>
-                    Only enabled rules are applied. Disabled rules stay available for later phases and presets.
-                  </Typography>
-                </Stack>
-              </Collapse>
-
-              <Divider />
-
-              <Stack spacing={2}>
-                {!result ? (
-                  <Alert severity='warning'>
-                    Run the historical universe filter first. The screener query below works on the <strong>included stocks</strong> from that run.
-                  </Alert>
-                ) : null}
-
-                <Box sx={{ position: 'relative' }}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    minRows={5}
-                    label='Historical Screener Query'
-                    placeholder='Sales growth > 12&#10;AND Profit growth > 15&#10;AND Return on capital employed > 15'
-                    value={query}
-                    onChange={event => {
-                      setQuery(event.target.value)
-                      requestAnimationFrame(updateCaretState)
-                    }}
-                    onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-                      if (!suggestions.length) return
-                      if (event.key === 'ArrowDown') {
-                        event.preventDefault()
-                        setActiveSuggestionIndex(current => (current + 1) % suggestions.length)
-                        return
-                      }
-                      if (event.key === 'ArrowUp') {
-                        event.preventDefault()
-                        setActiveSuggestionIndex(current => (current - 1 + suggestions.length) % suggestions.length)
-                        return
-                      }
-                      if (event.key === 'Tab') {
-                        event.preventDefault()
-                        const suggestion = suggestions[activeSuggestionIndex]
-                        if (!suggestion) return
-                        const { nextQuery, nextCursor } = replaceLineField(query, activeLineContext, suggestion)
-                        setQuery(nextQuery)
-                        requestAnimationFrame(() => {
-                          if (!textareaRef.current) return
-                          textareaRef.current.focus()
-                          textareaRef.current.setSelectionRange(nextCursor, nextCursor)
-                          updateCaretState()
-                        })
-                      }
-                    }}
-                    onFocus={() => {
-                      setEditorFocused(true)
-                      requestAnimationFrame(updateCaretState)
-                    }}
-                    onBlur={() => {
-                      window.setTimeout(() => setEditorFocused(false), 120)
-                    }}
-                    onClick={() => requestAnimationFrame(updateCaretState)}
-                    onKeyUp={() => requestAnimationFrame(updateCaretState)}
-                    inputRef={textareaRef}
-                    helperText='Write screener-style query here. It will run only on the stocks that pass the enabled rules above.'
-                  />
-
-                  {Boolean(editorFocused && suggestions.length && cursorPosition && activeLineContext.fieldText.trim()) ? (
-                    <Paper
-                      elevation={8}
-                      sx={{
-                        position: 'absolute',
-                        top: (cursorPosition?.top || 0) + (cursorPosition?.lineHeight || 24) + 36,
-                        left: Math.min((cursorPosition?.left || 0) + 16, 520),
-                        width: { xs: 'calc(100% - 24px)', sm: 420 },
-                        maxWidth: 'calc(100% - 24px)',
-                        borderRadius: 2,
-                        overflow: 'hidden',
-                        zIndex: 20,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                      }}
-                    >
-                      <Box sx={{ px: 2, py: 1.25, bgcolor: 'action.hover', borderBottom: '1px solid', borderColor: 'divider' }}>
-                        <Typography variant='caption' color='text.secondary'>
-                          Suggestions for {activeLineContext.fieldText || 'current line'}
-                        </Typography>
-                      </Box>
-                      <Stack spacing={0}>
-                        {suggestions.slice(0, 8).map((item, index) => (
-                          <Box
-                            key={item.key || item.label || index}
-                            onMouseDown={event => {
-                              event.preventDefault()
-                              const { nextQuery, nextCursor } = replaceLineField(query, activeLineContext, item)
-                              setQuery(nextQuery)
-                              requestAnimationFrame(() => {
-                                if (!textareaRef.current) return
-                                textareaRef.current.focus()
-                                textareaRef.current.setSelectionRange(nextCursor, nextCursor)
-                                updateCaretState()
-                              })
-                            }}
-                            sx={{
-                              px: 2,
-                              py: 1.5,
-                              cursor: 'pointer',
-                              bgcolor: index === activeSuggestionIndex ? 'action.selected' : 'background.paper',
-                              borderBottom: index === Math.min(suggestions.length, 8) - 1 ? 'none' : '1px solid',
-                              borderColor: 'divider',
-                              '&:hover': { bgcolor: 'action.hover' },
-                            }}
-                          >
-                            <Stack direction='row' justifyContent='space-between' spacing={2}>
-                              <Box>
-                                <Typography variant='subtitle2'>{item.label}</Typography>
-                                <Typography variant='caption' color='text.secondary'>
-                                  {item.example || item.aliases?.slice(0, 3).join(', ') || 'No example'}
-                                </Typography>
-                              </Box>
-                              {item.unit ? <Chip size='small' label={item.unit} variant='outlined' /> : null}
-                            </Stack>
-                          </Box>
-                        ))}
-                      </Stack>
-                    </Paper>
-                  ) : null}
-                </Box>
-
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', sm: 'center' }}>
-                  <Button
-                    variant='contained'
-                    startIcon={<SearchIcon />}
-                    disabled={loadingRules || running || queryLoading || !query.trim() || !result || !result.included_stocks?.length}
-                    onClick={() => runHistoricalQuery(ENDURL.POST_HISTORICAL_UNIVERSE_SEARCH, 'Main fundamentals engine')}
-                  >
-                    {queryLoading ? 'Running Query...' : 'Run Screener Query'}
-                  </Button>
-                  <Button
-                    variant='outlined'
-                    startIcon={<SearchIcon />}
-                    disabled={loadingRules || running || queryLoading || !query.trim() || !result || !result.included_stocks?.length}
-                    onClick={() =>
-                      runHistoricalQuery(
-                        ENDURL.POST_HISTORICAL_UNIVERSE_SEARCH_SPLIT,
-                        'Split fundamentals + EOD engine'
-                      )
-                    }
-                  >
-                    {queryLoading ? 'Running Query...' : 'Run Split Query'}
-                  </Button>
-                  <Chip size='small' label={suggestionLoading ? 'Updating suggestions...' : 'Suggestions follow cursor'} variant='outlined' />
-                  {result ? <Chip size='small' label={`Query universe: ${result.included_count} included stocks`} variant='outlined' /> : null}
-                  {queryEngineLabel ? <Chip size='small' color='primary' label={queryEngineLabel} variant='outlined' /> : null}
-                </Stack>
+                <Chip
+                  size='small'
+                  color={isFilterApplied ? 'success' : 'warning'}
+                  label={isFilterApplied ? 'Filter applied' : 'Needs filter'}
+                  variant='outlined'
+                />
               </Stack>
             </Stack>
-          </CardContent>
-        </Card>
+          </AccordionSummary>
+          {(loadingRules || filterLoading) && <LinearProgress />}
+          <AccordionDetails>
+            <Stack spacing={3}>
+              {error ? <Alert severity='error'>{error}</Alert> : null}
+
+              <Grid container spacing={4}>
+                {ruleDefinitions.map(rule => {
+                  const current = ruleState[rule.id] || { enabled: rule.defaultEnabled, parameters: rule.parameters || {} }
+
+                  return (
+                    <Grid item xs={12} md={6} key={rule.id}>
+                      <Paper variant='outlined' sx={{ p: 4, height: '100%' }}>
+                        <Stack spacing={2.5}>
+                          <Box>
+                            <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between'>
+                              <Typography variant='h6'>{rule.label}</Typography>
+                              <FormControlLabel
+                                control={<Switch checked={Boolean(current.enabled)} onChange={(_, checked) => handleToggleRule(rule.id, checked)} />}
+                                label={current.enabled ? 'On' : 'Off'}
+                                sx={{ mr: 0 }}
+                              />
+                            </Stack>
+                            <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+                              {rule.description}
+                            </Typography>
+                          </Box>
+
+                          <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
+                            {Object.entries(rule.parameters || {}).map(([paramKey]) => (
+                              <TextField
+                                key={paramKey}
+                                size='small'
+                                type='number'
+                                label={formatLabel(paramKey)}
+                                value={current.parameters?.[paramKey] ?? ''}
+                                onChange={event => handleParamChange(rule.id, paramKey, event.target.value)}
+                                inputProps={{ min: 1 }}
+                                sx={{ minWidth: 180 }}
+                              />
+                            ))}
+                          </Stack>
+                        </Stack>
+                      </Paper>
+                    </Grid>
+                  )
+                })}
+              </Grid>
+
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', sm: 'center' }}>
+                <Button
+                  variant='contained'
+                  disabled={loadingRules || filterLoading || !ruleDefinitions.length || isFilterApplied}
+                  onClick={runUniverseFilter}
+                >
+                  {filterLoading ? 'Running Filter...' : isFilterApplied ? 'Filter Up to Date' : 'Run Filter'}
+                </Button>
+              </Stack>
+            </Stack>
+          </AccordionDetails>
+        </Accordion>
       </Grid>
 
       {result ? (
@@ -780,301 +901,396 @@ const HistoricalUniversePage: NextPage = () => {
           <Grid item xs={12}>
             <Card>
               <CardContent sx={{ pb: '16px !important' }}>
-                <Tabs
-                  value={resultSectionTab}
-                  onChange={(_, value) => setResultSectionTab(value)}
-                  variant='scrollable'
-                  scrollButtons='auto'
-                >
+                <Tabs value={resultTab} onChange={(_, value) => setResultTab(value)} variant='scrollable' scrollButtons='auto'>
                   <Tab label='Summary' />
-                  <Tab label={`Universe Results (${activeRows.length})`} />
-                  <Tab label={`Screener Results (${queryRows.length})`} />
+                  <Tab label={`Included (${result.included_count})`} />
+                  <Tab label={`Excluded (${result.excluded_count})`} />
                 </Tabs>
               </CardContent>
             </Card>
           </Grid>
 
-          {resultSectionTab === 0 ? <Grid item xs={12} md={4}>
-            <Card>
-              <CardHeader title='Universe Summary' />
-              <CardContent>
-                <Stack spacing={2}>
-                  <Chip label={`Candidates: ${result.total_candidates}`} color='primary' variant='outlined' />
-                  <Chip label={`Included: ${result.included_count}`} color='success' variant='outlined' />
-                  <Chip label={`Excluded: ${result.excluded_count}`} color='error' variant='outlined' />
-                  <Typography variant='body2' color='text.secondary'>
-                    This output is our clean historical universe snapshot for the chosen date.
-                  </Typography>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid> : null}
+          {resultTab === 0 ? (
+            <Grid item xs={12}>
+              <Card>
+                <CardHeader title='Universe Summary' />
+                <CardContent>
+                  <Stack spacing={2}>
+                    <Chip label={`As Of Date: ${result.as_of_date}`} color='primary' variant='outlined' />
+                    <Chip label={`Candidates: ${result.total_candidates}`} variant='outlined' />
+                    <Chip label={`Included: ${result.included_count}`} color='success' variant='outlined' />
+                    <Chip label={`Excluded: ${result.excluded_count}`} color='error' variant='outlined' />
+                    <Chip label={`State: ${result.universe_state_key || appliedStateKey || currentStateKey}`} variant='outlined' />
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          ) : null}
 
-          {resultSectionTab === 0 ? <Grid item xs={12} md={8}>
-            <Card>
-              <CardHeader title='Failure Counts By Rule' />
-              <CardContent>
-                <Stack direction='row' spacing={1.5} flexWrap='wrap' useFlexGap>
-                  {failureRows.length ? (
-                    failureRows.map(item => <Chip key={item.ruleId} label={`${item.label}: ${item.count}`} variant='outlined' />)
-                  ) : (
-                    <Typography variant='body2' color='text.secondary'>
-                      No enabled rule excluded any stock in this run.
-                    </Typography>
-                  )}
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid> : null}
+          {resultTab === 1 || resultTab === 2 ? (
+            <Grid item xs={12}>
+              <Card>
+                <CardHeader title={resultTab === 1 ? 'Included Stocks' : 'Excluded Stocks'} />
+                <CardContent>
+                  <TableContainer component={Paper} variant='outlined'>
+                    <Table size='small'>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Symbol</TableCell>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Exchange</TableCell>
+                          <TableCell>Status</TableCell>
+                          <TableCell>Latest Trade</TableCell>
+                          <TableCell>Notes</TableCell>
+                          <TableCell>Compare</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {activeRows.map(row => (
+                          <TableRow key={row.master_id} hover>
+                            <TableCell>{row.symbol}</TableCell>
+                            <TableCell>{row.name}</TableCell>
+                            <TableCell>{row.exchange || '-'}</TableCell>
+                            <TableCell>{row.passed ? 'Passed' : 'Failed'}</TableCell>
+                            <TableCell>{row.latest_trade_date || '-'}</TableCell>
+                            <TableCell>
+                              {row.passed ? 'Included in current universe' : row.failed_rule_labels?.length ? row.failed_rule_labels.join(', ') : '-'}
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                size='small'
+                                variant='outlined'
+                                onClick={() =>
+                                  window.open(
+                                    `/eod-graph/?master_id=${encodeURIComponent(String(row.master_id))}&symbol=${encodeURIComponent(row.symbol || '')}`,
+                                    '_blank',
+                                    'noopener,noreferrer',
+                                  )
+                                }
+                              >
+                                Compare
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {!activeRows.length ? (
+                          <TableRow>
+                            <TableCell colSpan={7} align='center'>
+                              No rows to show
+                            </TableCell>
+                          </TableRow>
+                        ) : null}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </Card>
+            </Grid>
+          ) : null}
+        </>
+      ) : null}
 
-          {resultSectionTab === 1 ? <Grid item xs={12}>
-            <Card>
-              <CardHeader title='Universe Results' subheader='We can use this result set directly in Phase 2 screener selection.' />
-              <CardContent>
-                <Tabs
-                  value={activeTab}
-                  onChange={(_, value) => {
-                    setActiveTab(value)
-                    setPage(0)
-                  }}
-                  sx={{ mb: 3 }}
-                >
-                  <Tab label={`Included (${result.included_count})`} />
-                  <Tab label={`Excluded (${result.excluded_count})`} />
-                </Tabs>
-
-                <TablePagination
-                  component='div'
-                  count={activeRows.length}
-                  page={page}
-                  onPageChange={(_, newPage) => setPage(newPage)}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={event => {
-                    setRowsPerPage(parseInt(event.target.value, 10))
-                    setPage(0)
-                  }}
-                  rowsPerPageOptions={[25, 50, 100, 250]}
-                  sx={{ px: 0, mb: 2 }}
+      <Grid item xs={12}>
+        <Accordion expanded={isFilterApplied} disableGutters elevation={0} sx={{ '&:before': { display: 'none' } }}>
+          <Card>
+            <CardHeader
+              title='Historical Screener Query'
+              subheader='Phase 2 runs your screener query only on the stocks that currently pass the historical universe filter.'
+              action={
+                <Chip
+                  size='small'
+                  color={isFilterApplied ? 'success' : 'warning'}
+                  label={isFilterApplied ? 'Filter applied' : 'Run filter first for new rules/date'}
+                  variant='outlined'
                 />
+              }
+            />
+            {queryLoading ? <LinearProgress /> : null}
+            <CardContent>
+              {isFilterApplied ? (
+                <Stack spacing={3}>
+                  <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} flexWrap='wrap' useFlexGap>
+                    <Chip size='small' label={`As Of Date: ${asOfDate}`} variant='outlined' />
+                    <Chip size='small' label={hasQueryText ? 'Query ready' : 'Paste a query'} color={hasQueryText ? 'primary' : 'default'} variant='outlined' />
+                  </Stack>
 
-                <TableContainer component={Paper} variant='outlined' sx={{ maxHeight: 560 }}>
-                  <Table size='small' stickyHeader>
+                  <Box sx={{ position: 'relative' }}>
+                    <TextField
+                      fullWidth
+                      multiline
+                      minRows={6}
+                      label='Screener Query'
+                      placeholder='Price from 52 week high < 20&#10;AND Promoter holding > 40&#10;AND Current price < 100'
+                      value={query}
+                      onChange={event => {
+                        setQuery(event.target.value)
+                        requestAnimationFrame(updateCaretState)
+                      }}
+                      onKeyDown={onEditorKeyDown}
+                      onFocus={() => {
+                        setEditorFocused(true)
+                        requestAnimationFrame(updateCaretState)
+                      }}
+                      onBlur={() => {
+                        window.setTimeout(() => setEditorFocused(false), 120)
+                      }}
+                      onClick={() => requestAnimationFrame(updateCaretState)}
+                      onKeyUp={() => requestAnimationFrame(updateCaretState)}
+                      inputRef={textareaRef}
+                      helperText='This uses EOD snapshot fields plus split fundamentals. Press Tab to insert the highlighted suggestion.'
+                    />
+
+                    {suggestionOpen ? (
+                      <Paper
+                        elevation={8}
+                        sx={{
+                          position: 'absolute',
+                          top: (cursorPosition?.top || 0) + (cursorPosition?.lineHeight || 24) + 36,
+                          left: Math.min((cursorPosition?.left || 0) + 16, 520),
+                          width: { xs: 'calc(100% - 24px)', sm: 420 },
+                          maxWidth: 'calc(100% - 24px)',
+                          borderRadius: 2,
+                          overflow: 'hidden',
+                          zIndex: 20,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                        }}
+                      >
+                        <Box sx={{ px: 2, py: 1.25, bgcolor: 'action.hover', borderBottom: '1px solid', borderColor: 'divider' }}>
+                          <Typography variant='caption' color='text.secondary'>
+                            Suggestions for {activeLineContext.fieldText || 'current line'}
+                          </Typography>
+                        </Box>
+                        <Stack spacing={0}>
+                          {suggestions.slice(0, 8).map((item, index) => (
+                            <Box
+                              key={item.key || item.label || index}
+                              onMouseDown={event => {
+                                event.preventDefault()
+                                applySuggestion(item)
+                              }}
+                              sx={{
+                                px: 2,
+                                py: 1.5,
+                                cursor: 'pointer',
+                                bgcolor: index === activeSuggestionIndex ? 'action.selected' : 'background.paper',
+                                borderBottom: index === Math.min(suggestions.length, 8) - 1 ? 'none' : '1px solid',
+                                borderColor: 'divider',
+                                '&:hover': { bgcolor: 'action.hover' },
+                              }}
+                            >
+                              <Stack direction='row' justifyContent='space-between' spacing={2}>
+                                <Box>
+                                  <Typography variant='subtitle2'>{item.label}</Typography>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    {item.example || item.aliases?.slice(0, 3).join(', ') || 'No example'}
+                                  </Typography>
+                                </Box>
+                                {item.unit ? <Chip size='small' label={item.unit} variant='outlined' /> : null}
+                              </Stack>
+                            </Box>
+                          ))}
+                        </Stack>
+                      </Paper>
+                    ) : null}
+                  </Box>
+
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', sm: 'center' }}>
+                    <Button
+                      variant='contained'
+                      disabled={!canRunScreenerQuery}
+                      onClick={runScreenerQuery}
+                    >
+                      {queryLoading ? 'Running Query...' : 'Run Screener Query'}
+                    </Button>
+                    <Chip
+                      size='small'
+                      label={suggestionLoading ? 'Updating suggestions...' : 'Suggestions follow cursor'}
+                      variant='outlined'
+                    />
+                    {queryUniverse ? <Chip size='small' color='primary' label={`Matched: ${queryRows.length}`} variant='outlined' /> : null}
+                  </Stack>
+                </Stack>
+              ) : (
+                <Typography variant='body2' color='text.secondary'>
+                  Run Filter for the current rules and as-of date before using the screener.
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Accordion>
+      </Grid>
+
+      {queryUniverse ? (
+        <>
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Stack direction='row' spacing={1.25} flexWrap='wrap' useFlexGap>
+                  <Chip label={`Candidates: ${queryUniverse.total_candidates || 0}`} variant='outlined' />
+                  <Chip label={`Eligible after filter: ${queryUniverse.included_count || 0}`} color='success' variant='outlined' />
+                  <Chip label={`Excluded by filter: ${queryUniverse.excluded_count || 0}`} color='error' variant='outlined' />
+                  <Chip label={`Matched query: ${queryRows.length}`} color='primary' variant='outlined' />
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Card>
+              <CardHeader title='Matched Stocks' subheader='These stocks passed the current filter and also matched the screener query.' />
+              <CardContent>
+                <TableContainer component={Paper} variant='outlined'>
+                  <Table size='small'>
                     <TableHead>
                       <TableRow>
                         <TableCell>S.No.</TableCell>
-                        <TableCell>Symbol</TableCell>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Latest Trade Date</TableCell>
-                        <TableCell>Candles Considered</TableCell>
-                        <TableCell>Rule Notes</TableCell>
+                        <TableCell>Stock</TableCell>
+                        <TableCell>Price</TableCell>
+                        <TableCell>Details</TableCell>
+                        <TableCell>Compare</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {activeRows.length ? (
-                        paginatedRows.map((row, index) => (
-                          <TableRow
-                            key={`${activeTab}-${row.master_id}`}
-                            hover
-                            sx={{ cursor: 'pointer' }}
-                            onClick={() => window.open(`/eod-graph?master_id=${row.master_id}&symbol=${encodeURIComponent(row.symbol)}`, '_blank', 'noopener,noreferrer')}
-                          >
-                            <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                            <TableCell>
-                              <Stack spacing={0.5}>
-                                <Typography variant='body2' sx={{ fontWeight: 700 }}>
-                                  {row.symbol}
-                                </Typography>
-                                <Typography variant='caption' color='text.secondary'>
-                                  {row.exchange || '-'}
-                                </Typography>
-                              </Stack>
-                            </TableCell>
-                            <TableCell>{row.name}</TableCell>
-                            <TableCell>{row.latest_trade_date || '-'}</TableCell>
-                            <TableCell>{row.candle_count_considered || 0}</TableCell>
-                            <TableCell>
-                              {row.passed ? (
-                                <Chip size='small' color='success' label='Passed all enabled rules' />
-                              ) : (
-                                <Stack spacing={1.25}>
-                                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                                    {row.failed_rule_labels.map(label => (
-                                      <Chip key={label} size='small' color='error' variant='outlined' label={label} />
-                                    ))}
+                      {queryRows.length ? (
+                        queryRows.map((row, index) => {
+                          const symbol = String(row.symbol || '')
+                          const expanded = expandedSymbol === symbol
+
+                          return (
+                            <Fragment key={symbol || String(index)}>
+                              <TableRow key={symbol || String(index)} hover>
+                                <TableCell>{index + 1}</TableCell>
+                                <TableCell>
+                                  <Stack spacing={0.5}>
+                                    <Typography variant='body2' sx={{ fontWeight: 700 }}>
+                                      {row.symbol || '-'}
+                                    </Typography>
+                                    <Typography variant='caption' color='text.secondary'>
+                                      {row.name || '-'}
+                                    </Typography>
+                                    {row.analysis?.grade ? (
+                                      <Chip size='small' label={row.analysis.grade} color={gradeColor(row.analysis.grade) as any} variant='outlined' />
+                                    ) : null}
                                   </Stack>
-                                  {Object.entries(row.rule_results || {})
-                                    .filter(([, rule]) => rule?.enabled && rule?.passed === false)
-                                    .map(([ruleId, rule]) => (
-                                      <Accordion key={ruleId} disableGutters elevation={0} sx={{ backgroundColor: 'transparent', '&:before': { display: 'none' } }}>
-                                        <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 0, minHeight: 'unset' }}>
-                                          <Stack spacing={0.5}>
-                                            <Typography variant='caption' sx={{ fontWeight: 700 }}>
-                                              {formatLabel(ruleId)}
-                                            </Typography>
-                                            <Typography variant='caption' color='text.secondary'>
-                                              {rule.reason}
-                                            </Typography>
-                                          </Stack>
-                                        </AccordionSummary>
-                                        <AccordionDetails sx={{ px: 0, pt: 0.5 }}>
-                                          <Stack spacing={0.75}>
-                                            {Object.entries(rule.parameters || {}).length ? (
-                                              <Typography variant='caption' color='text.secondary'>
-                                                Parameters: {Object.entries(rule.parameters || {})
-                                                  .map(([key, value]) => `${formatLabel(key)}=${value}`)
-                                                  .join(', ')}
-                                              </Typography>
-                                            ) : null}
-                                            {Object.entries(rule.meta || {}).map(([metaKey, metaValue]) => (
-                                              <Typography key={metaKey} variant='caption' color='text.secondary'>
-                                                {formatLabel(metaKey)}: {formatMetaValue(metaValue)}
-                                              </Typography>
-                                            ))}
-                                          </Stack>
-                                        </AccordionDetails>
-                                      </Accordion>
-                                    ))}
-                                </Stack>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))
+                                </TableCell>
+                                <TableCell>{row.current_price ?? '-'}</TableCell>
+                                <TableCell>
+                                  <Button size='small' variant='text' onClick={() => setExpandedSymbol(expanded ? null : symbol)}>
+                                    {expanded ? 'Hide details' : 'View details'}
+                                  </Button>
+                                </TableCell>
+                                <TableCell>
+                                  <Button
+                                    size='small'
+                                    variant='outlined'
+                                    onClick={() =>
+                                      window.open(
+                                        `/eod-graph/?master_id=${encodeURIComponent(String(row.master_id || ''))}&symbol=${encodeURIComponent(row.symbol || '')}`,
+                                        '_blank',
+                                        'noopener,noreferrer',
+                                      )
+                                    }
+                                  >
+                                    Compare
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                              <TableRow key={`${symbol || index}-details`}>
+                                <TableCell colSpan={5} sx={{ p: 0, borderBottom: expanded ? undefined : 'none' }}>
+                                  <Collapse in={expanded} timeout='auto' unmountOnExit>
+                                    <Box sx={{ px: 4, py: 3 }}>
+                                      <Stack spacing={1}>
+                                        {(row.search?.matches || []).map((match, matchIndex) => (
+                                          <Typography key={`${symbol}-${match.field}-${matchIndex}`} variant='caption' color={match.status === 'match' ? 'success.main' : 'text.secondary'}>
+                                            {match.field}: actual {match.formattedActual || '?'} {match.operator} {match.threshold} - {match.reason}
+                                          </Typography>
+                                        ))}
+                                      </Stack>
+                                    </Box>
+                                  </Collapse>
+                                </TableCell>
+                              </TableRow>
+                            </Fragment>
+                          )
+                        })
                       ) : (
                         <TableRow>
-                          <TableCell colSpan={6}>
-                            <Typography variant='body2' color='text.secondary'>
-                              No stocks in this section for the current run.
-                            </Typography>
+                          <TableCell colSpan={5} align='center'>
+                            No stocks matched the current screener query.
                           </TableCell>
                         </TableRow>
                       )}
                     </TableBody>
                   </Table>
                 </TableContainer>
-
-                <TablePagination
-                  component='div'
-                  count={activeRows.length}
-                  page={page}
-                  onPageChange={(_, newPage) => setPage(newPage)}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={event => {
-                    setRowsPerPage(parseInt(event.target.value, 10))
-                    setPage(0)
-                  }}
-                  rowsPerPageOptions={[25, 50, 100, 250]}
-                  sx={{ px: 0, mt: 2 }}
-                />
-
-                <Divider sx={{ my: 3 }} />
-                <Typography variant='caption' color='text.secondary'>
-                  Click any stock row to open its EOD graph in a new tab. This table now paginates the full result set from the current run.
-                </Typography>
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  spacing={1.5}
+                  alignItems={{ xs: 'stretch', sm: 'center' }}
+                  justifyContent='space-between'
+                  sx={{ mt: 3 }}
+                >
+                  <Typography variant='body2' color='text.secondary'>
+                    Create a backtesting portfolio from this exact as-of date, query, and matched watchlist.
+                  </Typography>
+                  <Button
+                    variant='contained'
+                    disabled={!canCreateBacktestingPortfolio}
+                    onClick={openCreateBacktestingDialog}
+                  >
+                    Create Backtesting Portfolio
+                  </Button>
+                </Stack>
               </CardContent>
             </Card>
-          </Grid> : null}
+          </Grid>
         </>
       ) : null}
 
-      {query.trim() && resultSectionTab === 2 ? (
-        <Grid item xs={12}>
-          <Card>
-            <CardHeader title='Screener Query Results' subheader='These stocks passed the rules above and also matched your screener query.' />
-            <CardContent>
-              {queryTimings ? (
-                <Stack direction='row' spacing={1.25} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
-                  <Chip size='small' variant='outlined' label={`Universe time: ${queryTimings.universe_duration_ms ?? 0} ms`} />
-                  <Chip size='small' variant='outlined' label={`Query time: ${queryTimings.query_duration_ms ?? 0} ms`} />
-                  <Chip size='small' color='primary' variant='outlined' label={`Total time: ${queryTimings.total_duration_ms ?? 0} ms`} />
-                  <Chip size='small' variant='outlined' label={`Included stocks used: ${queryTimings.included_stock_count ?? 0}`} />
-                  <Chip
-                    size='small'
-                    variant='outlined'
-                    label={queryTimings.used_provided_master_ids ? 'Used Phase 1 included stocks directly' : 'Universe rebuilt on backend'}
-                  />
-                </Stack>
-              ) : null}
-
-              <TableContainer component={Paper} variant='outlined' sx={{ maxHeight: 560 }}>
-                <Table size='small' stickyHeader>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>S.No.</TableCell>
-                      <TableCell>Symbol</TableCell>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Price</TableCell>
-                      <TableCell>Market Cap</TableCell>
-                      <TableCell>Score</TableCell>
-                      <TableCell>Rule Notes</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {queryRows.length ? (
-                      queryRows.map((row, index) => {
-                        const symbol = String(row.symbol || '')
-                        const expanded = expandedQuerySymbol === symbol
-                        return [
-                          <TableRow
-                            key={`query-${symbol || index}`}
-                            hover
-                            sx={{ cursor: 'pointer' }}
-                            onClick={() => window.open(`/eod-graph?master_id=${row.master_id}&symbol=${encodeURIComponent(String(row.symbol || ''))}`, '_blank', 'noopener,noreferrer')}
-                          >
-                            <TableCell>{index + 1}</TableCell>
-                            <TableCell>{row.symbol || '-'}</TableCell>
-                            <TableCell>{row.name || '-'}</TableCell>
-                            <TableCell>{row.current_price ?? '-'}</TableCell>
-                            <TableCell>{row.market_cap ?? '-'}</TableCell>
-                            <TableCell>{row.analysis?.score ?? '-'}</TableCell>
-                            <TableCell>
-                              <Button
-                                size='small'
-                                variant='text'
-                                onClick={event => {
-                                  event.stopPropagation()
-                                  setExpandedQuerySymbol(expanded ? null : symbol)
-                                }}
-                              >
-                                {(row.search?.matched_count || 0) > 0 ? `${row.search?.matched_count} clauses` : 'Details'}
-                              </Button>
-                            </TableCell>
-                          </TableRow>,
-                          <TableRow key={`query-${symbol || index}-details`}>
-                            <TableCell colSpan={7} sx={{ p: 0, borderBottom: expanded ? undefined : 'none' }}>
-                              <Accordion expanded={expanded} onChange={(_, isExpanded) => setExpandedQuerySymbol(isExpanded ? symbol : null)} disableGutters elevation={0}>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                  <Typography variant='body2'>Match details</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                  <Stack spacing={1}>
-                                    {(row.search?.matches || []).map((match, matchIndex) => (
-                                      <Typography key={`${symbol}-${match.field}-${matchIndex}`} variant='caption' color={match.status === 'match' ? 'success.main' : 'text.secondary'}>
-                                        {match.field}: actual {match.formattedActual || '?'} {match.operator} {match.threshold} — {match.reason}
-                                      </Typography>
-                                    ))}
-                                  </Stack>
-                                </AccordionDetails>
-                              </Accordion>
-                            </TableCell>
-                          </TableRow>,
-                        ]
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={7}>
-                          <Typography variant='body2' color='text.secondary'>
-                            Run the screener query above to see matching stocks here.
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </CardContent>
-          </Card>
-        </Grid>
-      ) : null}
+      <Dialog open={createBacktestOpen} onClose={() => setCreateBacktestOpen(false)} maxWidth='sm' fullWidth>
+        <DialogTitle>Create Backtesting Portfolio</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2.5} sx={{ mt: 1 }}>
+            <Alert severity='info'>
+              This will create a <strong>Backtesting Portfolio</strong> using the current historical universe query and
+              save all matched stocks into the portfolio watchlist.
+            </Alert>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} flexWrap='wrap' useFlexGap>
+              <Chip size='small' label={`As Of Date: ${asOfDate}`} variant='outlined' />
+              <Chip size='small' label={`Matched Stocks: ${matchedMasterIds.length}`} color='primary' variant='outlined' />
+            </Stack>
+            <TextField
+              fullWidth
+              label='Portfolio Name'
+              value={backtestPortfolioName}
+              onChange={event => setBacktestPortfolioName(event.target.value)}
+            />
+            <TextField
+              fullWidth
+              type='number'
+              label='Initial Fund'
+              value={backtestInitialFund}
+              onChange={event => setBacktestInitialFund(event.target.value === '' ? '' : Number(event.target.value))}
+              inputProps={{ min: 0 }}
+            />
+            <TextField fullWidth multiline minRows={4} label='Saved Query' value={query.trim()} InputProps={{ readOnly: true }} />
+            {backtestFormError ? <Alert severity='error'>{backtestFormError}</Alert> : null}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCreateBacktestOpen(false)} color='secondary'>
+            Cancel
+          </Button>
+          <Button
+            variant='contained'
+            disabled={!canCreateBacktestingPortfolio || !backtestPortfolioName.trim()}
+            onClick={handleCreateBacktestingPortfolio}
+          >
+            {creatingBacktestPortfolio ? 'Creating...' : 'Create Portfolio'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Grid>
   )
 }

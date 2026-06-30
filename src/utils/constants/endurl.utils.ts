@@ -19,11 +19,14 @@ export const ENDURL = {
 
   // Stock Endpoints
   GET_ALL_ACTIVE_STOCKS: 'ticker/activestock',
+  POST_ACTIVE_STOCK_WATCHLIST_SNAPSHOT: 'ticker/activestock/watchlist-snapshot',
+  POST_ACTIVE_STOCK_BACKTEST_ANALYTICS: 'ticker/activestock/backtest-analytics',
   GET_STOCK_BY_SYMBOL: 'ticker/stocks/symbol/:symbol',
   GET_STOCK_BY_ID: 'ticker/stocks/:id',
 
   // Historical Universe / Backtesting Phase 1
   GET_HISTORICAL_UNIVERSE_RULES: 'ticker/historical-universe/rules',
+  POST_HISTORICAL_UNIVERSE_FILTER_CACHE: 'ticker/historical-universe/filter/cache',
   POST_HISTORICAL_UNIVERSE_FILTER: 'ticker/historical-universe/filter',
 
   // Stock Fundamental
@@ -73,10 +76,11 @@ export const ENDURL = {
   GET_PORTFOLIO_TYPES: 'user/portfolio-types',
   GET_MY_PORTFOLIOS: 'user/my-portfolios',
   CREATE_PORTFOLIO: 'user/my-portfolios',
-  GET_MY_PORTFOLIO_BY_ID: 'user/my-portfoliaaaos/:id',
+  GET_MY_PORTFOLIO_BY_ID: 'user/my-portfolios/:id',
   CREATE_ORDER: 'user/order/place',
   GET_STOCK_HOLDINGS: 'user/my-portfolios/holdings',
   GET_PORTFOLIO_DETAILS: 'user/my-portfolios/:portfolioId/holdings',
+  UPDATE_BACKTEST_PORTFOLIO_META: 'user/my-portfolios/:portfolioId/backtest-meta',
   GET_PORTFOLIO_HOLDING_ORDERS: 'user/my-portfolios/:portfolioId/holdings/:activeStockId/orders',
   GET_OPEN_ORDERS: 'user/order/open/:portfolioId',
   GET_OVERVIEW: 'user/dashboard',
@@ -107,6 +111,9 @@ export const ENDURL = {
   NEWS_GENERATE_SCRIPT: 'content/news-content/generate-script',
   NEWS_CONVERT_SCRIPT_HINDI: 'content/news-content/convert-script-hindi',
   NEWS_CONVERT_SCRIPT_HINDI_GEMINI: 'content/news-content/convert-script-hindi-gemini',
+  NEWS_GEMINI_CHAT: 'content/news-content/gemini-chat',
+  NEWS_GEMINI_GROUNDED_ANSWER: 'content/news-content/gemini-grounded-answer',
+  NEWS_GOOGLE_AI_SCRAPE_ANSWER: 'content/news-content/google-ai-scrape-answer',
   NEWS_SHORTEN_SCRIPT: 'content/news-content/shorten-script',
   NEWS_SPLIT_SCRIPT: 'content/news-content/split-script',
   NEWS_GENERATE_SCENE_AUDIOS: 'content/news-content/generate-scene-audios',
@@ -173,5 +180,8 @@ export const ENDURL = {
   GET_STOCK_SEARCH_SUGGESTIONS: 'ticker/fundamentals/analysis/search/suggestions',
   POST_HISTORICAL_UNIVERSE_SEARCH: 'ticker/historical-universe/search',
   POST_HISTORICAL_UNIVERSE_SEARCH_SPLIT: 'ticker/historical-universe/search-split',
+  POST_HISTORICAL_UNIVERSE_SEARCH_SPLIT_FAST: 'ticker/historical-universe/search-split-fast',
+  POST_EOD_SYNC_DAILY_FULL_TRIGGER: 'ticker/eod/sync-daily-full-trigger',
+  GET_STOCK_SHORTS_TOPICS: 'ticker/stock-shorts/topics',
   NEWS_CONTENT_IMAGE_SEARCH: 'content/news-content/image-search'
 }

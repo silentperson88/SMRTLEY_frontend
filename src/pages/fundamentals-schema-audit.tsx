@@ -72,7 +72,8 @@ const emptySelection = (audit?: SchemaAudit | null) => {
       out[tableKey][column.key] = Boolean(bucket.matched_columns?.[column.key])
     })
   })
-  return out
+  
+return out
 }
 
 const FundamentalsSchemaAuditPage: NextPage = () => {
@@ -105,7 +106,8 @@ const FundamentalsSchemaAuditPage: NextPage = () => {
               ...tableSelection
             }
           })
-          return merged
+          
+return merged
         })
       } catch (err: any) {
         setError(err?.response?.data?.message || err?.message || 'Failed to load schema audit')
@@ -230,7 +232,8 @@ const FundamentalsSchemaAuditPage: NextPage = () => {
         const tableSelection = selection[tableKey] || {}
         const selectedCount = Object.values(tableSelection).filter(Boolean).length
         const plannedCount = bucket.planned_columns?.length || 0
-        return (
+        
+return (
           <Grid key={tableKey} item xs={12}>
             <Card>
               <CardContent>
@@ -252,7 +255,8 @@ const FundamentalsSchemaAuditPage: NextPage = () => {
                       const matched = Boolean(bucket.matched_columns?.[column.key])
                       const checked = Boolean(tableSelection[column.key])
                       const matchedColumn = bucket.matched_columns?.[column.key]
-                      return (
+                      
+return (
                         <Grid key={column.key} item xs={12} md={6} lg={4}>
                           <Card variant='outlined' sx={{ height: '100%' }}>
                             <CardContent>
